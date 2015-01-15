@@ -40,8 +40,14 @@ var ChunkReader = function(file){
     self.file = file;
 }
 window.fileSelected = function(file){
-    console.log("test");
-    var out = gzip.unzip(file.getAsBinary());
-    console.log(out);
-    new ChunkReader(out).readNextLine()
+    var reader = new FileReader();
+    reader.onload = function(e){
+        console.log(typeof reader.result);
+        console.log(reader.result);
+        var byteArray = new Uint8Array(reader.result);
+        //console.log(byteArray);
+        var out = gzip.unzip(byteArray);
+        console.log(out);
+    }
+    reader.readAsArrayBuffer(file);
 };

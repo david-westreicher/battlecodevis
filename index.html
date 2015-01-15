@@ -6,8 +6,13 @@
         <script src="bundle.js"></script>
     </head>
     <body>
-        <input type="file" id="zipfile" onchange="fileSelected(this.files[0])">
+        <input type="file" id="zipfile">
         <button>Hallo</button>
+        <script type="text/javascript">
+            document.getElementById('zipfile').onchange = function(e) {
+                fileSelected(e.srcElement.files[0]);
+            };
+        </script>
     </body>
 </html>
 
