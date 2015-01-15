@@ -6,6 +6,103 @@
 		<script src="lib/js-unzip.min.js"></script>
 		<script src="unzip.js"></script>
 		<script>
+			var ChunkParser = function(){
+				var self = this;	
+				self.tagStack = [];
+				self.currentTag = null;	
+				self.metadata = {
+					teams:[],
+					maplist:[],
+					map: '',
+					ore: ''};
+				self.parseChunk = function(chunk){
+					//console.log(chunk);			
+					for(var i=0;i<chunk.length;i++){
+						var chr = chunk[i];
+						var lastTag =(self.tagStack.length>0)?self.tagStack[self.tagStack.length-1]:null;
+						if(self.currentTag!=null){
+							if(chr=='>'){
+								//console.log(self.currentTag);
+								if(lastTag!=null && ('/'+lastTag)==self.currentTag){
+									//console.log(self.tagStack)
+									self.tagStack.pop();
+									self.closedTag(lastTag);
+									//console.log(self.tagStack)
+								}else{
+									if(self.currentTag.length>0){
+										if(self.currentTag[self.currentTag.length-1]!='/'){
+											var niceTag = self.openedTag(self.currentTag);
+											self.tagStack.push(niceTag);
+										}else{
+											self.parseTag(self.currentTag);
+										}
+									}
+								}
+								self.currentTag=null;
+							}else
+								self.currentTag+=chr;
+						}else if(chr=='<')
+							self.currentTag='';
+						else{
+							//parse content of tag
+							if(lastTag=='mapTiles')
+								self.metadata.map+=chr;
+							else if(lastTag=='int-array')
+								self.metadata.ore+=chr;
+						}
+					}
+				}
+				self.openedTag = function(tag){
+					var niceTag = self.simpleTag(tag);
+					if(niceTag=='mapTiles'){
+						self.metadata.map = '';
+					}else if(niceTag=='mapInitialOre'){
+						self.metadata.ore = '';
+					}else if(niceTag=='map'){
+						var attrs = self.getAttrs(tag);
+						console.log(attrs);
+					}
+					return niceTag;
+				}
+				self.getAttrs = function(attrStr){
+					var attrs = {}
+					var splitted = attrStr.split(' ').slice(1);
+					for(var i=0;i<splitted.length;i++){
+						var attrPair = splitted[i];
+						if(attrPair[attrPair.length-1]=='/')
+							attrPair = attrPair.slice(0,attrPair.length-1);
+						attrPair = attrPair.split('=');
+						attrs[attrPair[0]] = attrPair[1].slice(1,attrPair[1].length-1);
+					}
+					return attrs;
+				}
+				self.closedTag = function(tag){
+					if(tag=='mapTiles'){
+						console.log(self.metadata.map);
+					}else if(tag=='mapInitialOre'){
+						console.log(self.metadata.ore);
+					}else if(tag=='int-array'){
+						self.metadata.ore+='\n';
+					}
+				}
+				self.parseTag = function(tag){
+					var splittedTag = tag.trim().split(' ');
+					if(splittedTag[0]=='ser.ExtensibleMetadata'){
+						var attrs = self.getAttrs(tag);
+						if(self.metadata.teams.length==0){
+							self.metadata.teams.push(attrs['team-a']);
+							self.metadata.teams.push(attrs['team-b']);
+						}
+						if(self.metadata.maplist.length==0){
+							self.metadata.maplist.push(attrs['maps']);
+						}
+						console.log(self.metadata);
+					}
+				}
+				self.simpleTag = function(tag){
+					return tag.trim().split(' ')[0];	
+				}
+			}
 			var ChunkReader = function(file){
 				var self = this;
 				self.update = function(){
@@ -17,6 +114,7 @@
 					if(self.start<self.file.size)
 						self.reader.readAsText(self.file.slice(self.start,self.end));	
 					else{
+						console.log(self.chunkParser.tagStack)
 						console.log("EOF")
 						console.log("time: "+(new Date().getTime()-self.startTime.getTime()));
 					}
@@ -25,19 +123,27 @@
 					self.end= Math.min(self.file.size,self.end);
 				}
 				self.startTime = new Date();
+				self.chunkParser = new ChunkParser();
 				self.chunkSize = 1024;
-				self.chunkSize = 2048;
-				self.chunkSize = 4096;
+				//self.chunkSize = 2048;
+				//self.chunkSize = 4096;
+				self.chunkSize = 8192;
 				self.start = 0;
 				self.end = self.chunkSize;
 				self.reader = new FileReader();
 				self.reader.onload = function(e){
 					//console.log(self.reader.result);
+					self.chunkParser.parseChunk(self.reader.result);
 					self.readNextLine();
 				}
 				self.file = file;
 			}
-			function fileSelected(file){
+			
+			function parse(file){
+				console.log("start parsing");
+				new ChunkReader(file).readNextLine()
+			}
+			function unzip(file){
 				//new ChunkReader(file).readNextLine()
 				var reader = new FileReader();
 				reader.onload = function(e){
@@ -52,7 +158,7 @@
 		</script>
 	</head>
 	<body>
-		<input type="file" id="zipfile" onchange="fileSelected(this.files[0])">
+		<input type="file" id="zipfile" onchange="parse(this.files[0])">
 		<button onClick="parseZip()">Hallo</button>
 	</body>
 </html>
