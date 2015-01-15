@@ -38,7 +38,16 @@
 				self.file = file;
 			}
 			function fileSelected(file){
-				new ChunkReader(file).readNextLine()
+				//new ChunkReader(file).readNextLine()
+				var reader = new FileReader();
+				reader.onload = function(e){
+					console.log(typeof reader.result);
+					console.log(reader.result);
+					var byteArray = new Uint8Array(reader.result);
+					//console.log(byteArray);
+					unzip(byteArray);
+				}
+				reader.readAsArrayBuffer(file);
 			}
 		</script>
 	</head>

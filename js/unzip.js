@@ -1,3 +1,92 @@
+var ID1 = 0x1F,	ID2 = 0x8B;
+var compressionMethods = { 'deflate': 8};
+
+var osMap = {
+			'fat': 0, // FAT file system (DOS, OS/2, NT) + PKZIPW 2.50 VFAT, NTFS
+			'amiga': 1, // Amiga
+			'vmz': 2, // VMS (VAX or Alpha AXP)
+			'unix': 3, // Unix
+			'vm/cms': 4, // VM/CMS
+			'atari': 5, // Atari
+			'hpfs': 6, // HPFS file system (OS/2, NT 3.x)
+			'macintosh': 7, // Macintosh
+			'z-system': 8, // Z-System
+			'cplm': 9, // CP/M
+			'tops-20': 10, // TOPS-20
+			'ntfs': 11, // NTFS file system (NT)
+			'qdos': 12, // SMS/QDOS
+			'acorn': 13, // Acorn RISC OS
+			'vfat': 14, // VFAT file system (Win95, NT)
+			'vms': 15, // MVS (code also taken for PRIMOS)
+			'beos': 16, // BeOS (BeBox or PowerMac)
+			'tandem': 17, // Tandem/NSK
+			'theos': 18 // THEOS
+		}
+var possibleFlags = {
+			'FTEXT': 0x01,
+			'FHCRC': 0x02,
+			'FEXTRA': 0x04,
+			'FNAME': 0x08,
+			'FCOMMENT': 0x10
+		}
+
+function readByte(arr) {
+		return arr.shift();
+	}
+
+	function readShort(arr) {
+		return arr.shift() | (arr.shift() << 8);
+	}
+
+	function readLong(arr) {
+		var n1 = readShort(arr),
+			n2 = readShort(arr);
+
+		// JavaScript can't handle bits in the position 32
+		// we'll emulate this by removing the left-most bit (if it exists)
+		// and add it back in via multiplication, which does work
+		if (n2 > 32768) {
+			n2 -= 32768;
+
+			return ((n2 << 16) | n1) + 32768 * Math.pow(2, 16);
+		}
+
+		return (n2 << 16) | n1;
+	}
+
+	function readString(arr) {
+		var charArr = [];
+
+		// turn all bytes into chars until the terminating null
+		while (arr[0] !== 0) {
+			charArr.push(String.fromCharCode(arr.shift()));
+		}
+
+		// throw away terminating null
+		arr.shift();
+
+		// join all characters into a cohesive string
+		return charArr.join('');
+	}
+
+	/*
+	 * Reads n number of bytes and return as an array.
+	 *
+	 * @param arr- Array of bytes to read from
+	 * @param n- Number of bytes to read
+	 */
+	function readBytes(arr, n) {
+		var i, ret = [];
+		for (i = 0; i < n; i += 1) {
+			ret.push(arr.shift());
+		}
+
+		return ret;
+	}
+
+
+
+
 function unzip(data, options) {
 		// start with a copy of the array
 		var arr = Array.prototype.slice.call(data, 0),
