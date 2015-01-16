@@ -83,16 +83,33 @@
 				document.body.appendChild( container );
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 4000;
+				camera.position.y = -2000;
 				scene = new THREE.Scene();
 				objects = [];
 
 				var lineGeom = new THREE.Geometry();
 				for(var i=0;i<2*100;i++){
-					lineGeom.vertices.push(new THREE.Vector3(Math.random()*400,Math.random()*400,0));
+					lineGeom.vertices.push(new THREE.Vector3(0,0,0));
 					lineGeom.colors.push(new THREE.Color(0x00ff00));
 				}
 				lines = new THREE.Line(lineGeom,new THREE.LineBasicMaterial({linewidth:3,vertexColors:THREE.VertexColors}),THREE.LinePieces);
 				scene.add(lines);
+
+				var gridGeom = new THREE.Geometry();
+				var gridNum = 30;
+				var startGrid = -gridNum;
+				var gridSize = 80;
+				for(var x=-gridNum+1;x<gridNum;x++){
+					gridGeom.vertices.push(new THREE.Vector3(x*gridSize,gridNum*gridSize,0));
+					gridGeom.vertices.push(new THREE.Vector3(x*gridSize,-gridNum*gridSize,0));
+				}
+				for(var y=-gridNum+1;y<gridNum;y++){
+					gridGeom.vertices.push(new THREE.Vector3(gridNum*gridSize,y*gridSize,0));
+					gridGeom.vertices.push(new THREE.Vector3(-gridNum*gridSize,y*gridSize,0));
+				}
+				var grid = new THREE.Line(gridGeom,new THREE.LineBasicMaterial({color:0xaaaaaa}),THREE.LinePieces);
+				scene.add(grid);
+
 
 				normalMaterial = new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } );
 				redMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
@@ -102,8 +119,9 @@
 					geometry.computeVertexNormals();
 					for ( var i = 0; i < 500; i ++ ) {
 						var mesh = new THREE.Mesh( geometry, normalMaterial );
+						mesh.position.z = 40;
 						mesh.visible = false;
-						mesh.scale.x = mesh.scale.y = mesh.scale.z = 50;
+						mesh.scale.x = mesh.scale.y = mesh.scale.z = 40;
 						objects.push( mesh );
 						scene.add( mesh );
 					}
@@ -141,8 +159,8 @@
 			}
 
 			function onDocumentMouseMove(event) {
-				mouseX = ( event.clientX - windowHalfX ) * 10;
-				mouseY = ( event.clientY - windowHalfY ) * 10;
+				mouseX = ( event.clientX - windowHalfX );
+				mouseY = ( event.clientY - windowHalfY );
 			}
 
 			function animate() {
@@ -166,7 +184,14 @@
 				}
 				if((frameNum++)%1==0)
 					simulate();
+
+				var cameraAngle = (mouseY/windowHalfY)*Math.PI/2.0;
+				console.log(cameraAngle);
+				camera.position.y = Math.sin(cameraAngle)*4500;
+				camera.position.z = Math.cos(cameraAngle)*4500;
 				camera.lookAt( scene.position );
+
+
 				var simulines = simulationData.lines;
 				var redCol = new THREE.Color(0xff0000);
 				var blueCol = new THREE.Color(0x0000ff);
