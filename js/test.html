@@ -8,18 +8,26 @@
 		<script src="unzip.js"></script>
 		<script src="parser.js"></script>
 		<script>
-			var simulationData = {};
-			var replayData = null;
-			var currentFrame = 0;
+			var simulationData  = {
+					robots:{},
+					lines:[]
+				};
+;
+			var replayData;
+			var currentFrame;
 
 			function parse(file){
 				replayData = (new Parser()).getData(file);
+				currentFrame = 0;
+				simulationData.robots = {};
 			}
+
 			function simulate(){
 				if(replayData==null || replayData.maplist.length==0 || replayData.maplist[0].frames.length<=currentFrame+1)
 					return;
 				var frame = replayData.maplist[0].frames[currentFrame];
 				var sigs = frame.signals;
+				simulationData.lines = [];
 				for(var i =0;i<sigs.length;i++){
 					var sig = sigs[i];
 					if(sig.type=="spawn"){
@@ -28,12 +36,15 @@
 							loc: sig.loc,
 							team: sig.team
 						};
-						simulationData[robot.id] = robot;
+						simulationData.robots[robot.id] = robot;
 					}else if(sig.type=="move"){
-						var robot = simulationData[sig.robotID];
+						var robot = simulationData.robots[sig.robotID];
 						robot.loc = sig.loc;
+					}else if(sig.type=="attack"){
+						var robot = simulationData.robots[sig.robotID];
+						simulationData.lines.push([robot.loc,sig.loc,robot.team]);
 					}else if(sig.type=="death"){
-						delete simulationData[sig.robotID];
+						delete simulationData.robots[sig.robotID];
 					}
 				}
 				currentFrame++;
@@ -55,11 +66,12 @@
 		<script>
 			var container, stats;
 			var camera, scene, renderer;
-			var objects;
-			var redMaterial,blueMaterial;
+			var objects,lines;
+			var redMaterial,blueMaterial,normalMaterial;
 			var mouseX = 0, mouseY = 0;
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
+			var frameNum = 0;
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 			init();
 			animate();
@@ -68,33 +80,32 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = 3000;
+				camera.position.z = 4000;
 				scene = new THREE.Scene();
 				objects = [];
-				var material = new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } );
+
+				var lineGeom = new THREE.Geometry();
+				for(var i=0;i<2*100;i++){
+					lineGeom.vertices.push(new THREE.Vector3(Math.random()*400,Math.random()*400,0));
+					lineGeom.colors.push(new THREE.Color(0x00ff00));
+				}
+				lines = new THREE.Line(lineGeom,new THREE.LineBasicMaterial({linewidth:3,vertexColors:THREE.VertexColors}),THREE.LinePieces);
+				scene.add(lines);
+
+				normalMaterial = new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } );
 				redMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 				blueMaterial = new THREE.MeshBasicMaterial( { color: 0x0000ff } );
 				var loader = new THREE.JSONLoader();
 				loader.load( 'obj/Suzanne.js', function ( geometry ) {
-
 					geometry.computeVertexNormals();
-
 					for ( var i = 0; i < 500; i ++ ) {
-
-						var mesh = new THREE.Mesh( geometry, material );
-
-						mesh.position.x = 8000 + 4000;
-						mesh.position.y = 8000 + 4000;
-						mesh.position.z = 0;
+						var mesh = new THREE.Mesh( geometry, normalMaterial );
+						mesh.visible = false;
 						mesh.scale.x = mesh.scale.y = mesh.scale.z = 50;
-
 						objects.push( mesh );
-
 						scene.add( mesh );
-
 					}
-
-				} );
+				});
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor( 0xffffff );
@@ -129,17 +140,55 @@
 				stats.update();
 			}
 
+			function locToMap(loc){
+				var mapLoc = [0,0];
+				var map = replayData.maplist[0];
+				mapLoc[0] = (loc[0]-map.originX-map.width/2)*80;
+				mapLoc[1] = -(loc[1]-map.originY-map.height/2)*80;
+				return mapLoc;
+			}
+
 			function render() {
-				simulate();
+				if((frameNum++)%1==0)
+					simulate();
 				camera.lookAt( scene.position );
+				var simulines = simulationData.lines;
+				var redCol = new THREE.Color(0xff0000);
+				var blueCol = new THREE.Color(0x0000ff);
+				for(var i=0;i<lines.geometry.vertices.length;i+=2){
+					if(i<simulines.length*2){
+						var start = locToMap(simulines[i/2][0]);
+						var end = locToMap(simulines[i/2][1]);
+						var col = simulines[i/2][2]=='A'?redCol:blueCol;
+						lines.geometry.vertices[i].set(start[0],start[1],0);	
+						lines.geometry.vertices[i+1].set(end[0],end[1],0);	
+						lines.geometry.colors[i].set(col);	
+						lines.geometry.colors[i+1].set(col);	
+					}else{
+						lines.geometry.vertices[i].set(0,0,0);
+						lines.geometry.vertices[i+1].set(0,0,0);
+					}
+				}
+				lines.geometry.verticesNeedUpdate = true;
+				lines.geometry.colorsNeedUpdate = true;
+
 				var meshi = 0;
-				for (var id in simulationData){
-					var robot = simulationData[id];
-					var map = replayData.maplist[0];
-					objects[meshi].position.x = (robot.loc[0]-map.originX-map.width/2)*80;
-					objects[meshi].position.y = -(robot.loc[1]-map.originY-map.height/2)*80;
+				for (var id in simulationData.robots){
+					if(frameNum==1000)
+						console.log(id);
+					var robot = simulationData.robots[id];
+					var mapLoc = locToMap(robot.loc);
+					objects[meshi].position.x = mapLoc[0];
+					objects[meshi].position.y = mapLoc[1];
 					objects[meshi].material = (robot.team=='A')?redMaterial:blueMaterial;
+					objects[meshi].visible = true;
 					meshi++;
+				}
+				for(var i=meshi;i<objects.length;i++){
+					objects[i].position.x = 0;
+					objects[i].position.y = 0;
+					objects[i].material = normalMaterial;
+					objects[i].visible = false;
 				}
 				renderer.render( scene, camera );
 			}

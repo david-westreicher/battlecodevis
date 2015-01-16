@@ -100,6 +100,14 @@ var ChunkParser = function(){
 				loc:self.parseLoc(attrs['newLoc'])
 			};
 			self.currentSignals.push(signal);
+		}else if(tagName=='sig.AttackSignal'){
+			var attrs = self.getAttrs(tag);
+			var signal = {
+				type:'attack',
+				robotID:parseInt(attrs['robotID']),
+				loc:self.parseLoc(attrs['targetLoc'])
+			};
+			self.currentSignals.push(signal);
 		}else if(tagName=='ser.RoundStats'){
 			var maplist = self.metadata.maplist;
 			var frames = maplist[maplist.length-1].frames;
