@@ -8,62 +8,145 @@
 		<script>
 			var ChunkParser = function(){
 				var self = this;	
+				self.lastTag=null;
 				self.tagStack = [];
 				self.currentTag = null;	
 				self.metadata = {
 					teams:[],
 					maplist:[],
-					map: '',
-					ore: ''};
+				};
+				self.currentmap = null;
 				self.parseChunk = function(chunk){
 					//console.log(chunk);			
 					for(var i=0;i<chunk.length;i++){
 						var chr = chunk[i];
-						var lastTag =(self.tagStack.length>0)?self.tagStack[self.tagStack.length-1]:null;
 						if(self.currentTag!=null){
+							//currently parsing inside the tag (<?>)
 							if(chr=='>'){
-								//console.log(self.currentTag);
-								if(lastTag!=null && ('/'+lastTag)==self.currentTag){
-									//console.log(self.tagStack)
+								//end of the tag reached
+								if(self.lastTag!=null && ('/'+self.lastTag)==self.currentTag){
+									//this is a closing tag (i.e. </map>)
 									self.tagStack.pop();
-									self.closedTag(lastTag);
-									//console.log(self.tagStack)
+									self.closedTag(self.lastTag);
+									self.lastTag =(self.tagStack.length>0)?self.tagStack[self.tagStack.length-1]:null;
 								}else{
+									//this tag is an opening tag or single tag (i.e. <map> or <map/>)
 									if(self.currentTag.length>0){
 										if(self.currentTag[self.currentTag.length-1]!='/'){
-											var niceTag = self.openedTag(self.currentTag);
-											self.tagStack.push(niceTag);
+											// i.e. <map>
+											var tagname = self.openedTag(self.currentTag);
+											self.tagStack.push(tagname);
+											self.lastTag =(self.tagStack.length>0)?self.tagStack[self.tagStack.length-1]:null;
 										}else{
-											self.parseTag(self.currentTag);
+											// single tag (i.e. <map/>)
+											self.parseSingleTag(self.currentTag);
 										}
 									}
 								}
 								self.currentTag=null;
 							}else
+								//haven't reached end of the tag yet
 								self.currentTag+=chr;
 						}else if(chr=='<')
+							//a new tag has begun
 							self.currentTag='';
-						else{
-							//parse content of tag
-							if(lastTag=='mapTiles')
-								self.metadata.map+=chr;
-							else if(lastTag=='int-array')
-								self.metadata.ore+=chr;
+						else if(chr!=' '&&chr!='\n'){
+							//we are between the opening and ending tag (=content)
+							self.parseContent(self.lastTag,chr);
 						}
 					}
 				}
-				self.openedTag = function(tag){
-					var niceTag = self.simpleTag(tag);
-					if(niceTag=='mapTiles'){
-						self.metadata.map = '';
-					}else if(niceTag=='mapInitialOre'){
-						self.metadata.ore = '';
-					}else if(niceTag=='map'){
-						var attrs = self.getAttrs(tag);
-						console.log(attrs);
-					}
-					return niceTag;
+
+				self.parseContent = function(tag,character){
+					//parse map tiles and ores
+					if(tag=='mapTiles')
+						self.currentmap.tiles+=character;
+					else if(tag=='int-array')
+						self.currentmap.ore+=character;
 				}
+
+				self.openedTag = function(tag){
+					var tagName = self.getTagName(tag);
+					if(tagName=='map'){
+						//parse map meta data
+						var attrs = self.getAttrs(tag);
+						var map ={
+							width:parseInt(attrs['mapWidth']),
+							height:parseInt(attrs['mapHeight']),
+							originX:parseInt(attrs['mapOriginX']),
+							originY:parseInt(attrs['mapOriginY']),
+							name:attrs['mapName'],
+							tiles:'',
+							ore:'',
+							frames:[]
+						};
+						self.currentmap = map;
+						self.metadata.maplist.push(map);
+					}
+					if(tagName=='ser.RoundDelta'){
+						var signals = [];
+						var maplist = self.metadata.maplist;
+						var frame = {
+							signals:[],
+							score:{A:0,B:0}
+						}
+						self.currentSignals = frame.signals;
+						maplist[maplist.length-1].frames.push(frame); 
+					}
+					return tagName;
+				}
+
+				self.closedTag = function(tag){
+				}
+				
+				self.parseSingleTag = function(tag){
+					//parse a single tag with attributes (i.e. <map mapWidth='231'/>)
+					var tagName = self.getTagName(tag);
+					if(tagName=='ser.ExtensibleMetadata'){
+						//parse team names
+						var attrs = self.getAttrs(tag);
+						if(self.metadata.teams.length==0){
+							self.metadata.teams.push(attrs['team-a']);
+							self.metadata.teams.push(attrs['team-b']);
+						}
+						console.log(self.metadata);
+					}
+					if(tagName=='ser.RoundStats'){
+						var maplist = self.metadata.maplist;
+						var frames = maplist[maplist.length-1].frames;
+						var frame = frames[frames.length-1];
+						var points = self.getAttrs(tag)['points'].split(',');
+						frame.score.A =points[0]; 
+						frame.score.B =points[1]; 
+					}
+					if(tagName=='sig.SpawnSignal'){
+						var attrs = self.getAttrs(tag);
+						var signal = {
+							type:'spawn',
+							robotID:parseInt(attrs['robotID']),
+							loc:self.parseLoc(attrs['loc']),
+							robotType:attrs['type'],
+							team:attrs['team']
+						};
+						self.currentSignals.push(signal);
+					}
+					if(tagName=='sig.MovementSignal'){
+						var attrs = self.getAttrs(tag);
+						var signal = {
+							type:'move',
+							robotID:parseInt(attrs['robotID']),
+							loc:self.parseLoc(attrs['newLoc'])
+						};
+						self.currentSignals.push(signal);
+					}
+				}
+
+				self.parseLoc = function(str){
+					var nums = str.split(',');	
+					nums = [parseInt(nums[0]),parseInt(nums[1])];
+					return nums;
+				}
+
 				self.getAttrs = function(attrStr){
 					var attrs = {}
 					var splitted = attrStr.split(' ').slice(1);
@@ -76,40 +159,14 @@
 					}
 					return attrs;
 				}
-				self.closedTag = function(tag){
-					if(tag=='mapTiles'){
-						console.log(self.metadata.map);
-					}else if(tag=='mapInitialOre'){
-						console.log(self.metadata.ore);
-					}else if(tag=='int-array'){
-						self.metadata.ore+='\n';
-					}
-				}
-				self.parseTag = function(tag){
-					var splittedTag = tag.trim().split(' ');
-					if(splittedTag[0]=='ser.ExtensibleMetadata'){
-						var attrs = self.getAttrs(tag);
-						if(self.metadata.teams.length==0){
-							self.metadata.teams.push(attrs['team-a']);
-							self.metadata.teams.push(attrs['team-b']);
-						}
-						if(self.metadata.maplist.length==0){
-							self.metadata.maplist.push(attrs['maps']);
-						}
-						console.log(self.metadata);
-					}
-				}
-				self.simpleTag = function(tag){
+
+				self.getTagName = function(tag){
+					//return the name of the tag without attributes
 					return tag.trim().split(' ')[0];	
 				}
 			}
 			var ChunkReader = function(file){
 				var self = this;
-				self.update = function(){
-					console.log(self.start);
-					console.log(self.end);
-					console.log(self.file);
-				}
 				self.readNextLine = function(){
 					if(self.start<self.file.size)
 						self.reader.readAsText(self.file.slice(self.start,self.end));	
@@ -124,10 +181,13 @@
 				}
 				self.startTime = new Date();
 				self.chunkParser = new ChunkParser();
-				self.chunkSize = 1024;
+				//self.chunkSize = 1024;
 				//self.chunkSize = 2048;
 				//self.chunkSize = 4096;
-				self.chunkSize = 8192;
+				//self.chunkSize = 8192;
+				//self.chunkSize = 16384;
+				self.chunkSize = 65536;
+				self.chunkSize = 262144;
 				self.start = 0;
 				self.end = self.chunkSize;
 				self.reader = new FileReader();
