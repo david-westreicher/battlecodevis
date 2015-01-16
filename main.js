@@ -41,15 +41,14 @@ var ChunkReader = function(file){
 }
 window.fileSelected = function(file){
     var reader = new FileReader();
+    var data = null;
     reader.onload = function(e){
-        console.log(typeof reader.result);
-        console.log(reader.result);
         var byteArray = new Uint8Array(reader.result);
-        // console.log(byteArray);
         var start = new Date().getTime();
-        var out = gzip.unzip(byteArray);
+        data = gzip.unzip(byteArray);
         var end = new Date().getTime();
         console.log('unzip execution time: ' + (end - start));
     }
     reader.readAsArrayBuffer(file);
+    return data;
 };
