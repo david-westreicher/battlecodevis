@@ -74,6 +74,8 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 			var frameNum = 0;
+			var redCol = new THREE.Color(0xff0000);
+			var blueCol = new THREE.Color(0x0000ff);
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 			init();
 			animate();
@@ -81,9 +83,8 @@
 			function init() {
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = 4000;
-				camera.position.y = -2000;
+				camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 1500;
 				scene = new THREE.Scene();
 				objects = [];
 
@@ -165,6 +166,14 @@
 
 			function animate() {
 				requestAnimationFrame( animate );
+
+				if(parseFile!=null){
+					parse(parseFile);
+					parseFile = null;
+				}
+				if((frameNum++)%1==0)
+					simulate();
+
 				render();
 				stats.update();
 			}
@@ -178,29 +187,22 @@
 			}
 
 			function render() {
-				if(parseFile!=null){
-					parse(parseFile);
-					parseFile = null;
-				}
-				if((frameNum++)%1==0)
-					simulate();
-
-				var cameraAngle = (mouseY/windowHalfY)*Math.PI/2.0;
-				console.log(cameraAngle);
-				camera.position.y = Math.sin(cameraAngle)*4500;
-				camera.position.z = Math.cos(cameraAngle)*4500;
+				//update camera
+				var cameraAngle = (mouseX/windowHalfX)*Math.PI*2;
+				var cameraRadius = 2500;
+				camera.position.x = Math.sin(cameraAngle)*cameraRadius;
+				camera.position.y = Math.cos(cameraAngle)*cameraRadius;
+				camera.up.set(0,0,1);
 				camera.lookAt( scene.position );
 
-
+				//draw shoot lines
 				var simulines = simulationData.lines;
-				var redCol = new THREE.Color(0xff0000);
-				var blueCol = new THREE.Color(0x0000ff);
 				for(var i=0;i<lines.geometry.vertices.length;i+=2){
 					if(i<simulines.length*2){
 						var start = locToMap(simulines[i/2][0]);
 						var end = locToMap(simulines[i/2][1]);
 						var col = simulines[i/2][2]=='A'?redCol:blueCol;
-						lines.geometry.vertices[i].set(start[0],start[1],0);	
+						lines.geometry.vertices[i].set(start[0],start[1],80);	
 						lines.geometry.vertices[i+1].set(end[0],end[1],0);	
 						lines.geometry.colors[i].set(col);	
 						lines.geometry.colors[i+1].set(col);	
@@ -212,6 +214,7 @@
 				lines.geometry.verticesNeedUpdate = true;
 				lines.geometry.colorsNeedUpdate = true;
 
+				//update meshes
 				var meshi = 0;
 				for (var id in simulationData.robots){
 					var robot = simulationData.robots[id];
@@ -225,6 +228,7 @@
 				for(var i=meshi;i<objects.length;i++){
 					objects[i].visible = false;
 				}
+
 				renderer.render( scene, camera );
 			}
 
