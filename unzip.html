@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>zip test</title>
+    <script src="zipbundle.js"></script>
+</head>
+<body>
+    <input type="file" id="zipfile">
+    <script type="text/javascript">
+        document.getElementById('zipfile').onchange = function(e) {
+            unzip(e.srcElement.files[0]);
+        };
+    </script>
+</body>
+<script type="text/javascript">
+</script>
+</html>
