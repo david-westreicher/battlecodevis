@@ -37,10 +37,9 @@
 											var tagname = self.openedTag(self.currentTag);
 											self.tagStack.push(tagname);
 											self.lastTag =(self.tagStack.length>0)?self.tagStack[self.tagStack.length-1]:null;
-										}else{
+										}else
 											// single tag (i.e. <map/>)
 											self.parseSingleTag(self.currentTag);
-										}
 									}
 								}
 								self.currentTag=null;
@@ -50,10 +49,9 @@
 						}else if(chr=='<')
 							//a new tag has begun
 							self.currentTag='';
-						else if(chr!=' '&&chr!='\n'){
+						else if(chr!=' '&&chr!='\n')
 							//we are between the opening and ending tag (=content)
 							self.parseContent(self.lastTag,chr);
-						}
 					}
 				}
 
@@ -67,7 +65,16 @@
 
 				self.openedTag = function(tag){
 					var tagName = self.getTagName(tag);
-					if(tagName=='map'){
+					if(tagName=='ser.RoundDelta'){
+						var signals = [];
+						var maplist = self.metadata.maplist;
+						var frame = {
+							signals:[],
+							score:{A:0,B:0}
+						}
+						self.currentSignals = frame.signals;
+						maplist[maplist.length-1].frames.push(frame); 
+					}else if(tagName=='map'){
 						//parse map meta data
 						var attrs = self.getAttrs(tag);
 						var map ={
@@ -82,17 +89,7 @@
 						};
 						self.currentmap = map;
 						self.metadata.maplist.push(map);
-					}
-					if(tagName=='ser.RoundDelta'){
-						var signals = [];
-						var maplist = self.metadata.maplist;
-						var frame = {
-							signals:[],
-							score:{A:0,B:0}
-						}
-						self.currentSignals = frame.signals;
-						maplist[maplist.length-1].frames.push(frame); 
-					}
+					} 
 					return tagName;
 				}
 
@@ -102,24 +99,22 @@
 				self.parseSingleTag = function(tag){
 					//parse a single tag with attributes (i.e. <map mapWidth='231'/>)
 					var tagName = self.getTagName(tag);
-					if(tagName=='ser.ExtensibleMetadata'){
-						//parse team names
+					if(tagName=='sig.MovementSignal'){
 						var attrs = self.getAttrs(tag);
-						if(self.metadata.teams.length==0){
-							self.metadata.teams.push(attrs['team-a']);
-							self.metadata.teams.push(attrs['team-b']);
-						}
-						console.log(self.metadata);
-					}
-					if(tagName=='ser.RoundStats'){
+						var signal = {
+							type:'move',
+							robotID:parseInt(attrs['robotID']),
+							loc:self.parseLoc(attrs['newLoc'])
+						};
+						self.currentSignals.push(signal);
+					}else if(tagName=='ser.RoundStats'){
 						var maplist = self.metadata.maplist;
 						var frames = maplist[maplist.length-1].frames;
 						var frame = frames[frames.length-1];
 						var points = self.getAttrs(tag)['points'].split(',');
 						frame.score.A =points[0]; 
 						frame.score.B =points[1]; 
-					}
-					if(tagName=='sig.SpawnSignal'){
+					}else if(tagName=='sig.SpawnSignal'){
 						var attrs = self.getAttrs(tag);
 						var signal = {
 							type:'spawn',
@@ -129,15 +124,14 @@
 							team:attrs['team']
 						};
 						self.currentSignals.push(signal);
-					}
-					if(tagName=='sig.MovementSignal'){
+					}else if(tagName=='ser.ExtensibleMetadata'){
+						//parse team names
 						var attrs = self.getAttrs(tag);
-						var signal = {
-							type:'move',
-							robotID:parseInt(attrs['robotID']),
-							loc:self.parseLoc(attrs['newLoc'])
-						};
-						self.currentSignals.push(signal);
+						if(self.metadata.teams.length==0){
+							self.metadata.teams.push(attrs['team-a']);
+							self.metadata.teams.push(attrs['team-b']);
+						}
+						console.log(self.metadata);
 					}
 				}
 
