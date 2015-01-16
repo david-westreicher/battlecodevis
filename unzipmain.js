@@ -1,5 +1,6 @@
 var pako = require('pako');
 
+window.pako = pako;
 window.unzip = function(file){
     var reader = new FileReader();
     reader.onload = function(e){
