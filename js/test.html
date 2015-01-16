@@ -15,11 +15,13 @@
 ;
 			var replayData;
 			var currentFrame;
+			var parseFile = null;
 
 			function parse(file){
 				replayData = (new Parser()).getData(file);
 				currentFrame = 0;
 				simulationData.robots = {};
+				simulationData.lines = [];
 			}
 
 			function simulate(){
@@ -118,6 +120,15 @@
 				stats.domElement.style.top = '0px';
 				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
+
+				var fileChooser = document.createElement('input'); 
+				fileChooser.style.position = 'absolute';
+				fileChooser.style.top = '0px';
+				fileChooser.style.left = '80px';
+				fileChooser.style.zIndex = 100;
+				fileChooser.type = 'file';
+				fileChooser.onchange = function(){parseFile=this.files[0];};
+				container.appendChild(fileChooser);
 				window.addEventListener( 'resize', onWindowResize, false );
 			}
 
@@ -149,6 +160,10 @@
 			}
 
 			function render() {
+				if(parseFile!=null){
+					parse(parseFile);
+					parseFile = null;
+				}
 				if((frameNum++)%1==0)
 					simulate();
 				camera.lookAt( scene.position );
@@ -174,8 +189,6 @@
 
 				var meshi = 0;
 				for (var id in simulationData.robots){
-					if(frameNum==1000)
-						console.log(id);
 					var robot = simulationData.robots[id];
 					var mapLoc = locToMap(robot.loc);
 					objects[meshi].position.x = mapLoc[0];
@@ -185,16 +198,12 @@
 					meshi++;
 				}
 				for(var i=meshi;i<objects.length;i++){
-					objects[i].position.x = 0;
-					objects[i].position.y = 0;
-					objects[i].material = normalMaterial;
 					objects[i].visible = false;
 				}
 				renderer.render( scene, camera );
 			}
 
 		</script>
-		<input type="file" id="zipfile" onchange="parse(this.files[0])">
 	</body>
 </html>
 

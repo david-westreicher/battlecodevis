@@ -139,7 +139,6 @@ var ChunkParser = function(){
 				self.metadata.teams.push(attrs['team-a']);
 				self.metadata.teams.push(attrs['team-b']);
 			}
-			console.log(self.metadata);
 		}
 	}
 
@@ -173,9 +172,9 @@ var ChunkReader = function(file){
 		if(self.start<self.file.size)
 			self.reader.readAsText(self.file.slice(self.start,self.end));	
 		else{
-			console.log(self.chunkParser.tagStack)
-			console.log("EOF")
-			console.log("time: "+(new Date().getTime()-self.startTime.getTime()));
+			if(self.chunkParser.tagStack.length!=0)
+				console.log("something went terribly wrong while parsing :(");
+			console.log("parsing finished, time: "+(new Date().getTime()-self.startTime.getTime())+"ms")
 		}
 		self.start+=self.chunkSize;
 		self.end+=self.chunkSize;
