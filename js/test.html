@@ -25,12 +25,15 @@
 					if(sig.type=="spawn"){
 						var robot = {
 							id:sig.robotID,
-							loc: sig.loc
+							loc: sig.loc,
+							team: sig.team
 						};
 						simulationData[robot.id] = robot;
 					}else if(sig.type=="move"){
 						var robot = simulationData[sig.robotID];
 						robot.loc = sig.loc;
+					}else if(sig.type=="death"){
+						delete simulationData[sig.robotID];
 					}
 				}
 				currentFrame++;
@@ -51,38 +54,26 @@
 		<script src="lib/stats.min.js"></script>
 		<script>
 			var container, stats;
-
 			var camera, scene, renderer;
-
 			var objects;
-
+			var redMaterial,blueMaterial;
 			var mouseX = 0, mouseY = 0;
-
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
-
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
-			var frame = 0;
 			init();
 			animate();
 
-
 			function init() {
-
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
-
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 3000;
-				camera.position.y = 500;
-
 				scene = new THREE.Scene();
-
 				objects = [];
-
 				var material = new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } );
-
+				redMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+				blueMaterial = new THREE.MeshBasicMaterial( { color: 0x0000ff } );
 				var loader = new THREE.JSONLoader();
 				loader.load( 'obj/Suzanne.js', function ( geometry ) {
 
@@ -116,62 +107,41 @@
 				stats.domElement.style.top = '0px';
 				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
-
-				//
-
 				window.addEventListener( 'resize', onWindowResize, false );
-
 			}
 
 			function onWindowResize() {
-
 				windowHalfX = window.innerWidth / 2;
 				windowHalfY = window.innerHeight / 2;
-
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
-
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 			}
 
 			function onDocumentMouseMove(event) {
-
 				mouseX = ( event.clientX - windowHalfX ) * 10;
 				mouseY = ( event.clientY - windowHalfY ) * 10;
-
 			}
 
-			//
-
 			function animate() {
-
 				requestAnimationFrame( animate );
-
 				render();
 				stats.update();
-
 			}
 
 			function render() {
-				if(frame%10==0)
-					simulate();
-
-				//camera.position.x += ( mouseX - camera.position.x ) * .05;
-				//camera.position.y += ( - mouseY - camera.position.y ) * .05;
+				simulate();
 				camera.lookAt( scene.position );
-
 				var meshi = 0;
 				for (var id in simulationData){
 					var robot = simulationData[id];
 					var map = replayData.maplist[0];
 					objects[meshi].position.x = (robot.loc[0]-map.originX-map.width/2)*80;
-					objects[meshi].position.y = (robot.loc[1]-map.originY-map.height/2)*80;
+					objects[meshi].position.y = -(robot.loc[1]-map.originY-map.height/2)*80;
+					objects[meshi].material = (robot.team=='A')?redMaterial:blueMaterial;
 					meshi++;
 				}
-
 				renderer.render( scene, camera );
-				frame++;
 			}
 
 		</script>

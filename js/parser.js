@@ -89,6 +89,7 @@ var ChunkParser = function(){
 	}
 	
 	self.parseSingleTag = function(tag){
+		//in demo 1217 in line 3102
 		//parse a single tag with attributes (i.e. <map mapWidth='231'/>)
 		var tagName = self.getTagName(tag);
 		if(tagName=='sig.MovementSignal'){
@@ -114,6 +115,13 @@ var ChunkParser = function(){
 				loc:self.parseLoc(attrs['loc']),
 				robotType:attrs['type'],
 				team:attrs['team']
+			};
+			self.currentSignals.push(signal);
+		}else if(tagName=='sig.DeathSignal'){
+			var attrs = self.getAttrs(tag);
+			var signal = {
+				type:'death',
+				robotID:parseInt(attrs['objectID'])
 			};
 			self.currentSignals.push(signal);
 		}else if(tagName=='ser.ExtensibleMetadata'){
