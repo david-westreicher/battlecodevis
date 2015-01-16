@@ -188,8 +188,13 @@ var ChunkReader = function(file){
 	//self.chunkSize = 8192;
 	//self.chunkSize = 16384;
 	self.chunkSize = 65536;
-	self.chunkSize = 262144;
+	self.chunkSize = 1048576;
 	self.start = 0;
+	self.inflate = new pako.Inflate({chunkSize:1048576});
+	self.inflate.onData =function(chunk) {
+		console.log(typeof chunk);
+		self.chunkParser.parseChunk(chunk);
+	}
 	self.end = self.chunkSize;
 	self.reader = new FileReader();
 	self.reader.onload = function(e){
@@ -197,12 +202,13 @@ var ChunkReader = function(file){
         var byteArray = new Uint8Array(self.reader.result);
         try {
             var start = new Date().getTime();
-            result = pako.inflate(byteArray);
+			self.inflate.push(byteArray,false);
+           // result = pako.inflate(byteArray);
             // var string = String.fromCharCode.apply(null,result.subarray(0,50))
             // console.log(string);
             var end = new Date().getTime();
             console.log('unzip execution time: ' + (end - start));
-		    self.chunkParser.parseChunk(result);
+		    //;
 		    self.readNextLine();
         }catch (err) {
             console.log(err);
