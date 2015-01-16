@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Title of the document</title>
+
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<script src="unzip.js"></script>
+		<script src="parser.js"></script>
+		<script>
+			var simulationData  = {
+					robots:{},
+					lines:[]
+				};
+;
+			var replayData;
+			var currentFrame;
+			var parseFile = null;
+
+			function parse(file){
+				replayData = (new Parser()).getData(file);
+				currentFrame = 0;
+				simulationData.robots = {};
+				simulationData.lines = [];
+			}
+
+			function simulate(){
+				if(replayData==null || replayData.maplist.length==0 || replayData.maplist[0].frames.length<=currentFrame+1)
+					return;
+				var frame = replayData.maplist[0].frames[currentFrame];
+				var sigs = frame.signals;
+				simulationData.lines = [];
+				for(var i =0;i<sigs.length;i++){
+					var sig = sigs[i];
+					if(sig.type=="spawn"){
+						var robot = {
+							id:sig.robotID,
+							loc: sig.loc,
+							team: sig.team
+						};
+						simulationData.robots[robot.id] = robot;
+					}else if(sig.type=="move"){
+						var robot = simulationData.robots[sig.robotID];
+						robot.loc = sig.loc;
+					}else if(sig.type=="attack"){
+						var robot = simulationData.robots[sig.robotID];
+						simulationData.lines.push([robot.loc,sig.loc,robot.team]);
+					}else if(sig.type=="death"){
+						delete simulationData.robots[sig.robotID];
+					}
+				}
+				currentFrame++;
+			}
+		</script>
+		<style>
+			body {
+				background:#fff;
+				padding:0;
+				margin:0;
+				font-weight: bold;
+				overflow:hidden;
+			}
+		</style>
+	</head>
+	<body>
+		<script src="lib/three.min.js"></script>
+		<script src="lib/stats.min.js"></script>
+		<script>
+			var container, stats;
+			var camera, scene, renderer;
+			var objects,lines;
+			var redMaterial,blueMaterial,normalMaterial;
+			var mouseX = 0, mouseY = 0;
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+			var frameNum = 0;
+			var redCol = new THREE.Color(0xff0000);
+			var blueCol = new THREE.Color(0x0000ff);
+			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+			init();
+			animate();
+
+			function init() {
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+				camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 1500;
+				scene = new THREE.Scene();
+				objects = [];
+
+				var lineGeom = new THREE.Geometry();
+				for(var i=0;i<2*100;i++){
+					lineGeom.vertices.push(new THREE.Vector3(0,0,0));
+					lineGeom.colors.push(new THREE.Color(0x00ff00));
+				}
+				lines = new THREE.Line(lineGeom,new THREE.LineBasicMaterial({linewidth:3,vertexColors:THREE.VertexColors}),THREE.LinePieces);
+				scene.add(lines);
+
+				var gridGeom = new THREE.Geometry();
+				var gridNum = 30;
+				var startGrid = -gridNum;
+				var gridSize = 80;
+				for(var x=-gridNum+1;x<gridNum;x++){
+					gridGeom.vertices.push(new THREE.Vector3(x*gridSize,gridNum*gridSize,0));
+					gridGeom.vertices.push(new THREE.Vector3(x*gridSize,-gridNum*gridSize,0));
+				}
+				for(var y=-gridNum+1;y<gridNum;y++){
+					gridGeom.vertices.push(new THREE.Vector3(gridNum*gridSize,y*gridSize,0));
+					gridGeom.vertices.push(new THREE.Vector3(-gridNum*gridSize,y*gridSize,0));
+				}
+				var grid = new THREE.Line(gridGeom,new THREE.LineBasicMaterial({color:0xaaaaaa}),THREE.LinePieces);
+				scene.add(grid);
+
+
+				normalMaterial = new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading } );
+				redMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+				blueMaterial = new THREE.MeshBasicMaterial( { color: 0x0000ff } );
+				var loader = new THREE.JSONLoader();
+				loader.load( 'obj/Suzanne.js', function ( geometry ) {
+					geometry.computeVertexNormals();
+					for ( var i = 0; i < 500; i ++ ) {
+						var mesh = new THREE.Mesh( geometry, normalMaterial );
+						mesh.position.z = 40;
+						mesh.visible = false;
+						mesh.scale.x = mesh.scale.y = mesh.scale.z = 40;
+						objects.push( mesh );
+						scene.add( mesh );
+					}
+				});
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor( 0xffffff );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
+
+				var fileChooser = document.createElement('input'); 
+				fileChooser.style.position = 'absolute';
+				fileChooser.style.top = '0px';
+				fileChooser.style.left = '80px';
+				fileChooser.style.zIndex = 100;
+				fileChooser.type = 'file';
+				fileChooser.onchange = function(){parseFile=this.files[0];};
+				container.appendChild(fileChooser);
+				window.addEventListener( 'resize', onWindowResize, false );
+			}
+
+			function onWindowResize() {
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+			}
+
+			function onDocumentMouseMove(event) {
+				mouseX = ( event.clientX - windowHalfX );
+				mouseY = ( event.clientY - windowHalfY );
+			}
+
+			function animate() {
+				requestAnimationFrame( animate );
+
+				if(parseFile!=null){
+					parse(parseFile);
+					parseFile = null;
+				}
+				if((frameNum++)%1==0)
+					simulate();
+
+				render();
+				stats.update();
+			}
+
+			function locToMap(loc){
+				var mapLoc = [0,0];
+				var map = replayData.maplist[0];
+				mapLoc[0] = (loc[0]-map.originX-map.width/2)*80;
+				mapLoc[1] = -(loc[1]-map.originY-map.height/2)*80;
+				return mapLoc;
+			}
+
+			function render() {
+				//update camera
+				var cameraAngle = (mouseX/windowHalfX)*Math.PI*2;
+				var cameraRadius = 2500;
+				camera.position.x = Math.sin(cameraAngle)*cameraRadius;
+				camera.position.y = Math.cos(cameraAngle)*cameraRadius;
+				camera.up.set(0,0,1);
+				camera.lookAt( scene.position );
+
+				//draw shoot lines
+				var simulines = simulationData.lines;
+				for(var i=0;i<lines.geometry.vertices.length;i+=2){
+					if(i<simulines.length*2){
+						var start = locToMap(simulines[i/2][0]);
+						var end = locToMap(simulines[i/2][1]);
+						var col = simulines[i/2][2]=='A'?redCol:blueCol;
+						lines.geometry.vertices[i].set(start[0],start[1],80);	
+						lines.geometry.vertices[i+1].set(end[0],end[1],0);	
+						lines.geometry.colors[i].set(col);	
+						lines.geometry.colors[i+1].set(col);	
+					}else{
+						lines.geometry.vertices[i].set(0,0,0);
+						lines.geometry.vertices[i+1].set(0,0,0);
+					}
+				}
+				lines.geometry.verticesNeedUpdate = true;
+				lines.geometry.colorsNeedUpdate = true;
+
+				//update meshes
+				var meshi = 0;
+				for (var id in simulationData.robots){
+					var robot = simulationData.robots[id];
+					var mapLoc = locToMap(robot.loc);
+					objects[meshi].position.x = mapLoc[0];
+					objects[meshi].position.y = mapLoc[1];
+					objects[meshi].material = (robot.team=='A')?redMaterial:blueMaterial;
+					objects[meshi].visible = true;
+					meshi++;
+				}
+				for(var i=meshi;i<objects.length;i++){
+					objects[i].visible = false;
+				}
+
+				renderer.render( scene, camera );
+			}
+
+		</script>
+	</body>
+</html>
+
