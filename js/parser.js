@@ -10,8 +10,8 @@ var ChunkParser = function(){
 	self.currentmap = null;
 	self.parseChunk = function(chunk){
 		//console.log(chunk);			
-		for(var i=0;i<chunk.length;i++){
-			var chr = chunk[i];
+		for(var i=0;i<chunk.length ;i++){
+			var chr = String.fromCharCode.apply(null,[chunk[i]]);
 			if(self.currentTag!=null){
 				//currently parsing inside the tag (<?>)
 				if(chr=='>'){
@@ -170,7 +170,7 @@ var ChunkReader = function(file){
 	var self = this;
 	self.readNextLine = function(){
 		if(self.start<self.file.size)
-			self.reader.readAsText(self.file.slice(self.start,self.end));	
+			self.reader.readAsArrayBuffer(self.file.slice(self.start,self.end));	
 		else{
 			if(self.chunkParser.tagStack.length!=0)
 				console.log("something went terribly wrong while parsing :(");
@@ -194,26 +194,21 @@ var ChunkReader = function(file){
 	self.reader = new FileReader();
 	self.reader.onload = function(e){
 		//console.log(self.reader.result);
-		self.chunkParser.parseChunk(self.reader.result);
-		self.readNextLine();
+        var byteArray = new Uint8Array(self.reader.result);
+        try {
+            var start = new Date().getTime();
+            result = pako.inflate(byteArray);
+            // var string = String.fromCharCode.apply(null,result.subarray(0,50))
+            // console.log(string);
+            var end = new Date().getTime();
+            console.log('unzip execution time: ' + (end - start));
+		    self.chunkParser.parseChunk(result);
+		    self.readNextLine();
+        }catch (err) {
+            console.log(err);
+        }
 	}
 	self.file = file;
-}
-
-function parse(file){
-}
-
-function unzip(file){
-	//new ChunkReader(file).readNextLine()
-	var reader = new FileReader();
-	reader.onload = function(e){
-		console.log(typeof reader.result);
-		console.log(reader.result);
-		var byteArray = new Uint8Array(reader.result);
-		//console.log(byteArray);
-		unzip(byteArray);
-	}
-	reader.readAsArrayBuffer(file);
 }
 
 var Parser = function(){

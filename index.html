@@ -14,7 +14,7 @@
             }
         </style>
         <script src="js/parser.js"></script>
-        <script src="bundle.js"></script>
+        <script src="zipbundle.js"></script>
         <script src="js/lib/three.min.js"></script>
         <script src="js/lib/stats.min.js"></script>
     </head>
@@ -32,8 +32,7 @@
         var parseFile = null;
 
         function parse(file){
-            // replayData = (new Parser()).getData(file);
-            replayData = fileSelected(parseFile);
+            replayData = (new Parser()).getData(file);
             currentFrame = 0;
             simulationData.robots = {};
             simulationData.lines = [];
