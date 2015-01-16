@@ -45,9 +45,11 @@ window.fileSelected = function(file){
         console.log(typeof reader.result);
         console.log(reader.result);
         var byteArray = new Uint8Array(reader.result);
-        //console.log(byteArray);
+        // console.log(byteArray);
+        var start = new Date().getTime();
         var out = gzip.unzip(byteArray);
-        console.log(out);
+        var end = new Date().getTime();
+        console.log('unzip execution time: ' + (end - start));
     }
     reader.readAsArrayBuffer(file);
 };
