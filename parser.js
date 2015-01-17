@@ -88,6 +88,8 @@ var ChunkParser = function(){
 	}
 
 	self.closedTag = function(tag){
+		if(tag=='int-array')
+			self.currentmap.ore+=',';
 	}
 	
 	self.parseSingleTag = function(tag){
@@ -108,6 +110,22 @@ var ChunkParser = function(){
 				type:'attack',
 				robotID:parseInt(attrs['robotID']),
 				loc:self.parseLoc(attrs['targetLoc'])
+			};
+			self.currentSignals.push(signal);
+		}else if(tagName=='sig.LocationOreChangeSignal'){
+			var attrs = self.getAttrs(tag);
+			var signal = {
+				type:'ore',
+				amount:parseFloat(attrs['ore']),
+				loc:self.parseLoc(attrs['loc'])
+			};
+			self.currentSignals.push(signal);
+		}else if(tagName=='sig.MineSignal'){
+			var attrs = self.getAttrs(tag);
+			var signal = {
+				type:'mine',
+				team:attrs['mineTeam'],
+				loc:self.parseLoc(attrs['mineLoc'])
 			};
 			self.currentSignals.push(signal);
 		}else if(tagName=='ser.RoundStats'){

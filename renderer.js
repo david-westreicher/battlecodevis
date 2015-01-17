@@ -9,6 +9,7 @@ var frameNum = 0,interp,isLastFrame;
 var redCol = new THREE.Color(0xff0000);
 var blueCol = new THREE.Color(0x0000ff);
 var slowmotion = 5;
+var oreTexture;
 document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 init();
 animate();
@@ -42,6 +43,7 @@ function init() {
 		gridGeom.vertices.push(new THREE.Vector3(-gridNum*gridSize,y*gridSize,0));
 	}
 	var grid = new THREE.Line(gridGeom,new THREE.LineBasicMaterial({color:0xCCCCCC}),THREE.LinePieces);
+	grid.position.z = 1;
 	scene.add(grid);
 
 	normalMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff } );
@@ -117,41 +119,87 @@ function toOreLoc(x,y){
 	return [(((128-map.width)/2)|0)+x,(((128-map.height)/2)|0)+y];
 }
 
+function updateOreTexture(){
+	var size = 128;
+	var textureData;
+	var map = replayData.maplist[0];
+	if(oreTexture==null){
+		textureData = new Uint8Array(size*size*3);
+		for(var x =0;x<=size;x++){
+			for(var y =0;y<=size;y++){
+				var dataIndex = (x+y*size)*3;
+				textureData[dataIndex+0]= 255;
+				textureData[dataIndex+1]= 255;
+				textureData[dataIndex+2]= 255;
+			}
+		}
+	}else
+		textureData = oreTexture.image.data;
+	if(true){
+		for(var x =0;x<map.width;x++){
+			for(var y =0;y<map.height;y++){
+				var oreLoc = toOreLoc(x,y);
+				var oreInt = simulationData.ore[x][y][1];
+				var oreTeam = simulationData.ore[x][y][2];
+				var dataIndex = (oreLoc[0]+oreLoc[1]*128)*3;
+				if(oreInt<0){
+					textureData[dataIndex+0]= 0;
+					textureData[dataIndex+1]= 255;
+					textureData[dataIndex+2]= 0;
+				}else if(oreInt>0){
+					textureData[dataIndex+0]= (oreTeam=='A'?255-simulationData.ore[x][y][1]*4:0);
+					textureData[dataIndex+1]= 255-simulationData.ore[x][y][1]*8;
+					textureData[dataIndex+2]= (oreTeam!='A'?255-simulationData.ore[x][y][1]*4:0);
+				}else{
+					textureData[dataIndex+0]= 255;
+					textureData[dataIndex+1]= 255;
+					textureData[dataIndex+2]= 255;
+				}
+			}	
+		}
+	}else{
+		for(var x =0;x<map.width;x++){
+			for(var y =0;y<map.height;y++){
+				var oreLoc = toOreLoc(x,y);
+				var oreInt = simulationData.ore[x][y][0]-simulationData.ore[x][y][1];
+				var dataIndex = (oreLoc[0]+oreLoc[1]*128)*3;
+				if(oreInt>=0){
+					textureData[dataIndex+0]= oreInt*8;
+					textureData[dataIndex+1]= oreInt*8;
+					textureData[dataIndex+2]= 0;
+				}else{
+					textureData[dataIndex+0]= 0;
+					textureData[dataIndex+1]= 255;
+					textureData[dataIndex+2]= 0;
+				}
+			}	
+		}
+	}
+	if(oreTexture==null){
+		//oreTexture = new THREE.DataTexture(textureData, size, size, THREE.RGBFormat, THREE.UnsignedByteType, THREE.UVMapping,THREE.ClampToEdgeWrapping,THREE.ClampToEdgeWrapping,THREE.NearestFilter, THREE.NearestMipMapLinearFilter );
+		oreTexture = new THREE.DataTexture(textureData, size, size, THREE.RGBFormat);
+		var plane= new THREE.Mesh(new THREE.PlaneGeometry(size*80,size*80),
+				new THREE.MeshBasicMaterial({map:oreTexture}));
+		plane.receiveShadow = true;
+		scene.add(plane);
+	}
+	oreTexture.needsUpdate = true;
+}
+
 function createMap(){
+	walls = 'set';
 	var map = replayData.maplist[0];
 	var tiles = map.tiles;
 	var mapGeom = new THREE.Geometry();
-
-	var width = 128, height = 128, bytes = 3;
-	var data = new Uint8Array( width * height * bytes );
-	for(var x = 0;x<width;x++){
-		for(var y = 0;y<height;y++){
-			data[(x+y*width)*3+0] = 255;//Math.random()*255|0;
-			data[(x+y*width)*3+1] = 255;//Math.random()*255|0;
-			data[(x+y*width)*3+2] = 255;//Math.random()*255|0;
-		}
-	}
-
 	for(var x =-1;x<=map.width;x++){
 		for(var y =-1;y<=map.height;y++){
-			if(x==-1||y==-1||x==map.width||y==map.height||tiles.charAt(x+y*map.width)=='#'){
+			if(x==-1||y==-1||x==map.width||y==map.height||tiles.charAt(x+y*map.width)=='#')
 				mapGeom.vertices.push(new THREE.Vector3(x*80-map.width*40,-(y*80-map.height*40),0));
-				var oreLoc = toOreLoc(x,y);
-				data[(oreLoc[0]+oreLoc[1]*128)*3+0]= 0;
-				data[(oreLoc[0]+oreLoc[1]*128)*3+1]= 255;
-				data[(oreLoc[0]+oreLoc[1]*128)*3+2]= 0;
-			}
 		}	
 	}
-	var mapLines = new THREE.PointCloud(mapGeom,new THREE.PointCloudMaterial({size:50,color:0x00ff00}));
+	var mapLines = new THREE.PointCloud(mapGeom,new THREE.PointCloudMaterial({size:100,color:0x00ff00}));
 	mapLines.position.z = 50;
 	scene.add(mapLines);
-	var texture = new THREE.DataTexture( data, width, height, THREE.RGBFormat , THREE.UnsignedByteType, THREE.UVMapping,THREE.ClampToEdgeWrapping,THREE.ClampToEdgeWrapping,THREE.NearestFilter,THREE.NearestMipMapLinearFilter );
-	texture.needsUpdate = true;
-	var plane= new THREE.Mesh(new THREE.PlaneGeometry(width*80,height*80),new THREE.MeshBasicMaterial({map:texture}));
-	plane.receiveShadow = true;
-	scene.add(plane);
-	walls = 'set'
 }
 function animate() {
 	requestAnimationFrame( animate );
@@ -160,8 +208,12 @@ function animate() {
 		parse(parseFile);
 		parseFile = null;
 	}
-	if(isMapParsed() && walls==null){
+	if(simulationData.ready && walls==null){
 		createMap();
+	}
+	if(simulationData.oreChanged){
+		updateOreTexture();
+		simulationData.oreChanged = false;
 	}
 
 	var frameMod = frameNum%slowmotion;

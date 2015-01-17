@@ -23,7 +23,10 @@
     <script type="text/javascript">
         var simulationData  = {
                 robots:{},
-                lines:[]
+                lines:[],
+				ore:[],
+				oreChanged:false,
+				ready:false
             };
 
         var replayData;
@@ -35,16 +38,43 @@
             currentFrame = 0;
             simulationData.robots = {};
             simulationData.lines = [];
+            simulationData.ore = [];
+            simulationData.ready = false;
+            simulationData.oreChanged = false;
         }
 
-		function isMapParsed(){
-			return replayData!=null && replayData.maplist.length>0 && replayData.maplist[0].frames.length>0;
+		function maplocToOreLoc(maploc){
+			var map = replayData.maplist[0];
+			return [-map.originX+maploc[0],-map.originY+maploc[1]];
 		}
 
         function simulate(){
             if(replayData==null || replayData.maplist.length==0 || replayData.maplist[0].frames.length<=currentFrame+1)
                 return;
-            var frame = replayData.maplist[0].frames[currentFrame];
+			var map = replayData.maplist[0];
+			if(Object.keys(simulationData.robots).length==0){
+				//INITIALIZE MAP & ORE
+				var oreStringArray = map.ore.split(',');
+				for(var x =0;x<map.width;x++){
+					var row = [];
+					for(var y =0;y<map.height;y++){
+						var currentOre = parseInt(oreStringArray[y+x*map.height]);
+						row.push([currentOre,0,'']);
+					}	
+					simulationData.ore.push(row);
+				}
+				var tiles = map.tiles;
+				for(var x =0;x<map.width;x++){
+					for(var y=0;y<map.height;y++){
+						if(x==-1||y==-1||x==map.width||y==map.height||tiles.charAt(x+y*map.width)=='#'){
+							simulationData.ore[x][y][1]=-1;
+						}
+					}	
+				}
+				simulationData.oreChanged = true;
+				simulationData.ready = true;
+			}
+            var frame = map.frames[currentFrame];
             var sigs = frame.signals;
             simulationData.lines = [];
             for(var i =0;i<sigs.length;i++){
@@ -67,6 +97,14 @@
                 }else if(sig.type=="attack"){
                     var robot = simulationData.robots[sig.robotID];
                     simulationData.lines.push([robot,sig.loc]);
+                }else if(sig.type=="ore"){
+					var oreLoc = maplocToOreLoc(sig.loc);
+					simulationData.ore[oreLoc[0]][oreLoc[1]][1] = sig.amount;
+					simulationData.oreChanged = true;
+                }else if(sig.type=="mine"){
+					var mineLoc = maplocToOreLoc(sig.loc);
+					simulationData.ore[oreLoc[0]][oreLoc[1]][2] = sig.team;
+					simulationData.oreChanged = true;
                 }else if(sig.type=="death"){
                     delete simulationData.robots[sig.robotID];
                 }
