@@ -8,8 +8,8 @@ var windowHalfY = window.innerHeight / 2;
 var frameNum = 0,interp,isLastFrame;
 var redCol = new THREE.Color(0xff0000);
 var blueCol = new THREE.Color(0x0000ff);
-var slowmotion = 5;
-var oreTexture;
+var slowmotion = 1;
+var oreTexture,gridMesh;
 document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 init();
 animate();
@@ -42,9 +42,9 @@ function init() {
 		gridGeom.vertices.push(new THREE.Vector3(gridNum*gridSize,y*gridSize,0));
 		gridGeom.vertices.push(new THREE.Vector3(-gridNum*gridSize,y*gridSize,0));
 	}
-	var grid = new THREE.Line(gridGeom,new THREE.LineBasicMaterial({color:0xCCCCCC}),THREE.LinePieces);
-	grid.position.z = 1;
-	scene.add(grid);
+	gridMesh = new THREE.Line(gridGeom,new THREE.LineBasicMaterial({color:0xCCCCCC}),THREE.LinePieces);
+	gridMesh.position.z = 1;
+	scene.add(gridMesh);
 
 	normalMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff } );
 
@@ -181,6 +181,12 @@ function updateOreTexture(){
 		var plane= new THREE.Mesh(new THREE.PlaneGeometry(size*80,size*80),
 				new THREE.MeshBasicMaterial({map:oreTexture}));
 		plane.receiveShadow = true;
+		if(map.width%2==0){
+			gridMesh.position.x-=40;
+			plane.position.x-=40;}
+		if(map.height%2==0){
+			gridMesh.position.y+=40;
+			plane.position.y+=40;}
 		scene.add(plane);
 	}
 	oreTexture.needsUpdate = true;
