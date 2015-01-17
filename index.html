@@ -13,10 +13,9 @@
                 overflow:hidden;
             }
         </style>
-        <script src="js/parser.js"></script>
-        <script src="zipbundle.js"></script>
-        <script src="js/lib/three.min.js"></script>
-        <script src="js/lib/stats.min.js"></script>
+        <script src="lib/three.min.js"></script>
+        <script src="lib/stats.min.js"></script>
+        <script src="bundle.js"></script>
     </head>
     <body>
     </body>
@@ -32,11 +31,15 @@
         var parseFile = null;
 
         function parse(file){
-            replayData = (new Parser()).getData(file);
+            replayData = getData(file);
             currentFrame = 0;
             simulationData.robots = {};
             simulationData.lines = [];
         }
+
+		function isMapParsed(){
+			return replayData!=null && replayData.maplist.length>0 && replayData.maplist[0].frames.length>0;
+		}
 
         function simulate(){
             if(replayData==null || replayData.maplist.length==0 || replayData.maplist[0].frames.length<=currentFrame+1)
@@ -70,7 +73,7 @@
     <script type="text/javascript">
         var container, stats;
         var camera, scene, renderer;
-        var objects,lines;
+        var objects,lines,walls;
         var redMaterial,blueMaterial,normalMaterial;
         var mouseX = 0, mouseY = 0;
         var windowHalfX = window.innerWidth / 2;
@@ -123,7 +126,7 @@
             redMaterial = new THREE.MeshLambertMaterial( { color: 0xff0000 } );
             blueMaterial = new THREE.MeshLambertMaterial( { color: 0x0000ff } );
             var loader = new THREE.JSONLoader();
-            loader.load( 'js/obj/Suzanne.js', function ( geometry ) {
+            loader.load( 'models/Suzanne.js', function ( geometry ) {
                 geometry.computeVertexNormals();
                 for ( var i = 0; i < 500; i ++ ) {
                     var mesh = new THREE.Mesh( geometry, normalMaterial );
@@ -187,6 +190,11 @@
             mouseY = ( event.clientY - windowHalfY );
         }
 
+		function createMap(){
+			walls = new THREE.Mesh(new THREE.PlaneGeometry(1000,1000),normalMaterial);
+			walls.position.z = 50;
+			scene.add(walls);
+		}
         function animate() {
             requestAnimationFrame( animate );
 
@@ -194,6 +202,9 @@
                 parse(parseFile);
                 parseFile = null;
             }
+			if(isMapParsed() && walls==null){
+				createMap();
+			}
             if((frameNum++)%3==0)
                 simulate();
 
@@ -256,7 +267,6 @@
 
             renderer.render( scene, camera );
         }
-
     </script>
 </html>
 

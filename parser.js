@@ -1,3 +1,5 @@
+var pako = require('pako');
+
 var ChunkParser = function(){
 	var self = this;	
 	self.lastTag=null;
@@ -188,9 +190,9 @@ var ChunkReader = function(file){
 	//self.chunkSize = 8192;
 	//self.chunkSize = 16384;
 	self.chunkSize = 65536;
-	self.chunkSize = 1048576;
+	self.chunkSize = 1048576*4;
 	self.start = 0;
-	self.inflate = new pako.Inflate({chunkSize:1048576});
+	self.inflate = new pako.Inflate({chunkSize:self.chunkSize});
 	self.inflate.onData =function(chunk) {
 		console.log(typeof chunk);
 		self.chunkParser.parseChunk(chunk);
@@ -217,13 +219,10 @@ var ChunkReader = function(file){
 	self.file = file;
 }
 
-var Parser = function(){
-	var self = this;
-	self.getData = function(file){
-		console.log("start parsing");
-		var chunkReader = new ChunkReader(file);
-		var data = chunkReader.chunkParser.metadata;
-		chunkReader.readNextLine();
-		return data;
-	}
+window.getData = function(file){
+	console.log("start parsing");
+	var chunkReader = new ChunkReader(file);
+	var data = chunkReader.chunkParser.metadata;
+	chunkReader.readNextLine();
+	return data;
 }

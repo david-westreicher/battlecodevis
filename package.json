@@ -2,9 +2,9 @@
     "name": "battlecodevis",
     "description": "battlecode viewer",
     "scripts": {
-        "browserify": "browserify main.js -o bundle.js"
+        "browserify": "browserify parser.js -o bundle.js"
     },
     "dependencies": {
-        "gzip-js": ">= 0.3.2"
+        "pako": ">= 0.2.5"
     }
 }
