@@ -3,6 +3,7 @@ var camera, scene, renderer;
 var objects,lines,walls;
 var redMaterial,blueMaterial,normalMaterial;
 var mouseX = 0, mouseY = 0;
+var cameraDist = 2000;
 var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
 var frameNum = 0,interp,isLastFrame;
@@ -11,6 +12,7 @@ var blueCol = new THREE.Color(0x0000ff);
 var slowmotion = 5;
 var oreMesh,gridMesh;
 document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
 init();
 animate();
 
@@ -112,6 +114,16 @@ function onWindowResize() {
 function onDocumentMouseMove(event) {
 	mouseX = ( event.clientX - windowHalfX );
 	mouseY = ( event.clientY - windowHalfY );
+}
+
+function onDocumentMouseWheel(event) {
+	console.log(event);
+	var up = event.wheelDelta>0||event.wheelDeltaY>0;
+	if(!up){
+		cameraDist*=1.1;
+	}else
+		cameraDist/=1.1;
+	cameraDist = Math.min(5000,Math.max(100,cameraDist));
 }
 
 function toOreLoc(x,y){
@@ -222,6 +234,8 @@ function animate() {
 		walls = null;
 		scene.remove(oreMesh);
 		oreMesh = null;
+		gridMesh.position.x = 0;
+		gridMesh.position.y = 0;
 	}
 	if(simulationData.oreChanged){
 		updateOreTexture();
@@ -268,10 +282,10 @@ function render() {
 	//update camera
 	var cameraAngle = (mouseX/windowHalfX)*Math.PI*2;
 	var cameraAngle2 = (mouseY/windowHalfY+1)*Math.PI/4;
-	var cameraRadius = Math.abs(Math.sin(cameraAngle2))*2000;
+	var cameraRadius = Math.abs(Math.sin(cameraAngle2))*cameraDist;
 	camera.position.x = Math.sin(cameraAngle)*cameraRadius;
 	camera.position.y = Math.cos(cameraAngle)*cameraRadius;
-	camera.position.z = Math.cos(cameraAngle2)*2000;
+	camera.position.z = Math.cos(cameraAngle2)*cameraDist;
 	camera.up.set(0,0,1);
 	camera.lookAt( scene.position );
 
@@ -300,6 +314,8 @@ function render() {
 	for (var id in simulationData.robots){
 		var robot = simulationData.robots[id];
 		var realPos = getInterpPosition(robot);
+		objects[meshi].scale.x = objects[meshi].scale.y = objects[meshi].scale.z = (robot.type=='TOWER'?60:30);
+		if(robot.type=='TOWER')objects[meshi].scale.z*=3;
 		objects[meshi].position.x = realPos[0];
 		objects[meshi].position.y = realPos[1];
 		objects[meshi].position.z = robot.type!='DRONE'?40:200;
