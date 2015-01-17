@@ -8,8 +8,8 @@ var windowHalfY = window.innerHeight / 2;
 var frameNum = 0,interp,isLastFrame;
 var redCol = new THREE.Color(0xff0000);
 var blueCol = new THREE.Color(0x0000ff);
-var slowmotion = 1;
-var oreTexture,gridMesh;
+var slowmotion = 5;
+var oreMesh,gridMesh;
 document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 init();
 animate();
@@ -123,7 +123,7 @@ function updateOreTexture(){
 	var size = 128;
 	var textureData;
 	var map = replayData.maplist[0];
-	if(oreTexture==null){
+	if(oreMesh==null){
 		textureData = new Uint8Array(size*size*3);
 		for(var x =0;x<=size;x++){
 			for(var y =0;y<=size;y++){
@@ -134,7 +134,7 @@ function updateOreTexture(){
 			}
 		}
 	}else
-		textureData = oreTexture.image.data;
+		textureData = oreMesh.material.map.image.data;
 	if(true){
 		for(var x =0;x<map.width;x++){
 			for(var y =0;y<map.height;y++){
@@ -147,9 +147,10 @@ function updateOreTexture(){
 					textureData[dataIndex+1]= 255;
 					textureData[dataIndex+2]= 0;
 				}else if(oreInt>0){
-					textureData[dataIndex+0]= (oreTeam=='A'?255-simulationData.ore[x][y][1]*4:0);
-					textureData[dataIndex+1]= 255-simulationData.ore[x][y][1]*8;
-					textureData[dataIndex+2]= (oreTeam!='A'?255-simulationData.ore[x][y][1]*4:0);
+					var minCol = Math.max(50,255-oreInt*6);
+					textureData[dataIndex+0]= (oreTeam=='A'?1:0.5)*minCol;
+					textureData[dataIndex+1]= minCol*0.5;
+					textureData[dataIndex+2]= (oreTeam!='A'?1:0.5)*minCol;
 				}else{
 					textureData[dataIndex+0]= 255;
 					textureData[dataIndex+1]= 255;
@@ -175,25 +176,24 @@ function updateOreTexture(){
 			}	
 		}
 	}
-	if(oreTexture==null){
+	if(oreMesh==null){
 		//oreTexture = new THREE.DataTexture(textureData, size, size, THREE.RGBFormat, THREE.UnsignedByteType, THREE.UVMapping,THREE.ClampToEdgeWrapping,THREE.ClampToEdgeWrapping,THREE.NearestFilter, THREE.NearestMipMapLinearFilter );
-		oreTexture = new THREE.DataTexture(textureData, size, size, THREE.RGBFormat);
-		var plane= new THREE.Mesh(new THREE.PlaneGeometry(size*80,size*80),
+		var oreTexture = new THREE.DataTexture(textureData, size, size, THREE.RGBFormat);
+		oreMesh = new THREE.Mesh(new THREE.PlaneGeometry(size*80,size*80),
 				new THREE.MeshBasicMaterial({map:oreTexture}));
-		plane.receiveShadow = true;
+		oreMesh.receiveShadow = true;
 		if(map.width%2==0){
 			gridMesh.position.x-=40;
-			plane.position.x-=40;}
+			oreMesh.position.x-=40;}
 		if(map.height%2==0){
 			gridMesh.position.y+=40;
-			plane.position.y+=40;}
-		scene.add(plane);
+			oreMesh.position.y+=40;}
+		scene.add(oreMesh);
 	}
-	oreTexture.needsUpdate = true;
+	oreMesh.material.map.needsUpdate = true;
 }
 
 function createMap(){
-	walls = 'set';
 	var map = replayData.maplist[0];
 	var tiles = map.tiles;
 	var mapGeom = new THREE.Geometry();
@@ -203,9 +203,9 @@ function createMap(){
 				mapGeom.vertices.push(new THREE.Vector3(x*80-map.width*40,-(y*80-map.height*40),0));
 		}	
 	}
-	var mapLines = new THREE.PointCloud(mapGeom,new THREE.PointCloudMaterial({size:100,color:0x00ff00}));
-	mapLines.position.z = 50;
-	scene.add(mapLines);
+	walls = new THREE.PointCloud(mapGeom,new THREE.PointCloudMaterial({size:100,color:0x00ff00}));
+	walls.position.z = 50;
+	scene.add(walls);
 }
 function animate() {
 	requestAnimationFrame( animate );
@@ -216,6 +216,12 @@ function animate() {
 	}
 	if(simulationData.ready && walls==null){
 		createMap();
+	}
+	if(!simulationData.ready && walls!=null){
+		scene.remove(walls);
+		walls = null;
+		scene.remove(oreMesh);
+		oreMesh = null;
 	}
 	if(simulationData.oreChanged){
 		updateOreTexture();
