@@ -9,7 +9,7 @@ var windowHalfY = window.innerHeight / 2;
 var frameNum = 0,interp,isLastFrame;
 var redCol = new THREE.Color(0xff0000);
 var blueCol = new THREE.Color(0x0000ff);
-var slowmotion = 5;
+var slowmotion = 6;
 var oreMesh,gridMesh;
 document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
@@ -53,13 +53,15 @@ function init() {
 	redMaterial = new THREE.MeshLambertMaterial( { color: 0xff0000 } );
 	blueMaterial = new THREE.MeshLambertMaterial( { color: 0x0000ff } );
 	var loader = new THREE.JSONLoader();
-	loader.load( 'models/Suzanne.js', function ( geometry ) {
-		geometry.computeVertexNormals(); for ( var i = 0; i < 500; i ++ ) {
+	loader.load( 'models/monster.js', function ( geometry ) {
+		geometry.center();
+		geometry.computeVertexNormals();
+		for ( var i = 0; i < 500; i ++ ) {
 			var mesh = new THREE.Mesh( geometry, normalMaterial );
+			mesh.rotation.x = Math.PI/2;
 			mesh.position.z = 40;
 			mesh.visible = false;
 			mesh.castShadow = true;
-			mesh.scale.x = mesh.scale.y = mesh.scale.z = 40;
 			objects.push( mesh );
 			scene.add( mesh );
 		}
@@ -155,9 +157,9 @@ function updateOreTexture(){
 				var oreTeam = simulationData.ore[x][y][2];
 				var dataIndex = (oreLoc[0]+oreLoc[1]*128)*3;
 				if(oreInt<0){
-					textureData[dataIndex+0]= 0;
-					textureData[dataIndex+1]= 255;
-					textureData[dataIndex+2]= 0;
+					textureData[dataIndex+0]= 127;
+					textureData[dataIndex+1]= 127;
+					textureData[dataIndex+2]= 127;
 				}else if(oreInt>0){
 					var minCol = Math.max(50,255-oreInt*6);
 					textureData[dataIndex+0]= (oreTeam=='A'?1:0.5)*minCol;
@@ -215,7 +217,7 @@ function createMap(){
 				mapGeom.vertices.push(new THREE.Vector3(x*80-map.width*40,-(y*80-map.height*40),0));
 		}	
 	}
-	walls = new THREE.PointCloud(mapGeom,new THREE.PointCloudMaterial({size:100,color:0x00ff00}));
+	walls = new THREE.PointCloud(mapGeom,new THREE.PointCloudMaterial({size:100,color:0x777777}));
 	walls.position.z = 50;
 	scene.add(walls);
 }
@@ -314,8 +316,20 @@ function render() {
 	for (var id in simulationData.robots){
 		var robot = simulationData.robots[id];
 		var realPos = getInterpPosition(robot);
-		objects[meshi].scale.x = objects[meshi].scale.y = objects[meshi].scale.z = (robot.type=='TOWER'?60:30);
-		if(robot.type=='TOWER')objects[meshi].scale.z*=3;
+		objects[meshi].scale.x = objects[meshi].scale.y = objects[meshi].scale.z = (robot.type=='TOWER'?0.10:0.05);
+		if(robot.type=='TOWER')
+			objects[meshi].scale.z*=0.3;
+		var yDif = robot.lastloc[1]-robot.loc[1];
+		var xDif = robot.lastloc[0]-robot.loc[0];
+		var angleDiff = -Math.atan2(yDif,xDif)+Math.PI-robot.rot;
+		while(Math.abs(angleDiff)>Math.PI*2){
+			if(angleDiff>0)
+				angleDiff-=Math.PI*2;
+			else
+				angleDiff+=Math.PI*2;
+		}
+		robot.rot += (angleDiff)/slowmotion;
+		objects[meshi].rotation.y = robot.rot;
 		objects[meshi].position.x = realPos[0];
 		objects[meshi].position.y = realPos[1];
 		objects[meshi].position.z = robot.type!='DRONE'?40:200;

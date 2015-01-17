@@ -86,7 +86,8 @@
                         team: sig.team,
                         type: sig.robotType,
 						lastloc: sig.loc,
-						hasInterp: false
+						hasInterp: false,
+						rot:0
                     };
                     simulationData.robots[robot.id] = robot;
                 }else if(sig.type=="move"){
