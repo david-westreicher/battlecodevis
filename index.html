@@ -54,12 +54,16 @@
                         id:sig.robotID,
                         loc: sig.loc,
                         team: sig.team,
-                        type: sig.robotType
+                        type: sig.robotType,
+						lastloc: sig.loc,
+						hasInterp: false
                     };
                     simulationData.robots[robot.id] = robot;
                 }else if(sig.type=="move"){
                     var robot = simulationData.robots[sig.robotID];
+					robot.lastloc = robot.loc;
                     robot.loc = sig.loc;
+					robot.hasInterp = true;
                 }else if(sig.type=="attack"){
                     var robot = simulationData.robots[sig.robotID];
                     simulationData.lines.push([robot,sig.loc]);
@@ -78,9 +82,10 @@
         var mouseX = 0, mouseY = 0;
         var windowHalfX = window.innerWidth / 2;
         var windowHalfY = window.innerHeight / 2;
-        var frameNum = 0;
+        var frameNum = 0,interp,isLastFrame;
         var redCol = new THREE.Color(0xff0000);
         var blueCol = new THREE.Color(0x0000ff);
+		var slowmotion = 5;
         document.addEventListener( 'mousemove', onDocumentMouseMove, false );
         init();
         animate();
@@ -117,18 +122,12 @@
             scene.add(grid);
 
             normalMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff } );
-            var plane = new THREE.Mesh(new THREE.PlaneGeometry(gridNum*gridSize*2,gridNum*gridSize*2),normalMaterial);
-            plane.position.z = -1;
-            plane.receiveShadow = true;
-            scene.add(plane);
-
 
             redMaterial = new THREE.MeshLambertMaterial( { color: 0xff0000 } );
             blueMaterial = new THREE.MeshLambertMaterial( { color: 0x0000ff } );
             var loader = new THREE.JSONLoader();
             loader.load( 'models/Suzanne.js', function ( geometry ) {
-                geometry.computeVertexNormals();
-                for ( var i = 0; i < 500; i ++ ) {
+                geometry.computeVertexNormals(); for ( var i = 0; i < 500; i ++ ) {
                     var mesh = new THREE.Mesh( geometry, normalMaterial );
                     mesh.position.z = 40;
                     mesh.visible = false;
@@ -190,10 +189,46 @@
             mouseY = ( event.clientY - windowHalfY );
         }
 
+		function toOreLoc(x,y){
+            var map = replayData.maplist[0];
+			return [(((128-map.width)/2)|0)+x,(((128-map.height)/2)|0)+y];
+		}
+
 		function createMap(){
-			walls = new THREE.Mesh(new THREE.PlaneGeometry(1000,1000),normalMaterial);
-			walls.position.z = 50;
-			scene.add(walls);
+            var map = replayData.maplist[0];
+			var tiles = map.tiles;
+            var mapGeom = new THREE.Geometry();
+
+			var width = 128, height = 128, bytes = 3;
+			var data = new Uint8Array( width * height * bytes );
+			for(var x = 0;x<width;x++){
+				for(var y = 0;y<height;y++){
+					data[(x+y*width)*3+0] = 255;//Math.random()*255|0;
+					data[(x+y*width)*3+1] = 255;//Math.random()*255|0;
+					data[(x+y*width)*3+2] = 255;//Math.random()*255|0;
+				}
+			}
+
+			for(var x =-1;x<=map.width;x++){
+				for(var y =-1;y<=map.height;y++){
+					if(x==-1||y==-1||x==map.width||y==map.height||tiles.charAt(x+y*map.width)=='#'){
+						mapGeom.vertices.push(new THREE.Vector3(x*80-map.width*40,-(y*80-map.height*40),0));
+						var oreLoc = toOreLoc(x,y);
+						data[(oreLoc[0]+oreLoc[1]*128)*3+0]= 0;
+						data[(oreLoc[0]+oreLoc[1]*128)*3+1]= 255;
+						data[(oreLoc[0]+oreLoc[1]*128)*3+2]= 0;
+					}
+				}	
+			}
+			var mapLines = new THREE.PointCloud(mapGeom,new THREE.PointCloudMaterial({size:50,color:0x00ff00}));
+            mapLines.position.z = 50;
+			scene.add(mapLines);
+			var texture = new THREE.DataTexture( data, width, height, THREE.RGBFormat , THREE.UnsignedByteType, THREE.UVMapping,THREE.ClampToEdgeWrapping,THREE.ClampToEdgeWrapping,THREE.NearestFilter,THREE.NearestMipMapLinearFilter );
+			texture.needsUpdate = true;
+			var plane= new THREE.Mesh(new THREE.PlaneGeometry(width*80,height*80),new THREE.MeshBasicMaterial({map:texture}));
+            plane.receiveShadow = true;
+			scene.add(plane);
+			walls = 'set'
 		}
         function animate() {
             requestAnimationFrame( animate );
@@ -205,8 +240,13 @@
 			if(isMapParsed() && walls==null){
 				createMap();
 			}
-            if((frameNum++)%3==0)
+
+			var frameMod = frameNum%slowmotion;
+			if(frameMod==0)
                 simulate();
+			interp = frameMod/slowmotion;
+			isLastFrame = frameMod==(slowmotion-1);
+			frameNum++;
 
             render();
             stats.update();
@@ -219,13 +259,32 @@
             mapLoc[1] = -(loc[1]-map.originY-map.height/2)*80;
             return mapLoc;
         }
+		function interpolate(arr2,arr1,interp){
+			var result = [0,0];
+			result[0] = arr1[0]*interp+(1-interp)*arr2[0];
+			result[1] = arr1[1]*interp+(1-interp)*arr2[1];
+			return result;	
+		}
+
+		function getInterpPosition(robot){
+			var realPos = locToMap(robot.loc);
+			if(robot.hasInterp){
+				var mapLocOld = locToMap(robot.lastloc);
+				realPos = interpolate(mapLocOld,realPos,interp);
+				if(isLastFrame)
+					robot.hasInterp=false;
+			}
+			return realPos;
+		}
 
         function render() {
             //update camera
             var cameraAngle = (mouseX/windowHalfX)*Math.PI*2;
-            var cameraRadius = 1000;
+            var cameraAngle2 = (mouseY/windowHalfY+1)*Math.PI/4;
+            var cameraRadius = Math.abs(Math.sin(cameraAngle2))*2000;
             camera.position.x = Math.sin(cameraAngle)*cameraRadius;
             camera.position.y = Math.cos(cameraAngle)*cameraRadius;
+            camera.position.z = Math.cos(cameraAngle2)*2000;
             camera.up.set(0,0,1);
             camera.lookAt( scene.position );
 
@@ -253,9 +312,9 @@
             var meshi = 0;
             for (var id in simulationData.robots){
                 var robot = simulationData.robots[id];
-                var mapLoc = locToMap(robot.loc);
-                objects[meshi].position.x = mapLoc[0];
-                objects[meshi].position.y = mapLoc[1];
+				var realPos = getInterpPosition(robot);
+                objects[meshi].position.x = realPos[0];
+                objects[meshi].position.y = realPos[1];
                 objects[meshi].position.z = robot.type!='DRONE'?40:200;
                 objects[meshi].material = (robot.team=='A')?redMaterial:blueMaterial;
                 objects[meshi].visible = true;
