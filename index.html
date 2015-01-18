@@ -104,8 +104,9 @@
 					simulationData.ore[oreLoc[0]][oreLoc[1]][1] = sig.amount;
 					simulationData.oreChanged = true;
                 }else if(sig.type=="mine"){
-					var mineLoc = maplocToOreLoc(sig.loc);
-					simulationData.ore[oreLoc[0]][oreLoc[1]][2] = sig.team;
+                    var robot = simulationData.robots[sig.robotID];
+					var mineLoc = robot?maplocToOreLoc(robot.loc):maplocToOreLoc(sig.loc);
+					simulationData.ore[mineLoc[0]][mineLoc[1]][2] = robot?robot.team:sig.team;
 					simulationData.oreChanged = true;
                 }else if(sig.type=="death"){
                     delete simulationData.robots[sig.robotID];

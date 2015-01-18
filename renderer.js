@@ -188,7 +188,7 @@ function updateOreTexture(){
 		}
 	}
 	if(oreMesh==null){
-		//oreTexture = new THREE.DataTexture(textureData, size, size, THREE.RGBFormat, THREE.UnsignedByteType, THREE.UVMapping,THREE.ClampToEdgeWrapping,THREE.ClampToEdgeWrapping,THREE.NearestFilter, THREE.NearestMipMapLinearFilter );
+		//var oreTexture = new THREE.DataTexture(textureData, size, size, THREE.RGBFormat, THREE.UnsignedByteType, THREE.UVMapping,THREE.ClampToEdgeWrapping,THREE.ClampToEdgeWrapping,THREE.NearestFilter, THREE.NearestMipMapLinearFilter );
 		var oreTexture = new THREE.DataTexture(textureData, size, size, THREE.RGBFormat);
 		oreMesh = new THREE.Mesh(new THREE.PlaneGeometry(size*80,size*80),
 				new THREE.MeshBasicMaterial({map:oreTexture}));

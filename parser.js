@@ -124,8 +124,9 @@ var ChunkParser = function(){
 			var attrs = self.getAttrs(tag);
 			var signal = {
 				type:'mine',
-				team:attrs['mineTeam'],
-				loc:self.parseLoc(attrs['mineLoc'])
+				robotID:parseInt(attrs['robotID']),
+				loc:self.parseLoc(attrs['mineLoc']),
+				team:attrs['mineTeam']
 			};
 			self.currentSignals.push(signal);
 		}else if(tagName=='ser.RoundStats'){
