@@ -15,27 +15,86 @@
         </style>
         <script src="lib/three.min.js"></script>
         <script src="lib/stats.min.js"></script>
-        <script src="bundle.js"></script>
         <script src="camera.js"></script>
     </head>
     <body>
     </body>
+    <!-- setup page -->
+    <script type="text/javascript">
+        var container = document.createElement( 'div' );
+        document.body.appendChild( container );
+
+        renderer = new THREE.WebGLRenderer();
+        renderer.shadowMapEnabled = true;
+        renderer.shadowMapSoft = false;
+        renderer.setClearColor( 0xffffff );
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        container.appendChild( renderer.domElement );
+
+        stats = new Stats();
+        stats.domElement.style.position = 'absolute';
+        stats.domElement.style.top = '0px';
+        stats.domElement.style.zIndex = 100;
+        container.appendChild( stats.domElement );
+
+        var fileChooser = document.createElement('input');
+        fileChooser.style.position = 'absolute';
+        fileChooser.style.top = '0px';
+        fileChooser.style.left = '80px';
+        fileChooser.style.zIndex = 100;
+        fileChooser.type = 'file';
+        fileChooser.addEventListener('change', function(e) {
+            worker.postMessage(this.files[0]);
+        }, false);
+        container.appendChild(fileChooser);
+
+        var loader = document.createElement('div');
+        loader.style.position = 'absolute';
+        loader.style.backgroundColor = 'white';
+        loader.style.top = '0px';
+        loader.style.left = '500px';
+        loader.style.zIndex = 100;
+        loader.type = 'file';
+        container.appendChild(loader);
+    </script>
+    <!-- worker -->
+    <script type="text/javascript">
+        var worker = new Worker('workerbundle.js');
+
+        worker.addEventListener('error', function(e){
+            console.error([
+                'ERROR: Line ', e.lineno, ' in ', e.filename, ': ', e.message
+            ].join(''));
+        }, false);
+
+        // got parsed chunk. render it
+        worker.addEventListener('message', function(e) {
+            var data = e.data;
+            if(data.data != null){
+                setData(data.data);
+                animate();
+            }
+            loader.innerHTML = data.message;
+        }, false);
+
+    </script>
     <!-- simulation & parsing -->
     <script type="text/javascript">
         var simulationData  = {
                 robots:{},
                 lines:[],
-				ore:[],
-				oreChanged:false,
-				ready:false
+                ore:[],
+                oreChanged:false,
+                ready:false
             };
 
         var replayData;
         var currentFrame;
         var parseFile = null;
 
-        function parse(file){
-            replayData = getData(file);
+        function setData(data){
+            replayData = data;
             currentFrame = 0;
             simulationData.robots = {};
             simulationData.lines = [];
@@ -44,37 +103,36 @@
             simulationData.oreChanged = false;
         }
 
-		function maplocToOreLoc(maploc){
-			var map = replayData.maplist[0];
-			return [-map.originX+maploc[0],-map.originY+maploc[1]];
-		}
+        function maplocToOreLoc(maploc){
+            var map = replayData.maplist[0];
+            return [-map.originX+maploc[0],-map.originY+maploc[1]];
+        }
 
         function simulate(){
             if(replayData==null || replayData.maplist.length==0 || replayData.maplist[0].frames.length<=currentFrame+1)
-                return;
-			var map = replayData.maplist[0];
-			if(Object.keys(simulationData.robots).length==0){
-				//INITIALIZE MAP & ORE
-				var oreStringArray = map.ore.split(',');
-				for(var x =0;x<map.width;x++){
-					var row = [];
-					for(var y =0;y<map.height;y++){
-						var currentOre = parseInt(oreStringArray[y+x*map.height]);
-						row.push([currentOre,0,'']);
-					}	
-					simulationData.ore.push(row);
-				}
-				var tiles = map.tiles;
-				for(var x =0;x<map.width;x++){
-					for(var y=0;y<map.height;y++){
-						if(x==-1||y==-1||x==map.width||y==map.height||tiles.charAt(x+y*map.width)=='#'){
-							simulationData.ore[x][y][1]=-1;
-						}
-					}	
-				}
-				simulationData.oreChanged = true;
-				simulationData.ready = true;
-			}
+                return; var map = replayData.maplist[0];
+            if(Object.keys(simulationData.robots).length==0){
+                //INITIALIZE MAP & ORE
+                var oreStringArray = map.ore.split(',');
+                for(var x =0;x<map.width;x++){
+                    var row = [];
+                    for(var y =0;y<map.height;y++){
+                        var currentOre = parseInt(oreStringArray[y+x*map.height]);
+                        row.push([currentOre,0,'']);
+                    }
+                    simulationData.ore.push(row);
+                }
+                var tiles = map.tiles;
+                for(var x =0;x<map.width;x++){
+                    for(var y=0;y<map.height;y++){
+                        if(x==-1||y==-1||x==map.width||y==map.height||tiles.charAt(x+y*map.width)=='#'){
+                            simulationData.ore[x][y][1]=-1;
+                        }
+                    }
+                }
+                simulationData.oreChanged = true;
+                simulationData.ready = true;
+            }
             var frame = map.frames[currentFrame];
             var sigs = frame.signals;
             simulationData.lines = [];
@@ -86,23 +144,23 @@
                         loc: sig.loc,
                         team: sig.team,
                         type: sig.robotType,
-						lastloc: sig.loc,
-						hasInterp: false,
-						rot:0
+                        lastloc: sig.loc,
+                        hasInterp: false,
+                        rot:0
                     };
                     simulationData.robots[robot.id] = robot;
                 }else if(sig.type=="move"){
                     var robot = simulationData.robots[sig.robotID];
-					robot.lastloc = robot.loc;
+                    robot.lastloc = robot.loc;
                     robot.loc = sig.loc;
-					robot.hasInterp = true;
+                    robot.hasInterp = true;
                 }else if(sig.type=="attack"){
                     var robot = simulationData.robots[sig.robotID];
                     simulationData.lines.push([robot,sig.loc]);
                 }else if(sig.type=="ore"){
-					var oreLoc = maplocToOreLoc(sig.loc);
-					simulationData.ore[oreLoc[0]][oreLoc[1]][1] = sig.amount;
-					simulationData.oreChanged = true;
+                    var oreLoc = maplocToOreLoc(sig.loc);
+                    simulationData.ore[oreLoc[0]][oreLoc[1]][1] = sig.amount;
+                    simulationData.oreChanged = true;
                 }else if(sig.type=="mine"){
                     var robot = simulationData.robots[sig.robotID];
 					var mineLoc = robot?maplocToOreLoc(robot.loc):maplocToOreLoc(sig.loc);
@@ -115,6 +173,6 @@
             currentFrame++;
         }
     </script>
-	<script src="renderer.js"></script>
+    <script src="renderer.js"></script>
 </html>
 

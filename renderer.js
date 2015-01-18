@@ -12,42 +12,15 @@ var blueCol = new THREE.Color(0x0000ff);
 var slowmotion = 6;
 var oreMesh,gridMesh;
 init();
-animate();
 
-function initDom(){
-	var container = document.createElement( 'div' );
-	document.body.appendChild( container );
-	
-	renderer = new THREE.WebGLRenderer();
-	renderer.shadowMapEnabled = true;
-	renderer.shadowMapSoft = false;
-	renderer.setClearColor( 0xffffff );
-	renderer.setPixelRatio( window.devicePixelRatio );
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	container.appendChild( renderer.domElement );
-
-	stats = new Stats();
-	stats.domElement.style.position = 'absolute';
-	stats.domElement.style.top = '0px';
-	stats.domElement.style.zIndex = 100;
-	container.appendChild( stats.domElement );
-
-	var fileChooser = document.createElement('input');
-	fileChooser.style.position = 'absolute';
-	fileChooser.style.top = '0px';
-	fileChooser.style.left = '80px';
-	fileChooser.style.zIndex = 100;
-	fileChooser.type = 'file';
-	fileChooser.onchange = function(){parseFile=this.files[0];};
-	container.appendChild(fileChooser);
-
+function initEvents(){
 	window.addEventListener( 'resize', onWindowResize, false );
 	document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 	document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
 }
 
 function init() {
-	initDom();
+	initEvents();
 	battlecodeCam = new battlecodeCamera();
 	scene = new THREE.Scene();
 	objects = [];
@@ -221,10 +194,6 @@ function createMap(){
 function animate() {
 	requestAnimationFrame( animate );
 
-	if(parseFile!=null){
-		parse(parseFile);
-		parseFile = null;
-	}
 	if(simulationData.ready && walls==null){
 		createMap();
 	}
