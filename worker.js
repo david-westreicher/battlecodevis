@@ -130,6 +130,7 @@ self.addEventListener('message', function(e) {
                 var signal = {
                     type:'mine',
                     team:attrs['mineTeam'],
+					robotID:parseInt(attrs['robotID']),
                     loc:this.parseLoc(attrs['mineLoc'])
                 };
                 this.currentSignals.push(signal);
