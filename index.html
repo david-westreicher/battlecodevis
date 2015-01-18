@@ -15,6 +15,7 @@
         </style>
         <script src="lib/three.min.js"></script>
         <script src="lib/stats.min.js"></script>
+        <script src="camera.js"></script>
     </head>
     <body>
     </body>
@@ -22,6 +23,20 @@
     <script type="text/javascript">
         var container = document.createElement( 'div' );
         document.body.appendChild( container );
+
+        renderer = new THREE.WebGLRenderer();
+        renderer.shadowMapEnabled = true;
+        renderer.shadowMapSoft = false;
+        renderer.setClearColor( 0xffffff );
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        container.appendChild( renderer.domElement );
+
+        stats = new Stats();
+        stats.domElement.style.position = 'absolute';
+        stats.domElement.style.top = '0px';
+        stats.domElement.style.zIndex = 100;
+        container.appendChild( stats.domElement );
 
         var fileChooser = document.createElement('input');
         fileChooser.style.position = 'absolute';

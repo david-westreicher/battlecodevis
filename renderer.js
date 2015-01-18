@@ -1,9 +1,9 @@
 var stats;
-var camera, scene, renderer;
+var battlecodeCam;
+var scene, renderer;
 var objects,lines,walls;
 var redMaterial,blueMaterial,normalMaterial;
 var mouseX = 0, mouseY = 0;
-var cameraDist = 2000;
 var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
 var frameNum = 0,interp,isLastFrame;
@@ -11,13 +11,17 @@ var redCol = new THREE.Color(0xff0000);
 var blueCol = new THREE.Color(0x0000ff);
 var slowmotion = 6;
 var oreMesh,gridMesh;
-document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
 init();
 
+function initEvents(){
+	window.addEventListener( 'resize', onWindowResize, false );
+	document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+	document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
+}
+
 function init() {
-	camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 1, 10000 );
-	camera.position.z = 1500;
+	initEvents();
+	battlecodeCam = new battlecodeCamera();
 	scene = new THREE.Scene();
 	objects = [];
 
@@ -70,35 +74,18 @@ function init() {
 	//light.shadowCameraVisible = true;
 	light.shadowCameraNear = 100;
 	light.shadowCameraFar = 600;
-	light.shadowCameraLeft = -2500; // CHANGED
-	light.shadowCameraRight = 2500; // CHANGED
-	light.shadowCameraTop = 2500; // CHANGED
-	light.shadowCameraBottom = -2500; // CHANGED
-	light.position.set(0,0,500); // CHANGED
+	light.shadowCameraLeft = -2500;
+	light.shadowCameraRight = 2500;
+	light.shadowCameraTop = 2500;
+	light.shadowCameraBottom = -2500;
+	light.position.set(0,0,500);
 	scene.add(light);
-
-	renderer = new THREE.WebGLRenderer();
-	renderer.shadowMapEnabled = true;
-	renderer.shadowMapSoft = false;
-	renderer.setClearColor( 0xffffff );
-	renderer.setPixelRatio( window.devicePixelRatio );
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	container.appendChild( renderer.domElement );
-
-	stats = new Stats();
-	stats.domElement.style.position = 'absolute';
-	stats.domElement.style.top = '0px';
-	stats.domElement.style.zIndex = 100;
-	container.appendChild( stats.domElement );
-
-	window.addEventListener( 'resize', onWindowResize, false );
 }
 
 function onWindowResize() {
 	windowHalfX = window.innerWidth / 2;
 	windowHalfY = window.innerHeight / 2;
-	camera.aspect = window.innerWidth / window.innerHeight;
-	camera.updateProjectionMatrix();
+	battlecodeCam.updateRatio();
 	renderer.setSize( window.innerWidth, window.innerHeight );
 }
 
@@ -108,13 +95,7 @@ function onDocumentMouseMove(event) {
 }
 
 function onDocumentMouseWheel(event) {
-	console.log(event);
-	var up = event.wheelDelta>0||event.wheelDeltaY>0;
-	if(!up){
-		cameraDist*=1.1;
-	}else
-		cameraDist/=1.1;
-	cameraDist = Math.min(5000,Math.max(100,cameraDist));
+	battlecodeCam.updateDist(event.wheelDelta>0||event.wheelDeltaY>0);
 }
 
 function toOreLoc(x,y){
@@ -269,12 +250,7 @@ function render() {
 	//update camera
 	var cameraAngle = (mouseX/windowHalfX)*Math.PI*2;
 	var cameraAngle2 = (mouseY/windowHalfY+1)*Math.PI/4;
-	var cameraRadius = Math.abs(Math.sin(cameraAngle2))*cameraDist;
-	camera.position.x = Math.sin(cameraAngle)*cameraRadius;
-	camera.position.y = Math.cos(cameraAngle)*cameraRadius;
-	camera.position.z = Math.cos(cameraAngle2)*cameraDist;
-	camera.up.set(0,0,1);
-	camera.lookAt( scene.position );
+	battlecodeCam.update(cameraAngle,cameraAngle2,scene.position);
 
 	//draw shoot lines
 	var simulines = simulationData.lines;
@@ -326,6 +302,6 @@ function render() {
 		objects[i].visible = false;
 	}
 
-	renderer.render( scene, camera );
+	renderer.render( scene, battlecodeCam.cam );
 }
 
