@@ -217,7 +217,6 @@ self.addEventListener('message', function(e) {
 
         this.readNextLine = function(){
             if(this.start<this.file.size){
-                console.log('loading chunk');
                 var chunk = this.reader.readAsArrayBuffer(this.file.slice(this.start,this.end));
                 var byteArray = new Uint8Array(chunk);
 
