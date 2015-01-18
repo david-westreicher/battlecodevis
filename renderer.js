@@ -1,4 +1,4 @@
-var container, stats;
+var stats;
 var camera, scene, renderer;
 var objects,lines,walls;
 var redMaterial,blueMaterial,normalMaterial;
@@ -14,11 +14,8 @@ var oreMesh,gridMesh;
 document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
 init();
-animate();
 
 function init() {
-	container = document.createElement( 'div' );
-	document.body.appendChild( container );
 	camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 1, 10000 );
 	camera.position.z = 1500;
 	scene = new THREE.Scene();
@@ -94,14 +91,6 @@ function init() {
 	stats.domElement.style.zIndex = 100;
 	container.appendChild( stats.domElement );
 
-	var fileChooser = document.createElement('input');
-	fileChooser.style.position = 'absolute';
-	fileChooser.style.top = '0px';
-	fileChooser.style.left = '80px';
-	fileChooser.style.zIndex = 100;
-	fileChooser.type = 'file';
-	fileChooser.onchange = function(){parseFile=this.files[0];};
-	container.appendChild(fileChooser);
 	window.addEventListener( 'resize', onWindowResize, false );
 }
 
@@ -224,10 +213,6 @@ function createMap(){
 function animate() {
 	requestAnimationFrame( animate );
 
-	if(parseFile!=null){
-		parse(parseFile);
-		parseFile = null;
-	}
 	if(simulationData.ready && walls==null){
 		createMap();
 	}
