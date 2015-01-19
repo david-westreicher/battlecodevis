@@ -9,17 +9,13 @@
         <script src="lib/three.min.js"></script>
         <script src="lib/stats.min.js"></script>
         <script src="camera.js"></script>
+        <script src="gui.js"></script>
         <script src="teams/teams.js"></script>
     </head>
     <body>
         <div id="container">
             <div class="controls">
             <input type="file" accept=".rms" onchange="loadFile(this.files[0])" style="top:0px;left:0px;position:absolute;z-index:100">
-            </div>
-            <div id="textDiv" style="position:absolute;top:0px;text-align:center;z-index:10;width:100%;opacity:0">
-                <div id="team1Text" style="display:inline-block;color:red;fon-family:monospace;font-weight:bold"></div>
-                <div style="display:inline-block;fon-family:monospace;padding:1rem">VS</div>
-                <div id="team2Text" style="display:inline-block;color:blue;fon-family:monospace;font-weight:bold"></div>
             </div>
             <div class="stats">
                 <div class="left">
@@ -29,14 +25,10 @@
                         <li></li>
                     </ul>
                     <div class="photo">
-                        <img src="http://s3.amazonaws.com/battlecode-avatars/avatars/96dbd41482d6f312e3dc52109c062de7.png"/>
+                        <img src="images/avatar_placeholder.png"/>
                     </div>
-                    <h3>Schnitzel</h3>
-                    <ul class="towers">
-                        <li class="alive"></li>
-                        <li class="alive"></li>
-                        <li class="dead"></li>
-                    </ul>
+                    <h3>???</h3>
+                    <ul class="towers"></ul>
                     <div class="live">
                     </div>
                 </div>
@@ -47,14 +39,10 @@
                         <li></li>
                     </ul>
                     <div class="photo">
-                        <img src="http://s3.amazonaws.com/battlecode-avatars/avatars/472e28e40621ebf0cd25b687a9525d71.png"/>
+                        <img src="images/avatar_placeholder.png"/>
                     </div>
-                    <h3>Geoduck</h3>
-                    <ul class="towers">
-                        <li class="alive"></li>
-                        <li class="dead"></li>
-                        <li class="dead"></li>
-                    </ul>
+                    <h3>???</h3>
+                    <ul class="towers"></ul>
                     <div class="live">
                     </div>
                 </div>
@@ -88,6 +76,17 @@
             currentMap = 0;
             startNewWorker(file);
         }
+        // global helper
+        var $ = function (el) {
+            return document.querySelectorAll(el);
+        }
+        var forEach = function (array, callback, scope) {
+            for (var i = 0; i < array.length; i++) {
+                callback.call(scope, i, array[i]); // passes back stuff we need
+            }
+        };
+        var gui = new GUI();
+
         function startNewWorker(file){
             window.worker = new Worker('workerbundle.js');
             window.worker.addEventListener('error', function(e){
@@ -102,9 +101,7 @@
                     for(var i =0;i<data.data.length;i++)
                         data.data[i] = teams[parseInt(data.data[i].substring(4))];
                     replayData = {maplist:[],teams:data.data};
-                    team1Text.innerHTML = data.data[0];
-                    team2Text.innerHTML = data.data[1];
-                    textDiv.style.opacity = 1;
+                    gui.setTeams(data.data);
                 }
                 if(data.message=='mapinfo'){
                     replayData.maplist.push(data.data);
@@ -195,6 +192,9 @@
                         rot:0
                     };
                     simulationData.robots[robot.id] = robot;
+                    if(robot.type == "TOWER"){
+                        gui.updateScore(robot.team, true);
+                    }
                 }else if(sig.type=="move"){
                     var robot = simulationData.robots[sig.robotID];
                     robot.lastloc = robot.loc;
@@ -213,9 +213,13 @@
                     simulationData.ore[mineLoc[0]][mineLoc[1]][2] = robot?robot.team:sig.team;
                     simulationData.oreChanged = true;
                 }else if(sig.type=="death"){
+                    if(simulationData.robots[sig.robotID].type == "TOWER"){
+                        gui.updateScore(simulationData.robots[sig.robotID].team, false);
+                    }
                     delete simulationData.robots[sig.robotID];
                 }else if(sig.type=="mapend"){
                     resetSimulation();
+                    gui.resetScores();
                     currentMap++;
                 }
             }
