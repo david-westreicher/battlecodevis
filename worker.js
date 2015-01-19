@@ -199,7 +199,7 @@ self.addEventListener('message', function(e) {
 
     var ChunkReader = function(file){
         this.startTime = new Date();
-        this.chunkSize = 1048576;
+        this.chunkSize = 1048576*4;
         this.chunkParser = new ChunkParser();
         this.inflate = new pako.Inflate({chunkSize:this.chunkSize});
         var self = this;
