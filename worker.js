@@ -194,57 +194,67 @@ self.addEventListener('message', function(e) {
     }
 
     var ChunkReader = function(file){
-        var counter = 0;
-        var percent = 0;
-
         this.startTime = new Date();
-        this.chunkSize = 65536*5;
-        // this.chunkSize = 1048576*4;
-        this.start = 0;
-        this.end = this.chunkSize;
-        this.file = file;
-
+        this.chunkSize = 1048576;
         this.chunkParser = new ChunkParser();
-
         this.inflate = new pako.Inflate({chunkSize:this.chunkSize});
         var self = this;
+		self.mapInfosSent = 0;
+		self.framesSent = 0;
         this.inflate.onData =function(chunk) {
-            // console.log('processing chunk '+counter);
             self.chunkParser.parseChunk(chunk);
-            counter++;
+			console.log("chunk");
+			if(self.mapInfosSent<self.chunkParser.metadata.maplist.length){
+				var map = self.chunkParser.metadata.maplist[self.mapInfosSent];
+				if(map.frames.length>0){
+					var mapInfo ={
+						width:map.width,
+						height:map.height,
+						originX:map.originX,
+						originY:map.originY,
+						name:map.name,
+						tiles:map.tiles,
+						ore:map.ore,
+						frames:[]
+					};
+					postMessage({data: mapInfo, message: 'mapinfo'});
+					if(self.mapInfosSent==0)
+						postMessage({data: self.chunkParser.metadata.teams, message: 'teams'});
+					self.mapInfosSent++;
+					self.framesSent = 0;
+				}
+			}
+			var frames =  self.chunkParser.metadata.maplist[self.mapInfosSent-1].frames;
+			if(self.framesSent+1<frames.length){
+				var framesToSend = [];
+				for(var i =self.framesSent;i<frames.length-1;i++){
+					framesToSend.push(frames[i]);
+				}
+				postMessage({data: framesToSend, message: 'frames'});
+			}
+
         }
 
         this.reader = new FileReaderSync();
 
         this.readNextLine = function(){
-            if(this.start<this.file.size){
-                var chunk = this.reader.readAsArrayBuffer(this.file.slice(this.start,this.end));
-                var byteArray = new Uint8Array(chunk);
-
-                percent = ((this.chunkSize*counter/this.file.size))*10;
-                postMessage({data: null, message: 'loading '+percent+'%'});
-
-                try {
-                    var start = new Date().getTime();
-                    this.inflate.push(byteArray,false);
-                    var end = new Date().getTime();
-                }catch (err) {
-                    console.log(err);
-                }
-                // console.log('unzip execution time: ' + (end - start));
-                this.start+=this.chunkSize;
-                this.end+=this.chunkSize;
-                this.end= Math.min(this.file.size,this.end);
-                this.readNextLine();
-            }else{
-                if(this.chunkParser.tagStack.length!=0){
-                    throw new Error("something went terribly wrong while parsing :(");
-                }
-                console.log("parsing finished, time: "+(new Date().getTime()-this.startTime.getTime())+"ms")
-                postMessage({data: chunkReader.chunkParser.metadata, message: 'loaded'});
-                console.log('closing worker');
-                close();
-            }
+			var chunk = this.reader.readAsArrayBuffer(file);
+			var byteArray = new Uint8Array(chunk);
+			postMessage({data: null, message: 'loading started'});
+			try {
+				var start = new Date().getTime();
+				this.inflate.push(byteArray,true);
+				var end = new Date().getTime();
+			}catch (err) {
+				console.log(err);
+			}
+			if(this.chunkParser.tagStack.length!=0){
+				throw new Error("something went terribly wrong while parsing :(");
+			}
+			console.log("parsing finished, time: "+(new Date().getTime()-this.startTime.getTime())+"ms")
+			postMessage({data: chunkReader.chunkParser.metadata, message: 'loaded'});
+			console.log('closing worker');
+			close();
         }
     };
 

@@ -12,6 +12,7 @@ var blueCol = new THREE.Color(0x0000ff);
 var slowmotion = 6;
 var oreMesh,gridMesh;
 init();
+animate();
 
 function initEvents(){
 	window.addEventListener( 'resize', onWindowResize, false );

@@ -70,12 +70,28 @@
 
         // got parsed chunk. render it
         worker.addEventListener('message', function(e) {
-            var data = e.data;
+            /*var data = e.data;
             if(data.data != null){
                 setData(data.data);
-                animate();
+               // animate();
             }
-            loader.innerHTML = data.message;
+            loader.innerHTML = data.message;*/
+			var data = e.data;
+			if(data.message=='mapinfo'){
+				if(replayData==null){
+					replayData = {maplist:[],teams:null};
+				}
+				replayData.maplist.push(data.data);
+			}
+			if(data.message=='teams'){
+				replayData.teams = data.data;	
+			}
+			if(data.message=='frames'){
+				var newFrames = data.data;
+				var frames = replayData.maplist[replayData.maplist.length-1].frames;
+				for(var i=0;i<newFrames.length;i++)
+					frames.push(newFrames[i]);
+			}
         }, false);
 
     </script>
@@ -90,7 +106,7 @@
             };
 
         var replayData;
-        var currentFrame;
+        var currentFrame=0;
         var parseFile = null;
 
         function setData(data){
@@ -110,7 +126,8 @@
 
         function simulate(){
             if(replayData==null || replayData.maplist.length==0 || replayData.maplist[0].frames.length<=currentFrame+1)
-                return; var map = replayData.maplist[0];
+                return; 
+			var map = replayData.maplist[0];
             if(Object.keys(simulationData.robots).length==0){
                 //INITIALIZE MAP & ORE
                 var oreStringArray = map.ore.split(',');
