@@ -1,0 +1,77 @@
+body {
+    background:#fff;
+    padding:0;
+    margin:0;
+    font-weight: bold;
+    overflow:hidden;
+}
+.stats{
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 160px;
+}
+.stats .left{
+    float: left;
+    width: 50%;
+}
+.left .photo{
+    float: left;
+}
+.stats .right{
+    float: right;
+    width: 50%;
+}
+.right .photo{
+    float: right;
+}
+.right h3{
+    text-align: right;
+}
+.photo{
+    margin: 4px;
+    height: 128px;
+    width: 128px;
+}
+
+.trophies{
+    width: 100%;
+    overflow: hidden;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0 4px;
+}
+.right .trophies li{
+    float: right;
+}
+.trophies li{
+    float: left;
+    margin: 0 5px;
+    display: block;
+    width: 20px;
+    height: 20px;
+    background: #E8DF32;
+}
+.towers{
+    list-style: none;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+}
+.right .towers, .right .towers li{
+    float: right;
+}
+.towers li{
+    width: 20px;
+    height: 20px;
+    float: left;
+    margin-right: 5px;
+}
+.towers .alive{
+    background-color: #A9D085;
+
+}
+.towers .dead{
+    background-color: #E7EDE2;
+}
+

@@ -2,119 +2,142 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Title of the document</title>
-        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-        <style>
-            body {
-                background:#fff;
-                padding:0;
-                margin:0;
-                font-weight: bold;
-                overflow:hidden;
-            }
-        </style>
-        <script src="lib/three.min.js"></script>
-        <script src="lib/stats.min.js"></script>
-        <script src="camera.js"></script>
-        <script src="modelrenderer.js"></script>
-        <script src="teams/teams.js"></script> </head> <body>
-		<div id="container">
-			<input type="file" accept=".rms" onchange="loadFile(this.files[0])" style="top:0px;left:0px;position:absolute;z-index:100">
-			<div id="textDiv" style="position:absolute;top:0px;text-align:center;z-index:10;width:100%;opacity:0">
-				<img id="team1Image" style="display:inline-block;width:100px"/>
-				<div id="team1Text" style="display:inline-block;color:red;font-family:monospace;font-weight:bold"></div>
-				<div style="display:inline-block;fon-family:monospace;padding:1rem">VS</div>
-				<div id="team2Text" style="display:inline-block;color:blue;font-family:monospace;font-weight:bold"></div>
-				<img id="team2Image" style="display:inline-block;width:100px"/>
+	<title>Title of the document</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link href="stylesheets/normalize.css" rel="stylesheet" type="text/css"/>
+	<link href="stylesheets/battelcode.css" rel="stylesheet" type="text/css"/>
+	<script src="lib/three.min.js"></script>
+	<script src="lib/stats.min.js"></script>
+	<script src="camera.js"></script>
+	<script src="modelrenderer.js"></script>
+	<script src="teams/teams.js"></script>
+</head>
+<body>
+	<div id="container">
+		<div class="controls">
+		<input type="file" accept=".rms" onchange="loadFile(this.files[0])" style="top:0px;left:0px;position:absolute;z-index:100">
+		</div>
+		<div id="textDiv" style="position:absolute;top:0px;text-align:center;z-index:10;width:100%;opacity:0">
+			<div id="team1Text" style="display:inline-block;color:red;fon-family:monospace;font-weight:bold"></div>
+			<div style="display:inline-block;fon-family:monospace;padding:1rem">VS</div>
+			<div id="team2Text" style="display:inline-block;color:blue;fon-family:monospace;font-weight:bold"></div>
+		</div>
+		<div class="stats">
+			<div class="left">
+				<ul class="trophies">
+					<li></li>
+					<li></li>
+					<li></li>
+				</ul>
+				<div class="photo">
+					<img src="http://s3.amazonaws.com/battlecode-avatars/avatars/96dbd41482d6f312e3dc52109c062de7.png"/>
+				</div>
+				<h3>Schnitzel</h3>
+				<ul class="towers">
+					<li class="alive"></li>
+					<li class="alive"></li>
+					<li class="dead"></li>
+				</ul>
+				<div class="live">
+				</div>
+			</div>
+			<div class="right">
+				<ul class="trophies">
+					<li></li>
+					<li></li>
+					<li></li>
+				</ul>
+				<div class="photo">
+					<img src="http://s3.amazonaws.com/battlecode-avatars/avatars/472e28e40621ebf0cd25b687a9525d71.png"/>
+				</div>
+				<h3>Geoduck</h3>
+				<ul class="towers">
+					<li class="alive"></li>
+					<li class="dead"></li>
+					<li class="dead"></li>
+				</ul>
+				<div class="live">
+				</div>
 			</div>
 		</div>
-    </body>
-    <!-- setup page -->
-    <script type="text/javascript">
-        renderer = new THREE.WebGLRenderer();
-        renderer.shadowMapEnabled = true;
-        renderer.shadowMapSoft = false;
-        renderer.setClearColor( 0xffffff );
-        renderer.setPixelRatio( window.devicePixelRatio );
-        renderer.setSize( window.innerWidth, window.innerHeight );
-        container.appendChild( renderer.domElement );
+	</div>
+</body>
+<!-- setup page -->
+<script type="text/javascript">
+	renderer = new THREE.WebGLRenderer();
+	renderer.shadowMapEnabled = true;
+	renderer.shadowMapSoft = false;
+	renderer.setClearColor( 0xffffff );
+	renderer.setPixelRatio( window.devicePixelRatio );
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	container.appendChild( renderer.domElement );
 
-        stats = new Stats();
-        stats.domElement.style.position = 'absolute';
-        stats.domElement.style.top = '0px';
-        stats.domElement.style.right = '0px';
-        stats.domElement.style.zIndex = 100;
-        container.appendChild( stats.domElement );
-    </script>
-    <!-- worker -->
-    <script type="text/javascript">
-		function loadFile(file){
-			if(window.worker)
-				window.worker.terminate();
-			resetSimulation();
-            simulationData.score = [0,0];
-			replayData = null;
-			currentMap = 0;
-			startNewWorker(file);
-		}
+	stats = new Stats();
+	stats.domElement.style.position = 'absolute';
+	stats.domElement.style.top = '0px';
+	stats.domElement.style.right = '0px';
+	stats.domElement.style.zIndex = 100;
+	container.appendChild( stats.domElement );
+</script>
+<!-- worker -->
+<script type="text/javascript">
+	function loadFile(file){
+		if(window.worker)
+			window.worker.terminate();
+		resetSimulation();
+		simulationData.score = [0,0];
+		replayData = null;
+		currentMap = 0;
+		startNewWorker(file);
+	}
 
-		function startNewWorker(file){
-			window.worker = new Worker('workerbundle.js');
-			window.worker.addEventListener('error', function(e){
-				console.error([
-					'ERROR: Line ', e.lineno, ' in ', e.filename, ': ', e.message
-				].join(''));
-			}, false);
-			// got parsed chunk. render it
-			window.worker.addEventListener('message', function(e) {
-				var data = e.data;
-				if(data.message=='teams'){
-					for(var i =0;i<data.data.length;i++)
-						data.data[i] = teams[parseInt(data.data[i].substring(4))];
-					replayData = {maplist:[],teams:data.data};
-					team1Text.innerHTML = data.data[0][0];
-					team2Text.innerHTML = data.data[1][0];
-					var imageURLbase = "http://s3.amazonaws.com/battlecode-avatars/avatars/";
-					if(data.data[0][1]=='hq1.png' || data.data[0][1]=='hq2.png')
-						team1Image.src = "./teams/hqred.png";
-					else
-						team1Image.src = imageURLbase+data.data[0][1];
-					if(data.data[1][1]=='hq1.png' || data.data[1][1]=='hq2.png')
-						team2Image.src = "./teams/hqblue.png";
-					else
-						team2Image.src = imageURLbase+data.data[1][1];
-					textDiv.style.opacity = 1;
-				}
-				if(data.message=='mapinfo'){
-					replayData.maplist.push(data.data);
-				}
-				if(data.message=='frames'){
-					var newFrames = data.data;
-					var frames = replayData.maplist[replayData.maplist.length-1].frames;
-					for(var i=0;i<newFrames.length;i++)
-						frames.push(newFrames[i]);
-				}
-			}, false);
-			window.worker.postMessage(file);
-		}
-
-    </script>
-    <!-- simulation & parsing -->
-    <script type="text/javascript">
-        var simulationData  = {
-                robots:{},
-                lines:[],
-                ore:[],
-                oreChanged:false,
-                ready:false,
-				score:[0,0],
-				gold:[0,0],
-				map:null
+	function startNewWorker(file){
+		window.worker = new Worker('workerbundle.js');
+		window.worker.addEventListener('error', function(e){
+			console.error([
+				'ERROR: Line ', e.lineno, ' in ', e.filename, ': ', e.message
+			].join(''));
+		}, false);
+		// got parsed chunk. render it
+		window.worker.addEventListener('message', function(e) {
+			var data = e.data;
+			if(data.message=='teams'){
+				for(var i =0;i<data.data.length;i++)
+					data.data[i] = teams[parseInt(data.data[i].substring(4))];
+				replayData = {maplist:[],teams:data.data};
+				team1Text.innerHTML = data.data[0];
+				team2Text.innerHTML = data.data[1];
+				textDiv.style.opacity = 1;
+			}
+			if(data.message=='mapinfo'){
+				replayData.maplist.push(data.data);
+			}
+			if(data.message=='frames'){
+				var newFrames = data.data;
+				var frames = replayData.maplist[replayData.maplist.length-1].frames;
+				for(var i=0;i<newFrames.length;i++)
+					frames.push(newFrames[i]);
+			}
+		}, false);
+		window.worker.postMessage(file);
+	}
+</script>
+<!-- simulation & parsing -->
+<script type="text/javascript">
+	var simulationData  = {
+			robots:{},
+			lines:[],
+			ore:[],
+			oreChanged:false,
+			ready:false,
+			score:[0,0],
+			gold:[0,0],
+			map:null
 		};
 
         var replayData;
         var currentFrame=0;
-		var currentMap=0;
+        var currentMap=0;
 
         function resetSimulation(){
             currentFrame = 0;
@@ -134,10 +157,10 @@
 
         function simulate(){
             if(replayData==null || replayData.maplist.length==currentMap || replayData.maplist[currentMap].frames.length<=currentFrame+1)
-                return; 
+                return;
             if(currentFrame==0){
                 //INITIALIZE MAP & ORE
-				var map = replayData.maplist[currentMap];
+                var map = replayData.maplist[currentMap];
                 var oreStringArray = map.ore.split(',');
                 for(var x =0;x<map.width;x++){
                     var row = [];
@@ -157,7 +180,7 @@
                 }
                 simulationData.oreChanged = true;
                 simulationData.ready = true;
-				simulationData.map = map;
+                simulationData.map = map;
             }
             var frame = simulationData.map.frames[currentFrame];
             var sigs = frame.signals;
@@ -191,17 +214,16 @@
                     simulationData.oreChanged = true;
                 }else if(sig.type=="mine"){
                     var robot = simulationData.robots[sig.robotID];
-					var mineLoc = robot?maplocToOreLoc(robot.loc):maplocToOreLoc(sig.loc);
-					simulationData.ore[mineLoc[0]][mineLoc[1]][2] = robot?robot.team:sig.team;
-					simulationData.oreChanged = true;
+                    var mineLoc = robot?maplocToOreLoc(robot.loc):maplocToOreLoc(sig.loc);
+                    simulationData.ore[mineLoc[0]][mineLoc[1]][2] = robot?robot.team:sig.team;
+                    simulationData.oreChanged = true;
                 }else if(sig.type=="death"){
                     delete simulationData.robots[sig.robotID];
                 }else if(sig.type=="mapend"){
 					simulationData.score[(sig.winner=='A')?0:1]++;
 					resetSimulation();
 					currentMap++;
-                }
-            }
+                } }
         }
     </script>
     <script src="renderer.js"></script>
