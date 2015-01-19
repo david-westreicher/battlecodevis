@@ -2,9 +2,12 @@
     "name": "battlecodevis",
     "description": "battlecode viewer",
     "scripts": {
-        "browserify": "browserify worker.js -o workerbundle.js"
+        "browserify": "browserify worker.js -o workerbundle.js",
+        "server": "./node_modules/beefy/bin/beefy worker.js --live --index=index.html",
+        "start": "npm run server"
     },
     "dependencies": {
-        "pako": ">= 0.2.5"
+        "pako": ">= 0.2.5",
+        "beefy": "*"
     }
 }
