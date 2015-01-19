@@ -217,9 +217,12 @@ self.addEventListener('message', function(e) {
 						ore:map.ore,
 						frames:[]
 					};
-					postMessage({data: mapInfo, message: 'mapinfo'});
 					if(self.mapInfosSent==0)
 						postMessage({data: self.chunkParser.metadata.teams, message: 'teams'});
+					else{
+						//before sending a new mapinfo send out last frames of previous map
+					}
+					postMessage({data: mapInfo, message: 'mapinfo'});
 					self.mapInfosSent++;
 					self.framesSent = 0;
 				}
@@ -231,6 +234,7 @@ self.addEventListener('message', function(e) {
 					framesToSend.push(frames[i]);
 				}
 				postMessage({data: framesToSend, message: 'frames'});
+				self.framesSent = frames.length-1;
 			}
 
         }
@@ -252,7 +256,6 @@ self.addEventListener('message', function(e) {
 				throw new Error("something went terribly wrong while parsing :(");
 			}
 			console.log("parsing finished, time: "+(new Date().getTime()-this.startTime.getTime())+"ms")
-			postMessage({data: chunkReader.chunkParser.metadata, message: 'loaded'});
 			console.log('closing worker');
 			close();
         }

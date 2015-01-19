@@ -70,20 +70,12 @@
 
         // got parsed chunk. render it
         worker.addEventListener('message', function(e) {
-            /*var data = e.data;
-            if(data.data != null){
-                setData(data.data);
-               // animate();
-            }
-            loader.innerHTML = data.message;*/
 			var data = e.data;
 			if(data.message=='mapinfo'){
-				if(replayData==null){
-					replayData = {maplist:[],teams:null};
-				}
 				replayData.maplist.push(data.data);
 			}
 			if(data.message=='teams'){
+				replayData = {maplist:[],teams:null};
 				replayData.teams = data.data;	
 			}
 			if(data.message=='frames'){

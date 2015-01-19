@@ -9,7 +9,7 @@ var windowHalfY = window.innerHeight / 2;
 var frameNum = 0,interp,isLastFrame;
 var redCol = new THREE.Color(0xff0000);
 var blueCol = new THREE.Color(0x0000ff);
-var slowmotion = 6;
+var slowmotion = 1;
 var oreMesh,gridMesh;
 init();
 animate();
