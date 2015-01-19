@@ -45,7 +45,7 @@
         fileChooser.style.zIndex = 100;
         fileChooser.type = 'file';
         fileChooser.addEventListener('change', function(e) {
-            worker.postMessage(this.files[0]);
+			loadFile(this.files[0]);
         }, false);
         container.appendChild(fileChooser);
 
@@ -60,30 +60,39 @@
     </script>
     <!-- worker -->
     <script type="text/javascript">
-        var worker = new Worker('workerbundle.js');
+		function loadFile(file){
+			if(window.worker)
+				window.worker.terminate();
+			resetSimulation();
+			replayData = null;
+			startNewWorker(file);
+		}
 
-        worker.addEventListener('error', function(e){
-            console.error([
-                'ERROR: Line ', e.lineno, ' in ', e.filename, ': ', e.message
-            ].join(''));
-        }, false);
-
-        // got parsed chunk. render it
-        worker.addEventListener('message', function(e) {
-			var data = e.data;
-			if(data.message=='teams'){
-				replayData = {maplist:[],teams:data.data};
-			}
-			if(data.message=='mapinfo'){
-				replayData.maplist.push(data.data);
-			}
-			if(data.message=='frames'){
-				var newFrames = data.data;
-				var frames = replayData.maplist[replayData.maplist.length-1].frames;
-				for(var i=0;i<newFrames.length;i++)
-					frames.push(newFrames[i]);
-			}
-        }, false);
+		function startNewWorker(file){
+			window.worker = new Worker('workerbundle.js');
+			window.worker.addEventListener('error', function(e){
+				console.error([
+					'ERROR: Line ', e.lineno, ' in ', e.filename, ': ', e.message
+				].join(''));
+			}, false);
+			// got parsed chunk. render it
+			window.worker.addEventListener('message', function(e) {
+				var data = e.data;
+				if(data.message=='teams'){
+					replayData = {maplist:[],teams:data.data};
+				}
+				if(data.message=='mapinfo'){
+					replayData.maplist.push(data.data);
+				}
+				if(data.message=='frames'){
+					var newFrames = data.data;
+					var frames = replayData.maplist[replayData.maplist.length-1].frames;
+					for(var i=0;i<newFrames.length;i++)
+						frames.push(newFrames[i]);
+				}
+			}, false);
+			window.worker.postMessage(file);
+		}
 
     </script>
     <!-- simulation & parsing -->
@@ -100,8 +109,7 @@
         var currentFrame=0;
         var parseFile = null;
 
-        function setData(data){
-            replayData = data;
+        function resetSimulation(){
             currentFrame = 0;
             simulationData.robots = {};
             simulationData.lines = [];
