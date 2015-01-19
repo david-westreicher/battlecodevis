@@ -57,7 +57,7 @@
 		}
 
 		function startNewWorker(file){
-			window.worker = new Worker('worker.js');
+			window.worker = new Worker('workerbundle.js');
 			window.worker.addEventListener('error', function(e){
 				console.error([
 					'ERROR: Line ', e.lineno, ' in ', e.filename, ': ', e.message
