@@ -9,6 +9,7 @@
         <script src="lib/three.min.js"></script>
         <script src="lib/stats.min.js"></script>
         <script src="camera.js"></script>
+        <script src="modelrenderer.js"></script>
         <script src="gui.js"></script>
         <script src="teams/teams.js"></script>
     </head>
@@ -72,6 +73,7 @@
             if(window.worker)
                 window.worker.terminate();
             resetSimulation();
+            simulationData.score = [0,0];
             replayData = null;
             currentMap = 0;
             startNewWorker(file);
@@ -124,9 +126,10 @@
                 ore:[],
                 oreChanged:false,
                 ready:false,
+                score:[0,0],
+                gold:[0,0],
                 map:null
         };
-
         var replayData;
         var currentFrame=0;
         var currentMap=0;
@@ -136,10 +139,11 @@
             simulationData.robots = {};
             simulationData.lines = [];
             simulationData.ore = [];
-            simulationData.score = [0,0];
             simulationData.ready = false;
             simulationData.oreChanged = false;
             simulationData.map = null;
+            simulationData.gold = [0,0];
+            gui.resetScores();
         }
 
         function maplocToOreLoc(maploc){
@@ -177,7 +181,7 @@
             var frame = simulationData.map.frames[currentFrame];
             var sigs = frame.signals;
             simulationData.lines = [];
-            simulationData.score = frame.score;
+            simulationData.gold = frame.score;
             currentFrame++;
             for(var i =0;i<sigs.length;i++){
                 var sig = sigs[i];
@@ -219,8 +223,8 @@
                     delete simulationData.robots[sig.robotID];
                 }else if(sig.type=="mapend"){
                     resetSimulation();
-                    gui.resetScores();
                     currentMap++;
+                    simulationData.score[(sig.winner=='A')?0:1]++;
                 }
             }
         }

@@ -87,12 +87,21 @@ self.addEventListener('message', function(e) {
                     frames:[]
                 };
 				if(this.currentmap && this.currentmap.frames.length>0){
-					this.currentmap.frames[this.currentmap.frames.length-1].signals.push({type:'mapend'});
-					this.currentmap.frames.push([]);
+					//this.currentmap.frames[this.currentmap.frames.length-1].signals.push({type:'mapend'});
+					//this.currentmap.frames.push([]);
 				}
                 this.currentmap = map;
                 this.metadata.maplist.push(map);
-            }
+            }else if(tagName=='ser.MatchFooter'){
+                var maplist = this.metadata.maplist;
+				console.log(this.tagStack);
+                var attrs = this.getAttrs(tag);
+                var frame = {
+                    signals:[{type:'mapend',winner:attrs['winner']}]
+                }
+                maplist[maplist.length-1].frames.push(frame);
+				maplist[maplist.length-1].frames.push([]);
+			}
             return tagName;
         }
 
@@ -247,6 +256,14 @@ self.addEventListener('message', function(e) {
 			}
 
         }
+        this.inflate.onEnd =function(status) {
+			var frames =  self.chunkParser.metadata.maplist[self.mapInfosSent-1].frames;
+			var framesToSend = [];
+			for(var i =self.framesSent;i<frames.length;i++){
+				framesToSend.push(frames[i]);
+			}
+			postMessage({data: framesToSend, message: 'frames'});
+		}
 
         this.reader = new FileReaderSync();
 
