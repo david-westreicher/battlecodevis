@@ -100,14 +100,14 @@ function onDocumentMouseWheel(event) {
 }
 
 function toOreLoc(x,y){
-	var map = replayData.maplist[0];
+	var map = simulationData.map;
 	return [(((128-map.width)/2)|0)+x,(((128-map.height)/2)|0)+y];
 }
 
 function updateOreTexture(){
 	var size = 128;
 	var textureData;
-	var map = replayData.maplist[0];
+	var map = simulationData.map;
 	if(oreMesh==null){
 		textureData = new Uint8Array(size*size*3);
 		for(var x =0;x<=size;x++){
@@ -160,7 +160,7 @@ function updateOreTexture(){
 }
 
 function createMap(){
-	var map = replayData.maplist[0];
+	var map = simulationData.map;
 	var tiles = map.tiles;
 	var mapGeom = new THREE.Geometry();
 	for(var x =-1;x<=map.width;x++){
@@ -205,7 +205,7 @@ function animate() {
 
 function locToMap(loc){
 	var mapLoc = [0,0];
-	var map = replayData.maplist[0];
+	var map = simulationData.map;
 	mapLoc[0] = (loc[0]-map.originX-map.width/2)*80;
 	mapLoc[1] = -(loc[1]-map.originY-map.height/2)*80;
 	return mapLoc;

@@ -45,6 +45,7 @@
         fileChooser.style.zIndex = 100;
         fileChooser.type = 'file';
         fileChooser.addEventListener('change', function(e) {
+			//TODO fix bug if user cancels file selection (this.files == []?)
 			loadFile(this.files[0]);
         }, false);
         container.appendChild(fileChooser);
@@ -65,6 +66,7 @@
 				window.worker.terminate();
 			resetSimulation();
 			replayData = null;
+			currentMap = 0;
 			startNewWorker(file);
 		}
 
@@ -102,12 +104,13 @@
                 lines:[],
                 ore:[],
                 oreChanged:false,
-                ready:false
-            };
+                ready:false,
+				map:null
+		};
 
         var replayData;
         var currentFrame=0;
-        var parseFile = null;
+		var currentMap=0;
 
         function resetSimulation(){
             currentFrame = 0;
@@ -116,19 +119,20 @@
             simulationData.ore = [];
             simulationData.ready = false;
             simulationData.oreChanged = false;
+			simulationData.map = null;
         }
 
         function maplocToOreLoc(maploc){
-            var map = replayData.maplist[0];
+            var map = simulationData.map;
             return [-map.originX+maploc[0],-map.originY+maploc[1]];
         }
 
         function simulate(){
-            if(replayData==null || replayData.maplist.length==0 || replayData.maplist[0].frames.length<=currentFrame+1)
+            if(replayData==null || replayData.maplist.length==currentMap || replayData.maplist[currentMap].frames.length<=currentFrame+1)
                 return; 
-			var map = replayData.maplist[0];
-            if(Object.keys(simulationData.robots).length==0){
+            if(currentFrame==0){
                 //INITIALIZE MAP & ORE
+				var map = replayData.maplist[currentMap];
                 var oreStringArray = map.ore.split(',');
                 for(var x =0;x<map.width;x++){
                     var row = [];
@@ -148,10 +152,12 @@
                 }
                 simulationData.oreChanged = true;
                 simulationData.ready = true;
+				simulationData.map = map;
             }
-            var frame = map.frames[currentFrame];
+            var frame = simulationData.map.frames[currentFrame];
             var sigs = frame.signals;
             simulationData.lines = [];
+            currentFrame++;
             for(var i =0;i<sigs.length;i++){
                 var sig = sigs[i];
                 if(sig.type=="spawn"){
@@ -184,9 +190,11 @@
 					simulationData.oreChanged = true;
                 }else if(sig.type=="death"){
                     delete simulationData.robots[sig.robotID];
+                }else if(sig.type=="mapend"){
+					resetSimulation();
+					currentMap++;
                 }
             }
-            currentFrame++;
         }
     </script>
     <script src="renderer.js"></script>

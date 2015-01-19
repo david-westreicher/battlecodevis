@@ -86,6 +86,10 @@ self.addEventListener('message', function(e) {
                     ore:'',
                     frames:[]
                 };
+				if(this.currentmap && this.currentmap.frames.length>0){
+					this.currentmap.frames[this.currentmap.frames.length-1].signals.push({type:'mapend'});
+					this.currentmap.frames.push([]);
+				}
                 this.currentmap = map;
                 this.metadata.maplist.push(map);
             }
