@@ -203,7 +203,6 @@ self.addEventListener('message', function(e) {
 		self.framesSent = 0;
         this.inflate.onData =function(chunk) {
             self.chunkParser.parseChunk(chunk);
-			console.log("chunk");
 			if(self.mapInfosSent<self.chunkParser.metadata.maplist.length){
 				var map = self.chunkParser.metadata.maplist[self.mapInfosSent];
 				if(map.frames.length>0){
@@ -221,6 +220,12 @@ self.addEventListener('message', function(e) {
 						postMessage({data: self.chunkParser.metadata.teams, message: 'teams'});
 					else{
 						//before sending a new mapinfo send out last frames of previous map
+						var frames =  self.chunkParser.metadata.maplist[self.mapInfosSent-1].frames;
+						var framesToSend = [];
+						for(var i =self.framesSent;i<frames.length;i++){
+							framesToSend.push(frames[i]);
+						}
+						postMessage({data: framesToSend, message: 'frames'});
 					}
 					postMessage({data: mapInfo, message: 'mapinfo'});
 					self.mapInfosSent++;
