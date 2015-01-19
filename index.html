@@ -19,12 +19,17 @@
         <script src="teams/teams.js"></script>
     </head>
     <body>
+		<div id="container">
+			<input type="file" accept=".rms" onchange="loadFile(this.files[0])" style="top:0px;left:0px;position:absolute;z-index:100">
+			<div id="textDiv" style="position:absolute;top:0px;text-align:center;z-index:10;width:100%;opacity:0">
+				<div id="team1Text" style="display:inline-block;color:red;fon-family:monospace;font-weight:bold"></div>
+				<div style="display:inline-block;fon-family:monospace;padding:1rem">VS</div>
+				<div id="team2Text" style="display:inline-block;color:blue;fon-family:monospace;font-weight:bold"></div>
+			</div>
+		</div>
     </body>
     <!-- setup page -->
     <script type="text/javascript">
-        var container = document.createElement( 'div' );
-        document.body.appendChild( container );
-
         renderer = new THREE.WebGLRenderer();
         renderer.shadowMapEnabled = true;
         renderer.shadowMapSoft = false;
@@ -36,29 +41,9 @@
         stats = new Stats();
         stats.domElement.style.position = 'absolute';
         stats.domElement.style.top = '0px';
+        stats.domElement.style.right = '0px';
         stats.domElement.style.zIndex = 100;
         container.appendChild( stats.domElement );
-
-        var fileChooser = document.createElement('input');
-        fileChooser.style.position = 'absolute';
-        fileChooser.style.top = '0px';
-        fileChooser.style.left = '80px';
-        fileChooser.style.zIndex = 100;
-        fileChooser.type = 'file';
-        fileChooser.addEventListener('change', function(e) {
-			//TODO fix bug if user cancels file selection (this.files == []?)
-			loadFile(this.files[0]);
-        }, false);
-        container.appendChild(fileChooser);
-
-        var loader = document.createElement('div');
-        loader.style.position = 'absolute';
-        loader.style.backgroundColor = 'white';
-        loader.style.top = '0px';
-        loader.style.left = '500px';
-        loader.style.zIndex = 100;
-        loader.type = 'file';
-        container.appendChild(loader);
     </script>
     <!-- worker -->
     <script type="text/javascript">
@@ -85,6 +70,9 @@
 					for(var i =0;i<data.data.length;i++)
 						data.data[i] = teams[parseInt(data.data[i].substring(4))];
 					replayData = {maplist:[],teams:data.data};
+					team1Text.innerHTML = data.data[0];
+					team2Text.innerHTML = data.data[1];
+					textDiv.style.opacity = 1;
 				}
 				if(data.message=='mapinfo'){
 					replayData.maplist.push(data.data);
