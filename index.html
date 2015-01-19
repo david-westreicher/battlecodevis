@@ -4,22 +4,8 @@
         <meta charset="UTF-8">
         <title>Title of the document</title>
         <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-        <style>
-            body {
-                background:#fff;
-                padding:0;
-                margin:0;
-                font-weight: bold;
-                overflow:hidden;
-            }
-            .stats{
-                position: fixed;
-                bottom: 0;
-            }
-            .stats .left{
-                float: left;
-            }
-        </style>
+        <link href="stylesheets/normalize.css" rel="stylesheet" type="text/css"/>
+        <link href="stylesheets/battelcode.css" rel="stylesheet" type="text/css"/>
         <script src="lib/three.min.js"></script>
         <script src="lib/stats.min.js"></script>
         <script src="camera.js"></script>
@@ -39,6 +25,8 @@
                 <div class="left">
                     <ul class="trophies">
                         <li></li>
+                        <li></li>
+                        <li></li>
                     </ul>
                     <div class="photo">
                         <img src="http://s3.amazonaws.com/battlecode-avatars/avatars/96dbd41482d6f312e3dc52109c062de7.png"/>
@@ -47,13 +35,15 @@
                     <ul class="towers">
                         <li class="alive"></li>
                         <li class="alive"></li>
-                        <li class="disabled"></li>
+                        <li class="dead"></li>
                     </ul>
                     <div class="live">
                     </div>
                 </div>
                 <div class="right">
                     <ul class="trophies">
+                        <li></li>
+                        <li></li>
                         <li></li>
                     </ul>
                     <div class="photo">
@@ -62,8 +52,8 @@
                     <h3>Geoduck</h3>
                     <ul class="towers">
                         <li class="alive"></li>
-                        <li class="disabled"></li>
-                        <li class="disabled"></li>
+                        <li class="dead"></li>
+                        <li class="dead"></li>
                     </ul>
                     <div class="live">
                     </div>
