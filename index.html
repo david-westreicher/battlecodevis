@@ -16,6 +16,7 @@
         <script src="lib/three.min.js"></script>
         <script src="lib/stats.min.js"></script>
         <script src="camera.js"></script>
+        <script src="teams/teams.js"></script>
     </head>
     <body>
     </body>
@@ -81,6 +82,8 @@
 			window.worker.addEventListener('message', function(e) {
 				var data = e.data;
 				if(data.message=='teams'){
+					for(var i =0;i<data.data.length;i++)
+						data.data[i] = teams[parseInt(data.data[i].substring(4))];
 					replayData = {maplist:[],teams:data.data};
 				}
 				if(data.message=='mapinfo'){
