@@ -11,7 +11,9 @@ var redCol = new THREE.Color(0xff0000);
 var blueCol = new THREE.Color(0x0000ff);
 var slowmotion = 1;
 var oreMesh,gridMesh;
+var modelRenderer = new ModelRenderer();
 init();
+modelRenderer.init();
 animate();
 
 function initEvents(){
@@ -253,6 +255,10 @@ function render() {
 	}
 	lines.geometry.verticesNeedUpdate = true;
 	lines.geometry.colorsNeedUpdate = true;
+
+
+	modelRenderer.draw(scene,simulationData);
+
 
 	//update meshes
 	var meshi = 0;
