@@ -119,46 +119,27 @@ function updateOreTexture(){
 		}
 	}else
 		textureData = oreMesh.material.map.image.data;
-	if(true){
-		for(var x =0;x<map.width;x++){
-			for(var y =0;y<map.height;y++){
-				var oreLoc = toOreLoc(x,y);
-				var oreInt = simulationData.ore[x][y][1];
-				var oreTeam = simulationData.ore[x][y][2];
-				var dataIndex = (oreLoc[0]+oreLoc[1]*128)*3;
-				if(oreInt<0){
-					textureData[dataIndex+0]= 127;
-					textureData[dataIndex+1]= 127;
-					textureData[dataIndex+2]= 127;
-				}else if(oreInt>0){
-					var minCol = Math.max(50,255-oreInt*6);
-					textureData[dataIndex+0]= (oreTeam=='A'?1:0.5)*minCol;
-					textureData[dataIndex+1]= minCol*0.5;
-					textureData[dataIndex+2]= (oreTeam!='A'?1:0.5)*minCol;
-				}else{
-					textureData[dataIndex+0]= 255;
-					textureData[dataIndex+1]= 255;
-					textureData[dataIndex+2]= 255;
-				}
-			}	
-		}
-	}else{
-		for(var x =0;x<map.width;x++){
-			for(var y =0;y<map.height;y++){
-				var oreLoc = toOreLoc(x,y);
-				var oreInt = simulationData.ore[x][y][0]-simulationData.ore[x][y][1];
-				var dataIndex = (oreLoc[0]+oreLoc[1]*128)*3;
-				if(oreInt>=0){
-					textureData[dataIndex+0]= oreInt*8;
-					textureData[dataIndex+1]= oreInt*8;
-					textureData[dataIndex+2]= 0;
-				}else{
-					textureData[dataIndex+0]= 0;
-					textureData[dataIndex+1]= 255;
-					textureData[dataIndex+2]= 0;
-				}
-			}	
-		}
+	for(var x =0;x<map.width;x++){
+		for(var y =0;y<map.height;y++){
+			var oreLoc = toOreLoc(x,y);
+			var oreInt = simulationData.ore[x][y][1];
+			var oreTeam = simulationData.ore[x][y][2];
+			var dataIndex = (oreLoc[0]+oreLoc[1]*128)*3;
+			if(oreInt<0){
+				textureData[dataIndex+0]= 127;
+				textureData[dataIndex+1]= 127;
+				textureData[dataIndex+2]= 127;
+			}else if(oreInt>0){
+				var minCol = Math.max(50,255-oreInt*6);
+				textureData[dataIndex+0]= (oreTeam=='A'?1:0.5)*minCol;
+				textureData[dataIndex+1]= minCol*0.5;
+				textureData[dataIndex+2]= (oreTeam!='A'?1:0.5)*minCol;
+			}else{
+				textureData[dataIndex+0]= 255;
+				textureData[dataIndex+1]= 255;
+				textureData[dataIndex+2]= 255;
+			}
+		}	
 	}
 	if(oreMesh==null){
 		//var oreTexture = new THREE.DataTexture(textureData, size, size, THREE.RGBFormat, THREE.UnsignedByteType, THREE.UVMapping,THREE.ClampToEdgeWrapping,THREE.ClampToEdgeWrapping,THREE.NearestFilter, THREE.NearestMipMapLinearFilter );
