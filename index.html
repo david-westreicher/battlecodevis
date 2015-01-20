@@ -20,11 +20,7 @@
             </div>
             <div class="stats">
                 <div class="left">
-                    <ul class="trophies">
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                    </ul>
+                    <ul class="trophies"></ul>
                     <div class="photo">
                         <img src="images/avatar_placeholder.png"/>
                     </div>
@@ -34,11 +30,7 @@
                     </div>
                 </div>
                 <div class="right">
-                    <ul class="trophies">
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                    </ul>
+                    <ul class="trophies"></ul>
                     <div class="photo">
                         <img src="images/avatar_placeholder.png"/>
                     </div>
@@ -223,6 +215,8 @@
                     delete simulationData.robots[sig.robotID];
                 }else if(sig.type=="mapend"){
                     resetSimulation();
+                    gui.resetScores();
+                    gui.win(sig.winner);
                     currentMap++;
                     simulationData.score[(sig.winner=='A')?0:1]++;
                 }

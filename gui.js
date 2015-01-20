@@ -13,7 +13,7 @@ GUI.prototype = {
         }, this);
     },
     updateScore: function(team, more){
-        var teamIndex = (team=="A")?0:1;
+        var teamIndex = this.getTeamIndex(team);
         if(more){
             this.towers[team]++;
             var tower = document.createElement('li');
@@ -32,5 +32,13 @@ GUI.prototype = {
                 towerParent.removeChild(towerParent.firstElementChild);
             }
         });
+    },
+    win: function(team){
+        var trophy = document.createElement('li'),
+            teamIndex = this.getTeamIndex(team);
+        this.teamSections[teamIndex].getElementsByClassName('trophies')[0].appendChild(trophy);
+    },
+    getTeamIndex: function(team){
+        return (team=="A")?0:1;
     }
 }
