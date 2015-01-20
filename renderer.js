@@ -1,15 +1,14 @@
 var stats;
 var battlecodeCam;
 var scene, renderer;
-var objects,lines,walls;
-var redMaterial,blueMaterial,normalMaterial;
+var lines,walls;
 var mouseX = 0, mouseY = 0;
 var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
 var frameNum = 0,interp,isLastFrame;
 var redCol = new THREE.Color(0xff0000);
 var blueCol = new THREE.Color(0x0000ff);
-var slowmotion = 1;
+var slowmotion = 10;
 var oreMesh,gridMesh;
 var modelRenderer = new ModelRenderer();
 init();
@@ -26,7 +25,6 @@ function init() {
 	initEvents();
 	battlecodeCam = new battlecodeCamera();
 	scene = new THREE.Scene();
-	objects = [];
 
 	var lineGeom = new THREE.Geometry();
 	for(var i=0;i<2*100;i++){
@@ -51,25 +49,6 @@ function init() {
 	gridMesh = new THREE.Line(gridGeom,new THREE.LineBasicMaterial({color:0xCCCCCC}),THREE.LinePieces);
 	gridMesh.position.z = 1;
 	scene.add(gridMesh);
-
-	normalMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff } );
-
-	redMaterial = new THREE.MeshLambertMaterial( { color: 0xff0000 } );
-	blueMaterial = new THREE.MeshLambertMaterial( { color: 0x0000ff } );
-	var loader = new THREE.JSONLoader();
-	loader.load( 'models/monster.js', function ( geometry ) {
-		geometry.center();
-		geometry.computeVertexNormals();
-		for ( var i = 0; i < 500; i ++ ) {
-			var mesh = new THREE.Mesh( geometry, normalMaterial );
-			mesh.rotation.x = Math.PI/2;
-			mesh.position.z = 40;
-			mesh.visible = false;
-			mesh.castShadow = true;
-			objects.push( mesh );
-			scene.add( mesh );
-		}
-	});
 
 	//LIGHT
 	var light = new THREE.DirectionalLight(0xffffff, 1);
@@ -256,39 +235,7 @@ function render() {
 	lines.geometry.verticesNeedUpdate = true;
 	lines.geometry.colorsNeedUpdate = true;
 
-
 	modelRenderer.draw(scene,simulationData);
-
-
-	//update meshes
-	var meshi = 0;
-	for (var id in simulationData.robots){
-		var robot = simulationData.robots[id];
-		var realPos = getInterpPosition(robot);
-		objects[meshi].scale.x = objects[meshi].scale.y = objects[meshi].scale.z = (robot.type=='TOWER'?0.10:0.05);
-		if(robot.type=='TOWER')
-			objects[meshi].scale.z*=0.3;
-		var yDif = robot.lastloc[1]-robot.loc[1];
-		var xDif = robot.lastloc[0]-robot.loc[0];
-		var angleDiff = -Math.atan2(yDif,xDif)+Math.PI-robot.rot;
-		while(Math.abs(angleDiff)>Math.PI*2){
-			if(angleDiff>0)
-				angleDiff-=Math.PI*2;
-			else
-				angleDiff+=Math.PI*2;
-		}
-		robot.rot += (angleDiff)/slowmotion;
-		objects[meshi].rotation.y = robot.rot;
-		objects[meshi].position.x = realPos[0];
-		objects[meshi].position.y = realPos[1];
-		objects[meshi].position.z = robot.type!='DRONE'?40:200;
-		objects[meshi].material = (robot.team=='A')?redMaterial:blueMaterial;
-		objects[meshi].visible = true;
-		meshi++;
-	}
-	for(var i=meshi;i<objects.length;i++){
-		objects[i].visible = false;
-	}
 
 	renderer.render( scene, battlecodeCam.cam );
 }
