@@ -8,6 +8,7 @@
     },
     "dependencies": {
         "pako": ">= 0.2.5",
-        "beefy": "*"
+        "beefy": "*",
+        "browserify": "*"
     }
 }
