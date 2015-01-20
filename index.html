@@ -44,6 +44,8 @@
     </body>
     <!-- setup page -->
     <script type="text/javascript">
+        //TODO show map name
+        //TODO show round number
         renderer = new THREE.WebGLRenderer();
         renderer.shadowMapEnabled = true;
         renderer.shadowMapSoft = false;
@@ -62,6 +64,7 @@
     <!-- worker -->
     <script type="text/javascript">
         function loadFile(file){
+            //TODO check if file is defined
             if(window.worker)
                 window.worker.terminate();
             resetSimulation();
@@ -69,6 +72,7 @@
             replayData = null;
             currentMap = 0;
             startNewWorker(file);
+            //TODO gui.resetWins (remove all trophies)
         }
         // global helper
         var $ = function (el) {

@@ -94,7 +94,6 @@ self.addEventListener('message', function(e) {
                 this.metadata.maplist.push(map);
             }else if(tagName=='ser.MatchFooter'){
                 var maplist = this.metadata.maplist;
-				console.log(this.tagStack);
                 var attrs = this.getAttrs(tag);
                 var frame = {
                     signals:[{type:'mapend',winner:attrs['winner']}]
