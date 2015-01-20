@@ -56,8 +56,9 @@ function init() {
 	light.castShadow = true;
 	//light.shadowCameraVisible = true;
     var ratio = GLOBAL_SCALE/80;
-    light.shadowMapWidth = 1024*2;
-    light.shadowMapHeight = 1024*2;
+    //TODO set shadow quality to gui
+    //light.shadowMapWidth = 1024*2;
+    //light.shadowMapHeight = 1024*2;
 	light.shadowCameraNear = 100*ratio;
 	light.shadowCameraFar = 600*ratio;
 	light.shadowCameraLeft = -2500*ratio;
