@@ -3,6 +3,7 @@ var ModelRenderer = function(){
 	self.types = {
 		"AEROSPACELAB":{model:"models/box.js"},
 		"BARRACKS":{model:"models/box.js"},
+		"BASHER":{model:"models/Suzanne.js"},
 		"BEAVER":{model:"models/Suzanne.js"},
 		"COMMANDER":{model:"models/Suzanne.js"}, 
 		"COMPUTER":{model:"models/box.js"},

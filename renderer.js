@@ -82,6 +82,7 @@ function onDocumentMouseMove(event) {
 }
 
 function onDocumentMouseWheel(event) {
+    //TODO doesnt work in firefox?
 	battlecodeCam.updateDist(event.wheelDelta>0||event.wheelDeltaY>0);
 }
 
