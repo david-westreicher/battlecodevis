@@ -194,6 +194,7 @@
                         type: sig.robotType,
                         lastloc: sig.loc,
                         hasInterp: false,
+                        hp: 0,
                         rot:0
                     };
                     simulationData.robots[robot.id] = robot;
@@ -208,6 +209,13 @@
                 }else if(sig.type=="attack"){
                     var robot = simulationData.robots[sig.robotID];
                     simulationData.lines.push([robot,sig.loc]);
+                }else if(sig.type=="health"){
+                    var robots = sig.robots;
+                    var healths = sig.healths;
+                    for(var j=0;j<robots.length;j++){
+                        var robot = simulationData.robots[robots[j]];
+                        robot.hp = healths[j];
+                    }
                 }else if(sig.type=="ore"){
                     var oreLoc = maplocToOreLoc(sig.loc);
                     simulationData.ore[oreLoc[0]][oreLoc[1]][1] = sig.amount;

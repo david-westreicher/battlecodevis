@@ -153,6 +153,20 @@ self.addEventListener('message', function(e) {
                 var points = this.getAttrs(tag)['points'].split(',');
                 frame.score.A =points[0];
                 frame.score.B =points[1];
+            }else if(tagName=='sig.HealthChangeSignal'){
+                var attrs = this.getAttrs(tag);
+                var robots = attrs['robotIDs'].split(",");
+                for(var i=0;i<robots.length;i++)
+                    robots[i] = parseInt(robots[i]);
+                var healths = attrs['health'].split(",");
+                for(var i=0;i<healths.length;i++)
+                    healths[i] = parseFloat(healths[i]);
+                var signal = {
+                    type:'health',
+					robots:robots,
+					healths:healths,
+                };
+                this.currentSignals.push(signal);
             }else if(tagName=='sig.SpawnSignal'){
                 var attrs = this.getAttrs(tag);
                 var signal = {
