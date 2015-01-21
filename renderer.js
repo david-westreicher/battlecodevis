@@ -19,7 +19,10 @@ animate();
 function initEvents(){
 	window.addEventListener( 'resize', onWindowResize, false );
 	document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-	document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
+	if(navigator.userAgent.indexOf('Firefox')!=-1)
+        document.addEventListener( 'DOMMouseScroll', onDocumentMouseWheel, false );
+    else
+	    document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
 }
 
 function init() {
@@ -83,7 +86,8 @@ function onDocumentMouseMove(event) {
 
 function onDocumentMouseWheel(event) {
     //TODO doesnt work in firefox?
-	battlecodeCam.updateDist(event.wheelDelta>0||event.wheelDeltaY>0);
+    var delta = (navigator.userAgent.indexOf('Firefox')!=-1)?(-event.detail):(event.wheelDelta>0||event.wheelDeltaY>0)
+	battlecodeCam.updateDist(delta>0);
 }
 
 function toOreLoc(x,y){
