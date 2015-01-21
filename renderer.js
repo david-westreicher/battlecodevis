@@ -39,7 +39,7 @@ function init() {
 	scene.add(lines);
 
 	var gridGeom = new THREE.Geometry();
-	var gridNum = 30;
+	var gridNum = 60;
 	var startGrid = -gridNum;
 	var gridSize = GLOBAL_SCALE;
 	for(var x=-gridNum+1;x<gridNum;x++){
