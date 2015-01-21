@@ -96,8 +96,12 @@
             window.worker.addEventListener('message', function(e) {
                 var data = e.data;
                 if(data.message=='teams'){
-                    for(var i =0;i<data.data.length;i++)
-                        data.data[i] = teams[parseInt(data.data[i].substring(4))];
+                    for(var i =0;i<data.data.length;i++){
+                        var teamArray = teams[parseInt(data.data[i].substring(4))];
+                        if(!teamArray)
+                            teamArray = [data.data[i],"hq"+(i+1)+".png"];
+                        data.data[i] = teamArray;
+                    }
                     replayData = {maplist:[],teams:data.data};
                     gui.setTeams(data.data);
                 }
