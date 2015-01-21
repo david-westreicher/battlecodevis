@@ -17,6 +17,9 @@ body {
 }
 .left .photo{
     float: left;
+    border-bottom-color: #8C030E;
+    border-bottom-width: 10px;
+    border-bottom-style: solid;
 }
 .stats .right{
     float: right;
@@ -24,6 +27,9 @@ body {
 }
 .right .photo{
     float: right;
+    border-bottom-width: 10px;
+    border-bottom-color: #0027B3;
+    border-bottom-style: solid;
 }
 .right h3{
     text-align: right;
