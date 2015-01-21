@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Title of the document</title>
+        <title>battlecodevis - by team schnitzel</title>
         <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
         <link href="stylesheets/normalize.css" rel="stylesheet" type="text/css"/>
         <link href="stylesheets/battelcode.css" rel="stylesheet" type="text/css"/>
@@ -64,7 +64,8 @@
     <!-- worker -->
     <script type="text/javascript">
         function loadFile(file){
-            //TODO check if file is defined
+            if(!file)
+                return;
             if(window.worker)
                 window.worker.terminate();
             resetSimulation();
