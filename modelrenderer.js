@@ -66,7 +66,9 @@ var ModelRenderer = function(){
 		var loader = new THREE.JSONLoader();
 		self.normalMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff } );
         self.redMaterial = new THREE.MeshLambertMaterial( { color: 0xff0000 } );
+        self.redLightMaterial = new THREE.MeshLambertMaterial( { color: 0xff8888 } );
 	    self.blueMaterial = new THREE.MeshLambertMaterial( { color: 0x0000ff } );
+	    self.blueLightMaterial = new THREE.MeshLambertMaterial( { color: 0x8888ff } );
 	    self.createModelsArray();
 		self.loadModel(loader);
 	}
@@ -134,7 +136,17 @@ var ModelRenderer = function(){
 		    mesh.position.x = realPos[0];
 		    mesh.position.y = realPos[1];
 		    mesh.position.z = type.height?type.height:0;
-		    mesh.material = (robot.team=='A')?self.redMaterial:self.blueMaterial;
+		    if(robot.team=='A'){
+		        if(robot.supply>=1)
+		            mesh.material = self.redMaterial;
+		        else
+		            mesh.material = self.redLightMaterial;
+		    }else{
+                if(robot.supply>=1)
+		            mesh.material = self.blueMaterial;
+		        else
+		            mesh.material = self.blueLightMaterial;
+		    }
 		}
 		//remove unnecessary meshes if meshCounter[i]<self.meshes[i]
 		for(var i=0;i<meshCounter.length;i++){
