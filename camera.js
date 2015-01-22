@@ -12,9 +12,11 @@ var battlecodeCamera = function(){
 			self.cameraDist*=1.1;
 		}else
 			self.cameraDist/=1.1;
-		self.cameraDist = Math.min(500,Math.max(10,self.cameraDist));
+		self.cameraDist = Math.min(600,Math.max(20,self.cameraDist));
 	}
-	self.update = function(angle1,angle2,pos){
+	self.update = function(mouseX,mouseY,pos){
+        var angle1 = mouseX*Math.PI*2;
+	    var angle2 = ((self.cameraDist-10)/590+1)*Math.PI/2+Math.PI;//mouseY*Math.PI/4;
 		var cameraRadius = Math.abs(Math.sin(angle2))*self.cameraDist;
 		self.cam.position.x = Math.sin(angle1)*cameraRadius;
 		self.cam.position.y = Math.cos(angle1)*cameraRadius;

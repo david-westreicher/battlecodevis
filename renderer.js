@@ -228,9 +228,7 @@ function getInterpPosition(robot){
 
 function render() {
 	//update camera
-	var cameraAngle = (mouseX/windowHalfX)*Math.PI*2;
-	var cameraAngle2 = (mouseY/windowHalfY+1)*Math.PI/4;
-	battlecodeCam.update(cameraAngle,cameraAngle2,scene.position);
+	battlecodeCam.update((mouseX/windowHalfX),(mouseY/windowHalfY+1),scene.position);
 
 	//draw shoot lines
 	var simulines = simulationData.lines;
