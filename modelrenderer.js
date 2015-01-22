@@ -14,7 +14,7 @@ var ModelRenderer = function(){
 		"LAUNCHER":{model:"models/Suzanne.js"},
 		"MINER":{model:"models/Suzanne.js"},
 		"MINERFACTORY":{model:"models/box.js"},
-		"MISSILE":{model:"models/Suzanne.js"},
+		"MISSILE":{model:"models/missile.js",height:25},
 		"SOLDIER":{model:"models/Suzanne.js"},
 		"SUPPLYDEPOT":{model:"models/box.js"},
 		"TANK":{model:"models/Suzanne.js"},
@@ -59,7 +59,6 @@ var ModelRenderer = function(){
 	        if(!isAlreadyHere)
 	            self.models.push(model);
 	    }
-	    console.log(self.models);
 	}
 
 	self.init = function(){
@@ -67,7 +66,9 @@ var ModelRenderer = function(){
 		var loader = new THREE.JSONLoader();
 		self.normalMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff } );
         self.redMaterial = new THREE.MeshLambertMaterial( { color: 0xff0000 } );
+        self.redLightMaterial = new THREE.MeshLambertMaterial( { color: 0xff8888 } );
 	    self.blueMaterial = new THREE.MeshLambertMaterial( { color: 0x0000ff } );
+	    self.blueLightMaterial = new THREE.MeshLambertMaterial( { color: 0x8888ff } );
 	    self.createModelsArray();
 		self.loadModel(loader);
 	}
@@ -78,6 +79,25 @@ var ModelRenderer = function(){
 		mesh.scale.x = mesh.scale.y = mesh.scale.z = 5; 
 		mesh.castShadow = true;
 		return mesh;
+	}
+
+	self.interpolateRot = function(from,to,interp){
+	    var angleDiff = to-from;
+	    //normalize to [-Math.PI*2,Math.PI*2]
+		while(Math.abs(angleDiff)>=Math.PI*2){
+			if(angleDiff>0)
+				angleDiff-=Math.PI*2;
+			else
+				angleDiff+=Math.PI*2;
+		}
+		//normalize to [0,Math.PI*2]
+		if(angleDiff<0)
+		    angleDiff = Math.PI*2+angleDiff;
+		//normalize to [-Math.PI,Math.PI]
+		if(angleDiff>Math.PI)
+		    angleDiff = angleDiff-Math.PI*2;
+		to = angleDiff+from;
+		return to*interp+from*(1-interp);
 	}
 
 	self.draw = function(scene,simData){
@@ -104,22 +124,29 @@ var ModelRenderer = function(){
 				mesh = self.meshes[modelID][meshCounter[modelID]-1];
 			}
 			//update position ....
-	        var realPos = getInterpPosition(robot);
 		    var yDif = robot.lastloc[1]-robot.loc[1];
 		    var xDif = robot.lastloc[0]-robot.loc[0];
-		    var angleDiff = -Math.atan2(yDif,xDif)+Math.PI-robot.rot;
-		    while(Math.abs(angleDiff)>Math.PI*2){
-			    if(angleDiff>0)
-				    angleDiff-=Math.PI*2;
-			    else
-				    angleDiff+=Math.PI*2;
+		    var toRot = (xDif==0&&yDif==0)?0:(-Math.atan2(yDif,xDif)+Math.PI);
+		    mesh.rotation.y = self.interpolateRot(robot.rot,toRot,interp);
+		    if(robot.hasInterp && isLastFrame){
+		        robot.rot = toRot;
+		        mesh.rotation.y = toRot;
 		    }
-		    robot.rot += (angleDiff)/slowmotion;
-		    mesh.rotation.y = robot.rot;
+	        var realPos = getInterpPosition(robot);
 		    mesh.position.x = realPos[0];
 		    mesh.position.y = realPos[1];
 		    mesh.position.z = type.height?type.height:0;
-		    mesh.material = (robot.team=='A')?self.redMaterial:self.blueMaterial;
+		    if(robot.team=='A'){
+		        if(robot.supply>=1)
+		            mesh.material = self.redMaterial;
+		        else
+		            mesh.material = self.redLightMaterial;
+		    }else{
+                if(robot.supply>=1)
+		            mesh.material = self.blueMaterial;
+		        else
+		            mesh.material = self.blueLightMaterial;
+		    }
 		}
 		//remove unnecessary meshes if meshCounter[i]<self.meshes[i]
 		for(var i=0;i<meshCounter.length;i++){

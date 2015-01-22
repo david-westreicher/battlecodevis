@@ -195,6 +195,7 @@
                         lastloc: sig.loc,
                         hasInterp: false,
                         hp: 0,
+                        supply: 0,
                         rot:0
                     };
                     simulationData.robots[robot.id] = robot;
@@ -215,6 +216,13 @@
                     for(var j=0;j<robots.length;j++){
                         var robot = simulationData.robots[robots[j]];
                         robot.hp = healths[j];
+                    }
+                }else if(sig.type=="supply"){
+                    var robots = sig.robots;
+                    var supplies = sig.supplies;
+                    for(var j=0;j<robots.length;j++){
+                        var robot = simulationData.robots[robots[j]];
+                        robot.supply = supplies[j];
                     }
                 }else if(sig.type=="ore"){
                     var oreLoc = maplocToOreLoc(sig.loc);

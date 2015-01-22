@@ -5,7 +5,8 @@ var lines,walls;
 var mouseX = 0, mouseY = 0;
 var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
-var frameNum = 0,interp,isLastFrame; var redCol = new THREE.Color(0xff0000);
+var frameNum = 0,interp,isLastFrame; 
+var redCol = new THREE.Color(0xff0000);
 var blueCol = new THREE.Color(0x0000ff);
 var slowmotion = 4;
 var oreMesh,gridMesh;
@@ -19,7 +20,10 @@ animate();
 function initEvents(){
 	window.addEventListener( 'resize', onWindowResize, false );
 	document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-	document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
+	if(navigator.userAgent.indexOf('Firefox')!=-1)
+        document.addEventListener( 'DOMMouseScroll', onDocumentMouseWheel, false );
+    else
+	    document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
 }
 
 function init() {
@@ -36,7 +40,7 @@ function init() {
 	scene.add(lines);
 
 	var gridGeom = new THREE.Geometry();
-	var gridNum = 30;
+	var gridNum = 60;
 	var startGrid = -gridNum;
 	var gridSize = GLOBAL_SCALE;
 	for(var x=-gridNum+1;x<gridNum;x++){
@@ -83,7 +87,8 @@ function onDocumentMouseMove(event) {
 
 function onDocumentMouseWheel(event) {
     //TODO doesnt work in firefox?
-	battlecodeCam.updateDist(event.wheelDelta>0||event.wheelDeltaY>0);
+    var delta = (navigator.userAgent.indexOf('Firefox')!=-1)?(-event.detail):(event.wheelDelta>0||event.wheelDeltaY>0)
+	battlecodeCam.updateDist(delta>0);
 }
 
 function toOreLoc(x,y){
@@ -224,9 +229,7 @@ function getInterpPosition(robot){
 
 function render() {
 	//update camera
-	var cameraAngle = (mouseX/windowHalfX)*Math.PI*2;
-	var cameraAngle2 = (mouseY/windowHalfY+1)*Math.PI/4;
-	battlecodeCam.update(cameraAngle,cameraAngle2,scene.position);
+	battlecodeCam.update((mouseX/windowHalfX),(mouseY/windowHalfY+1),scene.position);
 
 	//draw shoot lines
 	var simulines = simulationData.lines;

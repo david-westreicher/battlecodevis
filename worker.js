@@ -184,6 +184,20 @@ self.addEventListener('message', function(e) {
                     robotID:parseInt(attrs['objectID'])
                 };
                 this.currentSignals.push(signal);
+            }else if(tagName=='sig.RobotInfoSignal'){
+                var attrs = this.getAttrs(tag);
+                var robots = attrs['robotIDs'].split(",");
+                for(var i=0;i<robots.length;i++)
+                    robots[i] = parseInt(robots[i]);
+                var supplies = attrs['supplyLevels'].split(",");
+                for(var i=0;i<supplies.length;i++)
+                    supplies[i] = parseFloat(supplies[i]);
+                var signal = {
+                    type:'supply',
+					robots:robots,
+					supplies:supplies,
+                };
+                this.currentSignals.push(signal);
             }else if(tagName=='ser.ExtensibleMetadata'){
                 //parse team names
                 var attrs = this.getAttrs(tag);
