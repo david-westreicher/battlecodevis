@@ -21,22 +21,28 @@
             </div>
             <div class="stats">
                 <div class="left">
+                    <div class="robots">
+                        <div class="commander bar"><span></span></div>
+                    </div>
                     <div class="photo">
                         <img src="images/avatar_placeholder.png"/>
                     </div>
                     <h3>???</h3>
                     <ul class="towers bar"></ul>
                     <ul class="trophies bar"></ul>
-                    <div class="live bar"><span></span></div>
+                    <div class="hq bar"><span></span></div>
                 </div>
                 <div class="right">
+                    <div class="robots">
+                        <div class="commander bar"><span></span></div>
+                    </div>
                     <div class="photo">
                         <img src="images/avatar_placeholder.png"/>
                     </div>
                     <h3>???</h3>
                     <ul class="towers bar"></ul>
                     <ul class="trophies bar"></ul>
-                    <div class="live bar"><span></span><div>
+                    <div class="hq bar"><span></span><div>
                 </div>
             </div>
         </div>
@@ -45,6 +51,9 @@
         var constants = {
             HQ: {
                 hp: 2000
+            },
+            COMMANDER: {
+                hp: 200
             }
         };
     </script>
@@ -201,7 +210,10 @@
                     }
                     if(robot.type == "HQ"){
                         gui.updateScore(robot.team, true);
-                        gui.setHQIds(robot);
+                        gui.setHQ(robot);
+                    }
+                    if(robot.type == "COMMANDER"){
+                        gui.setCommander(robot);
                     }
                 }else if(sig.type=="move"){
                     var robot = simulationData.robots[sig.robotID];
@@ -216,9 +228,11 @@
                     var healths = sig.healths;
                     for(var j=0;j<robots.length;j++){
                         var robot = simulationData.robots[robots[j]];
-                        robot.hp = healths[j];
-                        if(robot.type == "HQ"){
-                            gui.updateHQHP()
+                        if(robot.hp != healths[j]){
+                            robot.hp = healths[j];
+                            if(robot.type == "HQ" || robot.type == "COMMANDER"){
+                                    gui.updateHP(robot)
+                            }
                         }
                     }
                 }else if(sig.type=="supply"){
@@ -240,6 +254,9 @@
                 }else if(sig.type=="death"){
                     if(simulationData.robots[sig.robotID].type == "TOWER"){
                         gui.updateScore(simulationData.robots[sig.robotID].team, false);
+                    }
+                    if(simulationData.robots[sig.robotID].type == "COMMANDER"){
+                        gui.commanderDead(simulationData.robots[sig.robotID]);
                     }
                     delete simulationData.robots[sig.robotID];
                 }else if(sig.type=="mapend"){

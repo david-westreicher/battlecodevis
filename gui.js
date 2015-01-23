@@ -4,11 +4,13 @@ var GUI = function(){
     this.teams = {
         'A': {
             'towers': 0,
-            'HQ': 0
+            'HQ': 0,
+            'COMMANDER': 0
         },
         'B': {
             'towers': 0,
-            'HQ': 0
+            'HQ': 0,
+            'COMMANDER': 0
         }
     }
     this.resetScores();
@@ -35,19 +37,24 @@ GUI.prototype = {
             this.teams[team].towers--;
         }
     },
-    updateLiveBar: function(bar, percent){
-        bar.getElementsByTagName('span')[0].style.width = percent+'%';
-    },
-    setHQIds: function(robot){
+    setHQ: function(robot){
         this.teams[robot.team].HQ = robot.id;
-        this.updateHQHP();
+        this.updateHP(robot, true);
     },
-    updateHQHP: function(){
+    setCommander: function(robot){
+        var commanderElement = this.teamSections[this.getTeamIndex(robot)].getElementsByClassName(robot.type.toLowerCase());
+        this.teams[robot.team].COMMANDER = robot.id;
+        this.updateHP(robot, true);
+        commanderElement[0].style.display = "block";
+    },
+    updateHP: function(robot, force){
+        var type = robot.type.toLowerCase();
         forEach(this.teams, function(i, team){
-            if(simulationData.robots[team.HQ]){
-                console.log('team '+ team +' hp: ' + (simulationData.robots[team.HQ].hp/constants.HQ.hp)*100 + '%');
-                var bar = this.teamSections[this.getTeamIndex(team)].getElementsByClassName('live')[0];
-                this.updateLiveBar(bar, ((simulationData.robots[team.HQ].hp/constants.HQ.hp)*100));
+            if(simulationData.robots[team[robot.type]]){
+                var bar = this.teamSections[this.getTeamIndex(team)].getElementsByClassName(type)[0],
+                    percent = (simulationData.robots[team[robot.type]].hp/constants[robot.type].hp)*100;
+                bar.getElementsByTagName('span')[0].style.width = percent+'%';
+                console.log('team '+ team +' '+ robot.type +' hp: ' + percent + '%');
             }
         }, this);
     },
@@ -67,6 +74,10 @@ GUI.prototype = {
     resetWins: function(){
         this.teams.A.HQ = 0;
         this.teams.B.HQ = 0;
+    },
+    commanderDead: function(robot){
+        this.teams[robot.team].COMMANDER = 0;
+        this.teamSections[this.getTeamIndex(robot)].getElementsByClassName(robot.type.toLowerCase())[0].style.display = "none";
     },
     getTeamIndex: function(team){
         return (team=="A")?0:1;
