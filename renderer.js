@@ -1,6 +1,5 @@
 var stats;
-var battlecodeCam;
-var scene, renderer;
+var battlecodeCam; var scene, renderer;
 var lines,walls;
 var mouseX = 0, mouseY = 0;
 var windowHalfX = window.innerWidth / 2;
@@ -11,8 +10,11 @@ var blueCol = new THREE.Color(0x0000ff);
 var slowmotion = 4;
 var oreMesh,gridMesh;
 var modelRenderer = new ModelRenderer();
+var explosionRenderer = new ExplosionRenderer();
 var GLOBAL_SCALE = 10;
 var GLOBAL_SCALED2 = GLOBAL_SCALE/2;
+var raycaster = new THREE.Raycaster();
+var mouse = new THREE.Vector2();
 init();
 modelRenderer.init();
 animate();
@@ -20,6 +22,7 @@ animate();
 function initEvents(){
 	window.addEventListener( 'resize', onWindowResize, false );
 	document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+	document.addEventListener( 'click', onDocumentMouseClick, false );
 	if(navigator.userAgent.indexOf('Firefox')!=-1)
         document.addEventListener( 'DOMMouseScroll', onDocumentMouseWheel, false );
     else
@@ -30,6 +33,7 @@ function init() {
 	initEvents();
 	battlecodeCam = new battlecodeCamera();
 	scene = new THREE.Scene();
+    explosionRenderer.init(scene);
 
 	var lineGeom = new THREE.Geometry();
 	for(var i=0;i<2*100;i++){
@@ -85,6 +89,21 @@ function onDocumentMouseMove(event) {
 	mouseY = ( event.clientY - windowHalfY );
 }
 
+function onDocumentMouseClick(event) {
+    console.log(event);
+    mouse.x = ( event.x / window.innerWidth ) * 2 - 1;
+	mouse.y = - ( event.y / window.innerHeight ) * 2 + 1;
+	if(oreMesh!=null){
+        raycaster.setFromCamera( mouse, battlecodeCam.cam );
+        var intersects = raycaster.intersectObject(oreMesh,false);
+        if(intersects.length>0){
+            console.log(intersects);
+            var point = intersects[0].point;
+            battlecodeCam.setCenter(point.x,point.y);
+        }
+    }
+}
+
 function onDocumentMouseWheel(event) {
     //TODO doesnt work in firefox?
     var delta = (navigator.userAgent.indexOf('Firefox')!=-1)?(-event.detail):(event.wheelDelta>0||event.wheelDeltaY>0)
@@ -92,14 +111,14 @@ function onDocumentMouseWheel(event) {
 }
 
 function toOreLoc(x,y){
-	var map = simulationData.map;
+	var map = simulation.data.map;
 	return [(((128-map.width)/2)|0)+x,(((128-map.height)/2)|0)+y];
 }
 
 function updateOreTexture(){
 	var size = 128;
 	var textureData;
-	var map = simulationData.map;
+	var map = simulation.data.map;
 	if(oreMesh==null){
 		textureData = new Uint8Array(size*size*3);
 		for(var x =0;x<=size;x++){
@@ -123,8 +142,8 @@ function updateOreTexture(){
 				textureData[dataIndex+2]= 127;
 				continue;
 			}
-			var oreInt = simulationData.ore[x][y][1];
-			var oreTeam = simulationData.ore[x][y][2];
+			var oreInt = simulation.data.ore[x][y][1];
+			var oreTeam = simulation.data.ore[x][y][2];
 			if(oreInt<0){
 				textureData[dataIndex+0]= 127;
 				textureData[dataIndex+1]= 127;
@@ -159,7 +178,7 @@ function updateOreTexture(){
 }
 
 function createMap(){
-	var map = simulationData.map;
+	var map = simulation.data.map;
 	var tiles = map.tiles;
 	var mapGeom = new THREE.Geometry();
 	for(var x =-1;x<=map.width;x++){
@@ -175,10 +194,10 @@ function createMap(){
 function animate() {
 	requestAnimationFrame( animate );
 
-	if(simulationData.ready && walls==null){
+	if(simulation.data.ready && walls==null){
 		createMap();
 	}
-	if(!simulationData.ready && walls!=null){
+	if(!simulation.data.ready && walls!=null){
 		scene.remove(walls);
 		walls = null;
 		scene.remove(oreMesh);
@@ -186,14 +205,14 @@ function animate() {
 		gridMesh.position.x = 0;
 		gridMesh.position.y = 0;
 	}
-	if(simulationData.oreChanged){
+	if(simulation.data.oreChanged){
 		updateOreTexture();
-		simulationData.oreChanged = false;
+		simulation.data.oreChanged = false;
 	}
 
 	var frameMod = frameNum%slowmotion;
 	if(frameMod==0)
-		simulate();
+		simulation.simulate();
 	interp = frameMod/slowmotion;
 	isLastFrame = frameMod==(slowmotion-1);
 	frameNum++;
@@ -202,13 +221,6 @@ function animate() {
 	stats.update();
 }
 
-function locToMap(loc){
-	var mapLoc = [0,0];
-	var map = simulationData.map;
-	mapLoc[0] = (loc[0]-map.originX-map.width/2)*GLOBAL_SCALE;
-	mapLoc[1] = -(loc[1]-map.originY-map.height/2)*GLOBAL_SCALE;
-	return mapLoc;
-}
 function interpolate(arr2,arr1,interp){
 	var result = [0,0];
 	result[0] = arr1[0]*interp+(1-interp)*arr2[0];
@@ -217,10 +229,9 @@ function interpolate(arr2,arr1,interp){
 }
 
 function getInterpPosition(robot){
-	var realPos = locToMap(robot.loc);
+	var realPos = robot.loc;
 	if(robot.hasInterp){
-		var mapLocOld = locToMap(robot.lastloc);
-		realPos = interpolate(mapLocOld,realPos,interp);
+		realPos = interpolate(robot.lastloc,realPos,interp);
 		if(isLastFrame)
 			robot.hasInterp=false;
 	}
@@ -232,17 +243,14 @@ function render() {
 	battlecodeCam.update((mouseX/windowHalfX),(mouseY/windowHalfY+1),scene.position);
 
 	//draw shoot lines
-	var simulines = simulationData.lines;
+	var simulines = simulation.data.lines;
 	for(var i=0;i<lines.geometry.vertices.length;i+=2){
 		if(i<simulines.length*2){
-			var robot = simulines[i/2][0];
-			var start = locToMap(robot.loc);
-			var end = locToMap(simulines[i/2][1]);
-			var col = robot.team=='A'?redCol:blueCol;
-			var shootHeight = modelRenderer.types[robot.type].shootHeight;
-			shootHeight = shootHeight?shootHeight:5;
-			lines.geometry.vertices[i].set(start[0],start[1],shootHeight);
-			lines.geometry.vertices[i+1].set(end[0],end[1],0);
+			var start = simulines[i/2][0];
+			var end = simulines[i/2][1];
+			var col = simulines[i/2][2]=='A'?redCol:blueCol;
+			lines.geometry.vertices[i].set(start[0],start[1],start[2]);
+			lines.geometry.vertices[i+1].set(end[0],end[1],end[2]);
 			lines.geometry.colors[i].set(col);
 			lines.geometry.colors[i+1].set(col);
 		}else{
@@ -253,7 +261,8 @@ function render() {
 	lines.geometry.verticesNeedUpdate = true;
 	lines.geometry.colorsNeedUpdate = true;
 
-	modelRenderer.draw(scene,simulationData);
+	modelRenderer.draw(scene,simulation.data);
+	explosionRenderer.draw(scene,simulation.data.explosions);
 
 	renderer.render( scene, battlecodeCam.cam );
 }
