@@ -42,7 +42,7 @@ var ExplosionRenderer = function(){
             if(explosion[0]){
                 var freeIndex = self.findFreeIndex();
                 if(freeIndex>=0){
-                    var explosionLoc = locToMap(explosion[2]);
+                    var explosionLoc = explosion[2];
                     for(var j=freeIndex;j<freeIndex+self.particlesPerExplosion;j++){
                         var pos = vertices[j];
                         var x = (Math.random()-0.5)*5;

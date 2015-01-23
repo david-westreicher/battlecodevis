@@ -203,13 +203,6 @@ function animate() {
 	stats.update();
 }
 
-function locToMap(loc){
-	var mapLoc = [0,0];
-	var map = simulation.data.map;
-	mapLoc[0] = (loc[0]-map.originX-map.width/2)*GLOBAL_SCALE;
-	mapLoc[1] = -(loc[1]-map.originY-map.height/2)*GLOBAL_SCALE;
-	return mapLoc;
-}
 function interpolate(arr2,arr1,interp){
 	var result = [0,0];
 	result[0] = arr1[0]*interp+(1-interp)*arr2[0];
@@ -218,10 +211,9 @@ function interpolate(arr2,arr1,interp){
 }
 
 function getInterpPosition(robot){
-	var realPos = locToMap(robot.loc);
+	var realPos = robot.loc;
 	if(robot.hasInterp){
-		var mapLocOld = locToMap(robot.lastloc);
-		realPos = interpolate(mapLocOld,realPos,interp);
+		realPos = interpolate(robot.lastloc,realPos,interp);
 		if(isLastFrame)
 			robot.hasInterp=false;
 	}
@@ -236,13 +228,10 @@ function render() {
 	var simulines = simulation.data.lines;
 	for(var i=0;i<lines.geometry.vertices.length;i+=2){
 		if(i<simulines.length*2){
-			var robot = simulines[i/2][0];
-			var start = locToMap(robot.loc);
-			var end = locToMap(simulines[i/2][1]);
-			var col = robot.team=='A'?redCol:blueCol;
-			var shootHeight = modelRenderer.types[robot.type].shootHeight;
-			shootHeight = shootHeight?shootHeight:5;
-			lines.geometry.vertices[i].set(start[0],start[1],shootHeight);
+			var start = simulines[i/2][0];
+			var end = simulines[i/2][1];
+			var col = simulines[i/2][2]=='A'?redCol:blueCol;
+			lines.geometry.vertices[i].set(start[0],start[1],start[2]);
 			lines.geometry.vertices[i+1].set(end[0],end[1],0);
 			lines.geometry.colors[i].set(col);
 			lines.geometry.colors[i+1].set(col);
