@@ -8,6 +8,7 @@
         <link href="stylesheets/battelcode.css" rel="stylesheet" type="text/css"/>
         <script src="lib/three.min.js"></script>
         <script src="lib/stats.min.js"></script>
+        <script src="helpers.js"></script>
         <script src="camera.js"></script>
         <script src="modelrenderer.js"></script>
         <script src="gui.js"></script>
@@ -20,28 +21,33 @@
             </div>
             <div class="stats">
                 <div class="left">
-                    <ul class="trophies"></ul>
                     <div class="photo">
                         <img src="images/avatar_placeholder.png"/>
                     </div>
                     <h3>???</h3>
-                    <ul class="towers"></ul>
-                    <div class="live">
-                    </div>
+                    <ul class="towers bar"></ul>
+                    <ul class="trophies bar"></ul>
+                    <div class="live bar"><span></span></div>
                 </div>
                 <div class="right">
-                    <ul class="trophies"></ul>
                     <div class="photo">
                         <img src="images/avatar_placeholder.png"/>
                     </div>
                     <h3>???</h3>
-                    <ul class="towers"></ul>
-                    <div class="live">
-                    </div>
+                    <ul class="towers bar"></ul>
+                    <ul class="trophies bar"></ul>
+                    <div class="live bar"><span></span><div>
                 </div>
             </div>
         </div>
     </body>
+    <script type="text/javascript">
+        var constants = {
+            HQ: {
+                hp: 2000
+            }
+        };
+    </script>
     <!-- setup page -->
     <script type="text/javascript">
         //TODO show map name
@@ -63,6 +69,7 @@
     </script>
     <!-- worker -->
     <script type="text/javascript">
+        var gui = new GUI();
         function loadFile(file){
             if(!file)
                 return;
@@ -73,18 +80,8 @@
             replayData = null;
             currentMap = 0;
             startNewWorker(file);
-            //TODO gui.resetWins (remove all trophies)
+            gui.resetWins()
         }
-        // global helper
-        var $ = function (el) {
-            return document.querySelectorAll(el);
-        }
-        var forEach = function (array, callback, scope) {
-            for (var i = 0; i < array.length; i++) {
-                callback.call(scope, i, array[i]); // passes back stuff we need
-            }
-        };
-        var gui = new GUI();
 
         function startNewWorker(file){
             window.worker = new Worker('workerbundle.js');
@@ -202,6 +199,10 @@
                     if(robot.type == "TOWER"){
                         gui.updateScore(robot.team, true);
                     }
+                    if(robot.type == "HQ"){
+                        gui.updateScore(robot.team, true);
+                        gui.setHQIds(robot);
+                    }
                 }else if(sig.type=="move"){
                     var robot = simulationData.robots[sig.robotID];
                     robot.lastloc = robot.loc;
@@ -216,6 +217,9 @@
                     for(var j=0;j<robots.length;j++){
                         var robot = simulationData.robots[robots[j]];
                         robot.hp = healths[j];
+                        if(robot.type == "HQ"){
+                            gui.updateHQHP()
+                        }
                     }
                 }else if(sig.type=="supply"){
                     var robots = sig.robots;

@@ -39,16 +39,14 @@ body {
     height: 128px;
     width: 128px;
 }
-
+.bar{
+    margin: 10px 0 0 4px;
+    height: 20px;
+}
 .trophies{
-    width: 100%;
     overflow: hidden;
     list-style: none;
     padding: 0;
-    margin: 0 0 0 4px;
-}
-.right .trophies li{
-    float: right;
 }
 .trophies li{
     float: left;
@@ -61,17 +59,16 @@ body {
 .towers{
     list-style: none;
     overflow: hidden;
-    margin: 0;
     padding: 0;
 }
-.right .towers, .right .towers li{
+.right .towers li, .right .live, .right .trophies li{
     float: right;
 }
 .towers li{
     width: 20px;
     height: 20px;
     float: left;
-    margin-right: 5px;
+    margin: 0 5px;
 }
 .towers .alive{
     background-color: #A9D085;
@@ -80,4 +77,18 @@ body {
 .towers .dead{
     background-color: #E7EDE2;
 }
-
+.live{
+    width: 200px;
+    height: 20px;
+    display: block;
+    background: #008000;
+    float: left;
+    position: relative;
+}
+.live > span{
+    display: block;
+    height: 100%;
+    background-color: #2BC253;
+    position: relative;
+    overflow: hidden;
+}
