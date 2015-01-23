@@ -13,6 +13,8 @@ var modelRenderer = new ModelRenderer();
 var explosionRenderer = new ExplosionRenderer();
 var GLOBAL_SCALE = 10;
 var GLOBAL_SCALED2 = GLOBAL_SCALE/2;
+var raycaster = new THREE.Raycaster();
+var mouse = new THREE.Vector2();
 init();
 modelRenderer.init();
 animate();
@@ -20,6 +22,7 @@ animate();
 function initEvents(){
 	window.addEventListener( 'resize', onWindowResize, false );
 	document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+	document.addEventListener( 'click', onDocumentMouseClick, false );
 	if(navigator.userAgent.indexOf('Firefox')!=-1)
         document.addEventListener( 'DOMMouseScroll', onDocumentMouseWheel, false );
     else
@@ -84,6 +87,21 @@ function onWindowResize() {
 function onDocumentMouseMove(event) {
 	mouseX = ( event.clientX - windowHalfX );
 	mouseY = ( event.clientY - windowHalfY );
+}
+
+function onDocumentMouseClick(event) {
+    console.log(event);
+    mouse.x = ( event.x / window.innerWidth ) * 2 - 1;
+	mouse.y = - ( event.y / window.innerHeight ) * 2 + 1;
+	if(oreMesh!=null){
+        raycaster.setFromCamera( mouse, battlecodeCam.cam );
+        var intersects = raycaster.intersectObject(oreMesh,false);
+        if(intersects.length>0){
+            console.log(intersects);
+            var point = intersects[0].point;
+            battlecodeCam.setCenter(point.x,point.y);
+        }
+    }
 }
 
 function onDocumentMouseWheel(event) {
