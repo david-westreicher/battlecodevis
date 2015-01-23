@@ -11,7 +11,8 @@ var Simulation = function(){
             oreChanged:false,
             ready:false,
             gold:[0,0],
-            map:null
+            map:null,
+            robotMap:null
         };
     }
 
@@ -39,16 +40,21 @@ var Simulation = function(){
             self.data.ore.push(row);
         }
         var tiles = map.tiles;
+        var robotMap = []
         for(var x =0;x<map.width;x++){
+            var row = []
             for(var y=0;y<map.height;y++){
                 if(x==-1||y==-1||x==map.width||y==map.height||tiles.charAt(x+y*map.width)=='#'){
                     self.data.ore[x][y][1]=-1;
                 }
+                row.push(null);
             }
+            robotMap.push(row);
         }
         self.data.oreChanged = true;
         self.data.ready = true;
         self.data.map = map;
+        self.data.robotMap = robotMap;
     }
 
     self.locToMap = function(loc){
@@ -91,11 +97,19 @@ var Simulation = function(){
                     rot:0
                 };
                 self.data.robots[robot.id] = robot;
+                var mapLoc = self.maplocToOreLoc(sig.loc);
+                robot.mapLoc = mapLoc;
+                self.data.robotMap[mapLoc[0]][mapLoc[1]] = robot;
                 if(robot.type == "TOWER"){
                     gui.updateScore(robot.team, true);
                 }
             }else if(sig.type=="move"){
                 var robot = self.data.robots[sig.robotID];
+                var mapLoc = robot.mapLoc;
+                self.data.robotMap[robot.mapLoc[0]][robot.mapLoc[1]] = null;
+                mapLoc = self.maplocToOreLoc(sig.loc);
+                self.data.robotMap[mapLoc[0]][mapLoc[1]] = robot;
+                robot.mapLoc = mapLoc;
                 robot.lastloc = robot.loc;
                 robot.loc = self.locToMap(sig.loc);
                 robot.hasInterp = true;
@@ -105,7 +119,11 @@ var Simulation = function(){
                 var height = ("shootHeight" in type)?type.shootHeight:5;
                 var from = [robot.loc[0],robot.loc[1],height];
                 var attackLoc = self.locToMap(sig.loc);
-                self.data.lines.push([from,[attackLoc[0],attackLoc[1]],robot.team]);
+                var mapLoc = self.maplocToOreLoc(sig.loc);
+                var robot2 = self.data.robotMap[mapLoc[0]][mapLoc[1]];
+                var type2 = (robot2)?RobotTypes[robot2.type]:null;
+                height = (type2!=null)?type2.height:5;
+                self.data.lines.push([from,[attackLoc[0],attackLoc[1],height],robot.team]);
             }else if(sig.type=="health"){
                 var robots = sig.robots;
                 var healths = sig.healths;
@@ -131,6 +149,7 @@ var Simulation = function(){
                 self.data.oreChanged = true;
             }else if(sig.type=="death"){
                 var robot = self.data.robots[sig.robotID];
+                self.data.robotMap[robot.mapLoc[0]][robot.mapLoc[1]] = null;
                 if(robot.type == "TOWER"){
                     gui.updateScore(robot.team, false);
                 }else if(robot.type == "MISSILE")

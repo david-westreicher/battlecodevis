@@ -232,7 +232,7 @@ function render() {
 			var end = simulines[i/2][1];
 			var col = simulines[i/2][2]=='A'?redCol:blueCol;
 			lines.geometry.vertices[i].set(start[0],start[1],start[2]);
-			lines.geometry.vertices[i+1].set(end[0],end[1],0);
+			lines.geometry.vertices[i+1].set(end[0],end[1],end[2]);
 			lines.geometry.colors[i].set(col);
 			lines.geometry.colors[i+1].set(col);
 		}else{
