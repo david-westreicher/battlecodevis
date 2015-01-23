@@ -20,14 +20,14 @@ var Simulation = function(){
         self.score = [0,0];
         self.currentMap = 0;
         self.newMap();
-        gui.resetScores(); 
+        gui.resetScores();
     }
 
     self.maplocToOreLoc = function(maploc){
         var map = self.data.map;
         return [-map.originX+maploc[0],-map.originY+maploc[1]];
     }
-    
+
     self.initMap = function(){
         var map = replayData.maplist[self.currentMap];
         var oreStringArray = map.ore.split(',');
@@ -58,11 +58,11 @@ var Simulation = function(){
     }
 
     self.locToMap = function(loc){
-	    var mapLoc = [0,0];
-	    var map = simulation.data.map;
-	    mapLoc[0] = (loc[0]-map.originX-map.width/2)*GLOBAL_SCALE;
-	    mapLoc[1] = -(loc[1]-map.originY-map.height/2)*GLOBAL_SCALE;
-	    return mapLoc;
+        var mapLoc = [0,0];
+        var map = simulation.data.map;
+        mapLoc[0] = (loc[0]-map.originX-map.width/2)*GLOBAL_SCALE;
+        mapLoc[1] = -(loc[1]-map.originY-map.height/2)*GLOBAL_SCALE;
+        return mapLoc;
     }
 
     self.simulate = function(){
@@ -162,7 +162,7 @@ var Simulation = function(){
             }else if(sig.type=="death"){
                 var robot = self.data.robots[sig.robotID];
                 self.data.robotMap[robot.mapLoc[0]][robot.mapLoc[1]] = null;
-                switch robot.type{
+                switch (robot.type){
                     case "TOWER":
                         gui.updateScore(robot.team, false); break;
                     case "MISSILE":

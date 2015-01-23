@@ -50,9 +50,9 @@ GUI.prototype = {
     updateHP: function(robot, force){
         var type = robot.type.toLowerCase();
         forEach(this.teams, function(i, team){
-            if(simulationData.robots[team[robot.type]]){
+            if(simulation.data.robots[team[robot.type]]){
                 var bar = this.teamSections[this.getTeamIndex(team)].getElementsByClassName(type)[0],
-                    percent = (simulationData.robots[team[robot.type]].hp/constants[robot.type].hp)*100;
+                    percent = (simulation.data.robots[team[robot.type]].hp/constants[robot.type].hp)*100;
                 bar.getElementsByTagName('span')[0].style.width = percent+'%';
                 console.log('team '+ team +' '+ robot.type +' hp: ' + percent + '%');
             }
