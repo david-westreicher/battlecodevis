@@ -3,10 +3,11 @@ var battlecodeCamera = function(){
 	self.cameraDist = 200;
 	self.cam = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 1000 );
 	self.center = new THREE.Vector3(0,0,0);
+	self.toCenter = new THREE.Vector3(0,0,0);
 
     self.setCenter = function(x,y){
-        self.center.x = x;
-        self.center.y = y;
+        self.toCenter.x = x;
+        self.toCenter.y = y;
     }
 	self.updateRatio = function(){
 		self.cam.aspect = window.innerWidth / window.innerHeight;
@@ -28,5 +29,7 @@ var battlecodeCamera = function(){
 		self.cam.position.z = Math.cos(angle2)*self.cameraDist;
 		self.cam.up.set(0,0,1);
 		self.cam.lookAt(self.center);
+		self.center.x+=(self.toCenter.x-self.center.x)/10;
+		self.center.y+=(self.toCenter.y-self.center.y)/10;
 	}
 }
