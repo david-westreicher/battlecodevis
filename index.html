@@ -9,6 +9,7 @@
         <script src="lib/three.min.js"></script>
         <script src="lib/stats.min.js"></script>
         <script src="camera.js"></script>
+        <script src="simulation.js"></script>
         <script src="robottypes.js"></script>
         <script src="modelrenderer.js"></script>
         <script src="explosionrenderer.js"></script>
@@ -62,6 +63,8 @@
         stats.domElement.style.right = '0px';
         stats.domElement.style.zIndex = 100;
         container.appendChild( stats.domElement );
+
+        var simulation = new Simulation();
     </script>
     <!-- worker -->
     <script type="text/javascript">
@@ -70,10 +73,8 @@
                 return;
             if(window.worker)
                 window.worker.terminate();
-            resetSimulation();
-            simulationData.score = [0,0];
+            simulation.newReplayFile();
             replayData = null;
-            currentMap = 0;
             startNewWorker(file);
             //TODO gui.resetWins (remove all trophies)
         }
@@ -123,140 +124,6 @@
     </script>
     <!-- simulation & parsing -->
     <script type="text/javascript">
-        var simulationData  = {
-                robots:{},
-                lines:[],
-                explosions:[],
-                ore:[],
-                oreChanged:false,
-                ready:false,
-                score:[0,0],
-                gold:[0,0],
-                map:null
-        };
-        var replayData;
-        var currentFrame=0;
-        var currentMap=0;
-
-        function resetSimulation(){
-            currentFrame = 0;
-            simulationData.robots = {};
-            simulationData.lines = [];
-            simulationData.explosions = [];
-            simulationData.ore = [];
-            simulationData.ready = false;
-            simulationData.oreChanged = false;
-            simulationData.map = null;
-            simulationData.gold = [0,0];
-            gui.resetScores();
-        }
-
-        function maplocToOreLoc(maploc){
-            var map = simulationData.map;
-            return [-map.originX+maploc[0],-map.originY+maploc[1]];
-        }
-
-        function simulate(){
-            if(replayData==null || replayData.maplist.length==currentMap || replayData.maplist[currentMap].frames.length<=currentFrame+1)
-                return;
-            if(currentFrame==0){
-                //INITIALIZE MAP & ORE
-                var map = replayData.maplist[currentMap];
-                var oreStringArray = map.ore.split(',');
-                for(var x =0;x<map.width;x++){
-                    var row = [];
-                    for(var y =0;y<map.height;y++){
-                        var currentOre = parseInt(oreStringArray[y+x*map.height]);
-                        row.push([currentOre,0,'']);
-                    }
-                    simulationData.ore.push(row);
-                }
-                var tiles = map.tiles;
-                for(var x =0;x<map.width;x++){
-                    for(var y=0;y<map.height;y++){
-                        if(x==-1||y==-1||x==map.width||y==map.height||tiles.charAt(x+y*map.width)=='#'){
-                            simulationData.ore[x][y][1]=-1;
-                        }
-                    }
-                }
-                simulationData.oreChanged = true;
-                simulationData.ready = true;
-                simulationData.map = map;
-            }
-            var frame = simulationData.map.frames[currentFrame];
-            var sigs = frame.signals;
-            simulationData.lines = [];
-            simulationData.gold = frame.score;
-            currentFrame++;
-            for(var i =0;i<sigs.length;i++){
-                var sig = sigs[i];
-                if(sig.type=="spawn"){
-                    var robotType = RobotTypes[sig.robotType];
-                    var robot = {
-                        id:sig.robotID,
-                        loc: sig.loc,
-                        team: sig.team,
-                        type: sig.robotType,
-                        lastloc: sig.loc,
-                        hasInterp: false,
-                        hp: 0,
-                        supply: 0,
-                        z: ('spawnHeight' in robotType)?
-                            robotType.spawnHeight:
-                            (('height' in robotType)?robotType.height:0),
-                        rot:0
-                    };
-                    simulationData.robots[robot.id] = robot;
-                    if(robot.type == "TOWER"){
-                        gui.updateScore(robot.team, true);
-                    }
-                }else if(sig.type=="move"){
-                    var robot = simulationData.robots[sig.robotID];
-                    robot.lastloc = robot.loc;
-                    robot.loc = sig.loc;
-                    robot.hasInterp = true;
-                }else if(sig.type=="attack"){
-                    var robot = simulationData.robots[sig.robotID];
-                    simulationData.lines.push([robot,sig.loc]);
-                }else if(sig.type=="health"){
-                    var robots = sig.robots;
-                    var healths = sig.healths;
-                    for(var j=0;j<robots.length;j++){
-                        var robot = simulationData.robots[robots[j]];
-                        robot.hp = healths[j];
-                    }
-                }else if(sig.type=="supply"){
-                    var robots = sig.robots;
-                    var supplies = sig.supplies;
-                    for(var j=0;j<robots.length;j++){
-                        var robot = simulationData.robots[robots[j]];
-                        robot.supply = supplies[j];
-                    }
-                }else if(sig.type=="ore"){
-                    var oreLoc = maplocToOreLoc(sig.loc);
-                    simulationData.ore[oreLoc[0]][oreLoc[1]][1] = sig.amount;
-                    simulationData.oreChanged = true;
-                }else if(sig.type=="mine"){
-                    var robot = simulationData.robots[sig.robotID];
-                    var mineLoc = robot?maplocToOreLoc(robot.loc):maplocToOreLoc(sig.loc);
-                    simulationData.ore[mineLoc[0]][mineLoc[1]][2] = robot?robot.team:sig.team;
-                    simulationData.oreChanged = true;
-                }else if(sig.type=="death"){
-                    var robot = simulationData.robots[sig.robotID];
-                    if(robot.type == "TOWER"){
-                        gui.updateScore(robot.team, false);
-                    }else if(robot.type == "MISSILE")
-                        simulationData.explosions.push([true,7,robot.loc]);
-                    delete simulationData.robots[sig.robotID];
-                }else if(sig.type=="mapend"){
-                    resetSimulation();
-                    gui.resetScores();
-                    gui.win(sig.winner);
-                    currentMap++;
-                    simulationData.score[(sig.winner=='A')?0:1]++;
-                }
-            }
-        }
     </script>
     <script src="renderer.js"></script>
 </html>

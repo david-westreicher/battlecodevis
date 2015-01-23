@@ -93,14 +93,14 @@ function onDocumentMouseWheel(event) {
 }
 
 function toOreLoc(x,y){
-	var map = simulationData.map;
+	var map = simulation.data.map;
 	return [(((128-map.width)/2)|0)+x,(((128-map.height)/2)|0)+y];
 }
 
 function updateOreTexture(){
 	var size = 128;
 	var textureData;
-	var map = simulationData.map;
+	var map = simulation.data.map;
 	if(oreMesh==null){
 		textureData = new Uint8Array(size*size*3);
 		for(var x =0;x<=size;x++){
@@ -124,8 +124,8 @@ function updateOreTexture(){
 				textureData[dataIndex+2]= 127;
 				continue;
 			}
-			var oreInt = simulationData.ore[x][y][1];
-			var oreTeam = simulationData.ore[x][y][2];
+			var oreInt = simulation.data.ore[x][y][1];
+			var oreTeam = simulation.data.ore[x][y][2];
 			if(oreInt<0){
 				textureData[dataIndex+0]= 127;
 				textureData[dataIndex+1]= 127;
@@ -160,7 +160,7 @@ function updateOreTexture(){
 }
 
 function createMap(){
-	var map = simulationData.map;
+	var map = simulation.data.map;
 	var tiles = map.tiles;
 	var mapGeom = new THREE.Geometry();
 	for(var x =-1;x<=map.width;x++){
@@ -176,10 +176,10 @@ function createMap(){
 function animate() {
 	requestAnimationFrame( animate );
 
-	if(simulationData.ready && walls==null){
+	if(simulation.data.ready && walls==null){
 		createMap();
 	}
-	if(!simulationData.ready && walls!=null){
+	if(!simulation.data.ready && walls!=null){
 		scene.remove(walls);
 		walls = null;
 		scene.remove(oreMesh);
@@ -187,14 +187,14 @@ function animate() {
 		gridMesh.position.x = 0;
 		gridMesh.position.y = 0;
 	}
-	if(simulationData.oreChanged){
+	if(simulation.data.oreChanged){
 		updateOreTexture();
-		simulationData.oreChanged = false;
+		simulation.data.oreChanged = false;
 	}
 
 	var frameMod = frameNum%slowmotion;
 	if(frameMod==0)
-		simulate();
+		simulation.simulate();
 	interp = frameMod/slowmotion;
 	isLastFrame = frameMod==(slowmotion-1);
 	frameNum++;
@@ -205,7 +205,7 @@ function animate() {
 
 function locToMap(loc){
 	var mapLoc = [0,0];
-	var map = simulationData.map;
+	var map = simulation.data.map;
 	mapLoc[0] = (loc[0]-map.originX-map.width/2)*GLOBAL_SCALE;
 	mapLoc[1] = -(loc[1]-map.originY-map.height/2)*GLOBAL_SCALE;
 	return mapLoc;
@@ -233,7 +233,7 @@ function render() {
 	battlecodeCam.update((mouseX/windowHalfX),(mouseY/windowHalfY+1),scene.position);
 
 	//draw shoot lines
-	var simulines = simulationData.lines;
+	var simulines = simulation.data.lines;
 	for(var i=0;i<lines.geometry.vertices.length;i+=2){
 		if(i<simulines.length*2){
 			var robot = simulines[i/2][0];
@@ -254,8 +254,8 @@ function render() {
 	lines.geometry.verticesNeedUpdate = true;
 	lines.geometry.colorsNeedUpdate = true;
 
-	modelRenderer.draw(scene,simulationData);
-	explosionRenderer.draw(scene,simulationData.explosions);
+	modelRenderer.draw(scene,simulation.data);
+	explosionRenderer.draw(scene,simulation.data.explosions);
 
 	renderer.render( scene, battlecodeCam.cam );
 }
