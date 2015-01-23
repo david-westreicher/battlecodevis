@@ -1,6 +1,5 @@
 var stats;
-var battlecodeCam;
-var scene, renderer;
+var battlecodeCam; var scene, renderer;
 var lines,walls;
 var mouseX = 0, mouseY = 0;
 var windowHalfX = window.innerWidth / 2;
@@ -11,6 +10,7 @@ var blueCol = new THREE.Color(0x0000ff);
 var slowmotion = 4;
 var oreMesh,gridMesh;
 var modelRenderer = new ModelRenderer();
+var explosionRenderer = new ExplosionRenderer();
 var GLOBAL_SCALE = 10;
 var GLOBAL_SCALED2 = GLOBAL_SCALE/2;
 init();
@@ -30,6 +30,7 @@ function init() {
 	initEvents();
 	battlecodeCam = new battlecodeCamera();
 	scene = new THREE.Scene();
+    explosionRenderer.init(scene);
 
 	var lineGeom = new THREE.Geometry();
 	for(var i=0;i<2*100;i++){
@@ -254,6 +255,7 @@ function render() {
 	lines.geometry.colorsNeedUpdate = true;
 
 	modelRenderer.draw(scene,simulationData);
+	explosionRenderer.draw(scene,simulationData.explosions);
 
 	renderer.render( scene, battlecodeCam.cam );
 }

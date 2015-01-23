@@ -1,30 +1,9 @@
 var ModelRenderer = function(){
 	var self = this;
-	self.types = {
-		"AEROSPACELAB":{model:"models/box.js"},
-		"BARRACKS":{model:"models/box.js"},
-		"BASHER":{model:"models/Suzanne.js"},
-		"BEAVER":{model:"models/Suzanne.js"},
-		"COMMANDER":{model:"models/Suzanne.js"}, 
-		"COMPUTER":{model:"models/box.js"},
-		"DRONE":{model:"models/drone.js",height:25,shootHeight:25},
-		"HANDWASHSTATION":{model:"models/box.js"},
-		"HELIPAD":{model:"models/box.js"},
-		"HQ":{model:"models/hq.js",shootHeight:40},
-		"LAUNCHER":{model:"models/Suzanne.js"},
-		"MINER":{model:"models/Suzanne.js"},
-		"MINERFACTORY":{model:"models/box.js"},
-		"MISSILE":{model:"models/missile.js",height:25},
-		"SOLDIER":{model:"models/Suzanne.js"},
-		"SUPPLYDEPOT":{model:"models/box.js"},
-		"TANK":{model:"models/Suzanne.js"},
-		"TANKFACTORY":{model:"models/box.js"},
-		"TECHNOLOGYINSTITUTE":{model:"models/box.js"},
-		"TOWER":{model:"models/tower.js",shootHeight:22},
-		"TRAININGFIELD":{model:"models/box.js"},
-	};
+	
 	self.geometries = [];
 	self.meshes = [];
+	self.types = RobotTypes;
 
 	self.loadModel = function(loader){
 		if(self.models.length<=self.geometries.length)
@@ -135,7 +114,10 @@ var ModelRenderer = function(){
 	        var realPos = getInterpPosition(robot);
 		    mesh.position.x = realPos[0];
 		    mesh.position.y = realPos[1];
-		    mesh.position.z = type.height?type.height:0;
+		    mesh.position.z = robot.z;
+		    if("height" in type)
+		        robot.z += (type.height-robot.z)/slowmotion;
+
 		    if(robot.team=='A'){
 		        if(robot.supply>=1)
 		            mesh.material = self.redMaterial;

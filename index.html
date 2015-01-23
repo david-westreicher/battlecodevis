@@ -9,7 +9,9 @@
         <script src="lib/three.min.js"></script>
         <script src="lib/stats.min.js"></script>
         <script src="camera.js"></script>
+        <script src="robottypes.js"></script>
         <script src="modelrenderer.js"></script>
+        <script src="explosionrenderer.js"></script>
         <script src="gui.js"></script>
         <script src="teams/teams.js"></script>
     </head>
@@ -124,6 +126,7 @@
         var simulationData  = {
                 robots:{},
                 lines:[],
+                explosions:[],
                 ore:[],
                 oreChanged:false,
                 ready:false,
@@ -139,6 +142,7 @@
             currentFrame = 0;
             simulationData.robots = {};
             simulationData.lines = [];
+            simulationData.explosions = [];
             simulationData.ore = [];
             simulationData.ready = false;
             simulationData.oreChanged = false;
@@ -187,6 +191,7 @@
             for(var i =0;i<sigs.length;i++){
                 var sig = sigs[i];
                 if(sig.type=="spawn"){
+                    var robotType = RobotTypes[sig.robotType];
                     var robot = {
                         id:sig.robotID,
                         loc: sig.loc,
@@ -196,6 +201,9 @@
                         hasInterp: false,
                         hp: 0,
                         supply: 0,
+                        z: ('spawnHeight' in robotType)?
+                            robotType.spawnHeight:
+                            (('height' in robotType)?robotType.height:0),
                         rot:0
                     };
                     simulationData.robots[robot.id] = robot;
@@ -234,9 +242,11 @@
                     simulationData.ore[mineLoc[0]][mineLoc[1]][2] = robot?robot.team:sig.team;
                     simulationData.oreChanged = true;
                 }else if(sig.type=="death"){
-                    if(simulationData.robots[sig.robotID].type == "TOWER"){
-                        gui.updateScore(simulationData.robots[sig.robotID].team, false);
-                    }
+                    var robot = simulationData.robots[sig.robotID];
+                    if(robot.type == "TOWER"){
+                        gui.updateScore(robot.team, false);
+                    }else if(robot.type == "MISSILE")
+                        simulationData.explosions.push([true,7,robot.loc]);
                     delete simulationData.robots[sig.robotID];
                 }else if(sig.type=="mapend"){
                     resetSimulation();
