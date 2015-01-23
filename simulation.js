@@ -3,6 +3,8 @@ var Simulation = function(){
 
     self.newMap = function(){
         self.currentFrame = 0;
+        if(window.battlecodeCam)
+            window.battlecodeCam.setCenter(0,0);
         self.data  = {
             robots:{},
             lines:[],

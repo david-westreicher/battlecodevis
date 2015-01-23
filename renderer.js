@@ -15,6 +15,10 @@ var GLOBAL_SCALE = 10;
 var GLOBAL_SCALED2 = GLOBAL_SCALE/2;
 var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector2();
+var mouseDown = null;
+var mouseDownX = 0;
+var mouseDownY = 0;
+var CLICK_DRAG_TIME = 200;
 init();
 modelRenderer.init();
 animate();
@@ -23,6 +27,8 @@ function initEvents(){
 	window.addEventListener( 'resize', onWindowResize, false );
 	document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 	document.addEventListener( 'click', onDocumentMouseClick, false );
+	document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+	document.addEventListener( 'mouseup', onDocumentMouseUp, false );
 	if(navigator.userAgent.indexOf('Firefox')!=-1)
         document.addEventListener( 'DOMMouseScroll', onDocumentMouseWheel, false );
     else
@@ -89,19 +95,31 @@ function onDocumentMouseMove(event) {
 	mouseY = ( event.clientY - windowHalfY );
 }
 
+function onDocumentMouseDown(event) {
+    mouseDown = (new Date()).getTime();
+    mouseDownX = ( event.x - windowHalfX );
+    mouseDownY = ( event.y - windowHalfY );
+}
+function onDocumentMouseUp(event) {
+}
 function onDocumentMouseClick(event) {
-    console.log(event);
+    var now = (new Date()).getTime();
+    // not a click but a drag MAGIC-CONSTANT!!!
+    if(mouseDown+CLICK_DRAG_TIME<now){
+        mouseDown = null;
+        return;
+    }
     mouse.x = ( event.x / window.innerWidth ) * 2 - 1;
 	mouse.y = - ( event.y / window.innerHeight ) * 2 + 1;
 	if(oreMesh!=null){
         raycaster.setFromCamera( mouse, battlecodeCam.cam );
         var intersects = raycaster.intersectObject(oreMesh,false);
         if(intersects.length>0){
-            console.log(intersects);
             var point = intersects[0].point;
             battlecodeCam.setCenter(point.x,point.y);
         }
     }
+    mouseDown = null;
 }
 
 function onDocumentMouseWheel(event) {
@@ -240,7 +258,10 @@ function getInterpPosition(robot){
 
 function render() {
 	//update camera
-	battlecodeCam.update((mouseX/windowHalfX),(mouseY/windowHalfY+1),scene.position);
+	var now = (new Date()).getTime();
+	if(mouseDown!=null && mouseDown+CLICK_DRAG_TIME<now)
+	    battlecodeCam.updateRotation(((mouseDownX-mouseX)/windowHalfX));
+	battlecodeCam.update();
 
 	//draw shoot lines
 	var simulines = simulation.data.lines;
