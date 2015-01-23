@@ -103,7 +103,7 @@ var ModelRenderer = function(){
 				mesh = self.meshes[modelID][meshCounter[modelID]-1];
 			}
 			//update position ....
-		    var yDif = robot.lastloc[1]-robot.loc[1];
+		    var yDif = -(robot.lastloc[1]-robot.loc[1]);
 		    var xDif = robot.lastloc[0]-robot.loc[0];
 		    var toRot = (xDif==0&&yDif==0)?0:(-Math.atan2(yDif,xDif)+Math.PI);
 		    mesh.rotation.y = self.interpolateRot(robot.rot,toRot,interp);
