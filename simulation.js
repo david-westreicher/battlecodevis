@@ -168,7 +168,7 @@ var Simulation = function(){
                     case "MISSILE":
                         self.data.explosions.push([true,7,robot.loc]); break;
                     case "COMMANDER":
-                        gui.commanderDead(robot);
+                        gui.commanderDead(robot.team);
                 }
                 delete self.data.robots[sig.robotID];
             }else if(sig.type=="mapend"){

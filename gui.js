@@ -58,6 +58,7 @@ GUI.prototype = {
             }
         }, this);
     },
+    // when map is finished
     resetScores: function(){
         this.teams.A.towers = 0;
         this.teams.B.towers = 0;
@@ -65,21 +66,33 @@ GUI.prototype = {
             var parent = section.querySelector('.towers');
             removeChildren(parent, 'li');
         });
+
+        // reset COMMANDER
+        this.commanderDead("A");
+        this.commanderDead("B");
     },
     win: function(team){
         var trophy = document.createElement('li'),
             teamIndex = this.getTeamIndex(team);
         this.teamSections[teamIndex].getElementsByClassName('trophies')[0].appendChild(trophy);
     },
-    resetWins: function(){
-        this.teams.A.HQ = 0;
-        this.teams.B.HQ = 0;
-    },
-    commanderDead: function(robot){
-        this.teams[robot.team].COMMANDER = 0;
-        this.teamSections[this.getTeamIndex(robot)].getElementsByClassName(robot.type.toLowerCase())[0].style.display = "none";
+    commanderDead: function(team){
+        this.teams[team].COMMANDER = 0;
+        this.teamSections[this.getTeamIndex(team)].getElementsByClassName('commander')[0].style.display = "none";
     },
     getTeamIndex: function(team){
         return (team=="A")?0:1;
     },
+    // when loading a new game
+    resetUI: function(){
+        // reset HQ
+        this.teams.A.HQ = 0;
+        this.teams.B.HQ = 0;
+
+        // reset trophies
+        forEach(this.teamSections, function(i, section){
+            var trophiesParent = section.querySelector('.trophies');
+            removeChildren(trophiesParent, 'li');
+        });
+    }
 }
