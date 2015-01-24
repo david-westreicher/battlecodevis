@@ -4,10 +4,15 @@
         <meta charset="UTF-8">
         <title>battlecodevis - by team schnitzel</title>
         <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
         <link href="/src/stylesheets/normalize.css" rel="stylesheet" type="text/css"/>
         <link href="/src/stylesheets/battelcode.css" rel="stylesheet" type="text/css"/>
+
         <script src="/src/lib/three.min.js"></script>
         <script src="/src/lib/stats.min.js"></script>
+        <script src="/src/lib/dat.gui.min.js"></script>
+        <script src="/src/lib/html5slider.js"></script>
+
         <script src="/src/javascript/helpers.js"></script>
         <script src="/src/javascript/camera.js"></script>
         <script src="/src/javascript/simulation.js"></script>
@@ -15,12 +20,24 @@
         <script src="/src/javascript/modelrenderer.js"></script>
         <script src="/src/javascript/explosionrenderer.js"></script>
         <script src="/src/javascript/gui.js"></script>
+        <script src="/src/javascript/controlbar.js"></script>
         <script src="teams/teams.js"></script>
     </head>
     <body>
         <div id="container">
             <div class="controls">
-            <input type="file" accept=".rms" onchange="loadFile(this.files[0])" style="top:0px;left:0px;position:absolute;z-index:100">
+                <div class="buttons set">
+                    <label class="upload_label button"><input type="file" accept=".rms" onchange="loadFile(this.files[0])" class="upload" /></label>
+                    <input type="button" class="play button" />
+                    <input type="button" class="pause button" />
+                    <input type="button" class="foreplay button" /><!-- TODO check name foreplay? -->
+                </div>
+                <div class="slider set">
+                    <input type="range" min="0" max="500" step="1" />
+                    <p class="note">Current value: <span id="currentValue">0</span></p>
+                </div>
+                <div class="menu set">
+                </div>
             </div>
             <div class="stats">
                 <div class="left">

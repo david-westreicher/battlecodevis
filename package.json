@@ -2,13 +2,17 @@
     "name": "battlecodevis",
     "description": "battlecode viewer",
     "scripts": {
-        "browserify": "browserify worker.js -o workerbundle.js",
-        "server": "./node_modules/beefy/bin/beefy worker.js:workerbundle.js --live --index=index.html",
-        "start": "npm run browserify; node server.js"
+        "workers": "browserify src/javascript/worker.js -o workerbundle.js",
+        "vendors": "browserify -r src/javascript/dat-gui -r src/javascript/stats-js -o vendors.js",
+        "//": "compile: npm run workers && npm run vendors",
+        "compile": "npm run workers",
+        "start": "npm run compile && node server.js"
     },
     "dependencies": {
         "pako": ">= 0.2.5",
         "express": "~4.9.x",
-        "browserify": "*"
+        "browserify": "*",
+        "dat-gui": "*",
+        "stats-js": "*"
     }
 }

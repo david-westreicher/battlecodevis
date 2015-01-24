@@ -16,6 +16,9 @@ var GUI = function(){
     this.resetScores();
 }
 GUI.prototype = {
+    setUpControls: function(){
+        this.slider = new controlbar(document.querySelector('.slider input'));
+    },
     setTeams: function(data){
         forEach(this.teamSections, function(i, section){
             // set photo

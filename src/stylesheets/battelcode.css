@@ -136,3 +136,42 @@ body {
     position: relative;
     overflow: hidden;
 }
+
+/* controls */
+.controls{
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+.set{
+    float: left;
+}
+.button{
+    width: 32px;
+    height: 32px;
+    float: left;
+    margin: 0 5px;
+}
+.upload_label{
+    background: url('/assets/images/toolbarButton-openFile.png') no-repeat;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    background-color: #A97F0C;
+    display: block;
+}
+.upload{
+    z-index: 999;
+    line-height: 0;
+    font-size: 0px;
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    left: 0;
+}
+.slider{
+    width: 80%;
+}
+.slider input{
+    width: 100%;
+}
