@@ -1,0 +1,93 @@
+/**
+ * fontello fonts
+ */
+@import (less) "../fontello/authfactory-flat.css";
+@import (less) "../fontello/animation.css";
+
+
+/**
+ * custom/downloaded fonts
+ */
+@font-path: '../assets/fonts/';
+
+#font-face(@fontfamily) {
+    font-family: @fontfamily;
+    src: url("@{font-path}@{fontfamily}/@{fontfamily}.eot");
+    src: url("@{font-path}@{fontfamily}/@{fontfamily}.eot?#iefix") format('embedded-opentype'),
+         url("@{font-path}@{fontfamily}/@{fontfamily}.woff") format('woff'),
+         url("@{font-path}@{fontfamily}/@{fontfamily}.ttf") format('truetype'),
+         url("@{font-path}@{fontfamily}/@{fontfamily}.svg#@{fontfamily}") format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    #font-face('Bevan');
+}
+@font-face {
+    #font-face('Bitter-Bold');
+}
+@font-face {
+    #font-face('Bitter-Italic');
+}
+@font-face {
+    #font-face('Bitter-Regular');
+}
+@font-face {
+    #font-face('Cabin-Bold');
+}
+@font-face {
+    #font-face('Cabin-Italic');
+}
+@font-face {
+    #font-face('Cabin-Regular');
+}
+
+
+
+
+
+
+
+/**
+.font-face(@name: '', @eot: '', @woff: '', @ttf:'', @svg:'') {
+	@font-face {
+		font-family: @name;
+		src: url('../assets/fonts/'+@name+'/'+@name+'.eot');
+		src: url('../assets/fonts/Bevan/Bevan.eot?#iefix') format('eot'),
+		url('../assets/fonts/Bevan/Bevan.woff') format('woff'),
+		url('../assets/fonts/Bevan/Bevan.ttf') format('truetype'),
+		url('../assets/fonts/Bevan/Bevan.svg') format('svg');
+		font-weight: normal;
+		font-style: normal;
+	}
+	
+	@media screen and (-webkit-min-device-pixel-ratio:0) {
+		@font-face {
+			font-family: 'Bevan';
+			src: url('../assets/fonts/Bevan/Bevan.svg') format('svg');
+		}
+	}
+}
+
+
+
+
+@font-face {
+	font-family: 'Questrial';
+	src: url('../../../../fonts/google/Questrial/questrial-regular-webfont.eot');
+	src: url('../../../../fonts/google/Questrial/questrial-regular-webfont.eot?#iefix') format('eot'),
+	url('../../../../fonts/google/Questrial/questrial-regular-webfont.woff') format('woff'),
+	url('../../../../fonts/google/Questrial/questrial-regular-webfont.ttf') format('truetype'),
+	url('../../../../fonts/google/Questrial/questrial-regular-webfont.svg') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+	@font-face {
+		font-family: 'Questrial';
+		src: url('../../../../fonts/google/Questrial/questrial-regular-webfont.svg') format('svg');
+	}
+}
+**/

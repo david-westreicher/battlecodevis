@@ -1,0 +1,36 @@
+{
+  "name": "battlecodevis",
+  "version": "0.0.1",
+  "authors": [
+    "Team Schnitzel <>"
+  ],
+  "description": "",
+  "main": "./dist/battlecodevis.built.js",
+  "ignore": [
+    "**/.*",
+    "vendor",
+    "test",
+    "tests",
+    "node_modules"
+  ],
+  "dependencies": {
+    "stats.js": "r12",
+    "threejs": "r70",
+    
+    "requirejs": "~2.1.11",
+    "requirejs-plugins": "~1.0.2",
+    "require-less": "~0.1.2",
+    "require-css": "~0.1.4",
+    
+    "jquery": "1.9.1",
+    "bootstrap": "~3.0.0",
+    
+    "underscore": "~1.6.0",
+    "backbone": "~1.1.2",
+    "backbone.marionette": "~2.0.3",
+    "backbone.babysitter": "*",
+    "backbone.wreqr": "*",
+    
+    "hammerjs": "~2.0.2"
+  }
+}

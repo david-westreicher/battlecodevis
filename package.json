@@ -1,14 +1,23 @@
 {
     "name": "battlecodevis",
     "description": "battlecode viewer",
+    "version": "0.0.1",
+    "author": {
+        "name": "Team Schnitzel",
+        "email": ""
+    },
+    "engines": {
+        "node": ">=0.8.x",
+        "npm": ">=1.1.x"
+    },
     "scripts": {
+        "postinstall": "node install.js",
+
         "browserify": "browserify worker.js -o workerbundle.js",
         "server": "./node_modules/beefy/bin/beefy worker.js:workerbundle.js --live --index=index.html",
         "start": "npm run browserify; node server.js"
     },
     "dependencies": {
-        "pako": ">= 0.2.5",
-        "express": "~4.9.x",
-        "browserify": "*"
+        "package-script": "0.0.8"
     }
 }

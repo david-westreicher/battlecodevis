@@ -1,0 +1,72 @@
+.plugin-headergallery{
+	display: block;
+	height: 500px;
+	background-size: cover;
+	background-position: center center;
+	margin: 0px 20px 0px 20px;
+	.border-radius(20px);
+}
+
+.shuffle-item{
+		margin-top: 15px !important;
+		top: 15px !important;
+	}
+
+.plugin-camplist{
+	height: 50px;
+}
+.plugin-camplist ul{
+	
+	overflow: visible;
+	margin: 0px 0px 0px 0px;
+	padding: 0px;
+	position: absolute;
+	margin-top: -35px;
+	
+	
+	li{
+		display: block;
+		float: left;
+		text-align: center;
+		a{
+			.border-radius(57px);
+			font-size: 14px;
+			text-decoration: none;
+			color: @gray-lighter;
+			display: block;
+			
+			background-color: #000;
+					
+			width: 70px;
+			height: 70px;
+			background-position: center center;
+			margin-top: 0px;
+			position: relative;
+			margin-right: 15px;
+			
+			.top{
+				width: 100%;
+				display: block;
+				top: 20%;
+				position: absolute;
+			}
+			.bottom{
+				width: 100%;
+				display: block;
+				bottom: 20%;
+				position: absolute;
+			}
+		}
+		&:first-child{
+			margin-top: -20px;
+			a{
+				font-size: 16px;
+				color: @gray-darker;
+				width: 115px;
+				height: 115px;
+				background-image: url('../../assets/logo_small.jpg');
+			}
+		}
+	}	
+	
+}

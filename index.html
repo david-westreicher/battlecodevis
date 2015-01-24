@@ -4,10 +4,67 @@
         <meta charset="UTF-8">
         <title>battlecodevis - by team schnitzel</title>
         <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        
         <link href="stylesheets/normalize.css" rel="stylesheet" type="text/css"/>
         <link href="stylesheets/battelcode.css" rel="stylesheet" type="text/css"/>
+        
         <script src="lib/three.min.js"></script>
         <script src="lib/stats.min.js"></script>
+        
+        
+        
+                
+        <script>
+            $(document).ready(function(){
+                /**
+                 * init our require app / bootstrap require
+                 */
+                require({
+                    baseUrl: '{{ URL::to("src") }}',
+                    paths: {
+                        r: './require.app'
+                    },
+                    deps: ['r'],
+                    urlArgs: "bust=" + (new Date()).getTime()
+                });
+                
+                /**
+                 * boootstraping the app
+                 * use require.app -> onReady() to check for ready state
+                 */
+                require(['r'], function(r)
+                {
+                    
+                    window.setUrlPrefix('{{ URL::to("") }}/');
+                    
+                    r.onReady(function()
+                    {
+                        //@@
+                        require([
+                            'bootstrap',
+                            //'css!../packages/furcata/page/global',
+                            //'css!../packages/project/bootstrap/plugins/page/global'
+                        ], function()
+                        {
+                        //@@
+                            /*
+                            FurcataAdminApp.start({
+                                selector: '#main',
+                                sizeContainerSelector: '#wrap',
+                                sizeSubtract: [10, 10]
+                            });
+                            */
+                        });
+                    });
+                });
+            });
+        </script>
+        
+        
+        
+        
+        
+        
         <script src="helpers.js"></script>
         <script src="camera.js"></script>
         <script src="simulation.js"></script>
