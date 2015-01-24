@@ -19,4 +19,5 @@ WORKDIR /battlecodevis
 
 EXPOSE 5000
 
-CMD ["/usr/bin/npm", "run", "start"]
+ENTRYPOINT ["/usr/bin/npm"]
+CMD ["run", "start"]
