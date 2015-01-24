@@ -67,86 +67,27 @@
 @import "fonts.less";
 @import "plugins/gallery.less";
 @import "plugins/headergallery.less";
-
 */
-
-/**
-@font-family-sans-serif:  "Cabin-Regular", "Helvetica Neue", Helvetica, Arial, sans-serif;
-@font-family-sans-serif-bold:  "Cabin-Bold", "Helvetica Neue", Helvetica, Arial, sans-serif;
-@font-family-sans-serif-italic:  "Cabin-Italic", "Helvetica Neue", Helvetica, Arial, sans-serif;
-@font-family-serif:       "Bitter-Regular", Georgia, "Times New Roman", Times, serif;
-@font-family-serif-bold:       "Bevan", Georgia, "Times New Roman", Times, serif;
-
-**/
-
-
 
 /**
  * replace icons with own icons
  */
+/*
 .glyphicon-chevron-left:extend(.af-icon-arrow-hollow-circle-left all){
   font-family: "authfactory-flat";
 }
+*/
 
-
-
+/**
+ * theme elements
+ */
 body{
 	width: 100%;
 	height: 100%;
 	//font-variant: small-caps;
 }
+
 /**
-#navigation{
-	height: 85px;
-	font-size: 24px;
-	text-transform: uppercase;
-	
-	.logo{
-		.border-radius(57px);
-		background-image: url('../../assets/logo.jpg');
-		position:absolute;
-		top: -10px;
-		display: block;
-		width: 115px;
-		height: 115px;
-	}
-	
-	ul{
-		float: right;
-		overflow: visible;
-		margin: 20px 0px 0px 120px;
-		padding: 0px;
-		li{
-				display: inline-block;
-				a{
-					padding: 0px 0px 0px 20px;
-					font-size: 18px;
-					text-decoration: none;
-					color: @gray-lighter;
-					&:after{
-						content:"/";
-						margin-left: 20px;
-					}
-					&:hover{
-						color: @gray-light;
-						&:after{
-							color: @gray-lighter;
-						}
-					}
-				}
-		}
-	}
-}
-**/
-
-#header{
-	
-}
-
-#content{
-	
-}
-
-#footer{
-	
-}
+ * app (battlecode)
+ */
+@import (less) "app/battlecode.css";

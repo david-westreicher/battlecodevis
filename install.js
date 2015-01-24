@@ -9,6 +9,9 @@ require('package-script').spawn([
 }, {
     command: "npm",
     args: ["install", "-g", "browserify"]
+}, {
+    command: "npm",
+    args: ["install", "-g", "beefy"]
 }, { 
     command: "npm",
     args: ["install", "-g", "bower"]
@@ -28,6 +31,9 @@ require('package-script').spawn([
 
 // SYMLINKS
 {
+    command : "pako",
+    args : ["link", "pako"]
+}, {
     command : "npm",
     args : ["link", "grunt"]
 }, {

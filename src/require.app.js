@@ -2,6 +2,7 @@ define(function() {
 
 	/**
 	 * Register Method
+	 * objpath is a dot limited string of paths (like com.schnitzel.namespace)
 	 */
 	window.register = function(objpath, obj) {
 		var arr_objects = objpath.split('.');
@@ -28,15 +29,19 @@ define(function() {
 		}
 	};
 	
+	/**
+	 * Set URL Prefix 
+	 */
 	if(!window.urlPrefix){
-		window.urlPrefix = 'http://';
-		window.setUrlPrefix = function(val){
-			window.urlPrefix = val;
-		};
-		window.getUrlPrefix = function(){
-			return window.urlPrefix;
-		};
+		//window.urlPrefix = 'http://';
+		window.urlPrefix = '';
 	}
+	window.setUrlPrefix = function(val){
+        window.urlPrefix = val;
+    };
+    window.getUrlPrefix = function(){
+        return window.urlPrefix;
+    };
 	
 	/**
 	 * Require App

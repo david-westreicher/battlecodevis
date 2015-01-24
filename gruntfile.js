@@ -11,10 +11,10 @@ module.exports = function(grunt) {
         less : {
             src : {
                 expand : true,
-                cwd : 'src/styles/less',
+                cwd : 'src/styles',
                 src : '*.less',
                 ext : '.css',
-                dest : 'src/styles/css'
+                dest : 'dist'
             },
             bootstrap : {
                 expand : true,

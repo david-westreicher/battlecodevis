@@ -5,22 +5,24 @@
         <title>battlecodevis - by team schnitzel</title>
         <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
         
-        <link href="stylesheets/normalize.css" rel="stylesheet" type="text/css"/>
-        <link href="stylesheets/battelcode.css" rel="stylesheet" type="text/css"/>
+        <link href="vendor/normalize.css/normalize.css" rel="stylesheet" type="text/css"/>
         
-        <script src="lib/three.min.js"></script>
-        <script src="lib/stats.min.js"></script>
+        <link href="dist/main.css" rel="stylesheet" type="text/css"/>
+        <!--[if IE 7]><link href="dist/main-ie7.css" rel="stylesheet" type="text/css"/><![endif]-->
         
-        
-        
-                
+        <!--
+           from sewa: i would prefer a require.js setup, with packaged files / classes / objects
+           then we can build one distribution file with require.js included
+           but the beefy live update doesn't work, so use "npm run server-static"
+        -->
+        <!--
+        <script src="vendor/requirejs/require.js"></script>
+        <script src="vendor/jquery/jquery.js"></script>
         <script>
             $(document).ready(function(){
-                /**
-                 * init our require app / bootstrap require
-                 */
+                // init our require app / bootstrap require
                 require({
-                    baseUrl: '{{ URL::to("src") }}',
+                    baseUrl: './src/',
                     paths: {
                         r: './require.app'
                     },
@@ -28,42 +30,45 @@
                     urlArgs: "bust=" + (new Date()).getTime()
                 });
                 
-                /**
-                 * boootstraping the app
-                 * use require.app -> onReady() to check for ready state
-                 */
+                // boootstraping the app
                 require(['r'], function(r)
                 {
+                    // you can set the url prefix for harder links
+                    // window.setUrlPrefix('{{ URL::to("") }}/');
                     
-                    window.setUrlPrefix('{{ URL::to("") }}/');
-                    
+                    // check for readyness
                     r.onReady(function()
                     {
-                        //@@
+                        /**
+                         * SETUP YOUR APP 
+                         */
                         require([
                             'bootstrap',
-                            //'css!../packages/furcata/page/global',
-                            //'css!../packages/project/bootstrap/plugins/page/global'
-                        ], function()
+                            'statsjs',
+                            'threejs',
+                            
+                            'helpers',
+                            'camera',
+                            'simulation',
+                            'robottypes',
+                            'modelrenderer',
+                            'explosionrenderer',
+                            'gui',
+                            'teams/teams'
+                        ], function(Bootstrap, Statsjs, Threejs)
                         {
-                        //@@
-                            /*
-                            FurcataAdminApp.start({
-                                selector: '#main',
-                                sizeContainerSelector: '#wrap',
-                                sizeSubtract: [10, 10]
-                            });
-                            */
+                            console.log(Bootstrap);
+                            console.log(Statsjs);
+                            console.log(Threejs);
                         });
                     });
                 });
             });
         </script>
+        -->
         
-        
-        
-        
-        
+        <script src="vendor/threejs/build/three.js"></script>
+        <script src="vendor/stats.js/build/stats.min.js"></script>
         
         <script src="helpers.js"></script>
         <script src="camera.js"></script>
@@ -73,6 +78,7 @@
         <script src="explosionrenderer.js"></script>
         <script src="gui.js"></script>
         <script src="teams/teams.js"></script>
+        
     </head>
     <body>
         <div id="container">

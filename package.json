@@ -14,7 +14,8 @@
         "postinstall": "node install.js",
 
         "browserify": "browserify worker.js -o workerbundle.js",
-        "server": "./node_modules/beefy/bin/beefy worker.js:workerbundle.js --live --index=index.html",
+        "server": "beefy worker.js:workerbundle.js --live --index=index.html",
+        "server-static": "beefy worker.js:workerbundle.js --index=index.html",
         "start": "npm run browserify; node server.js"
     },
     "dependencies": {
