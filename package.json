@@ -11,14 +11,19 @@
         "npm": ">=1.1.x"
     },
     "scripts": {
-        "postinstall": "node install.js",
+        "postinstall": "bower install && grunt",
 
         "browserify": "browserify worker.js -o workerbundle.js",
-        "server": "beefy worker.js:workerbundle.js --live --index=index.html",
-        "server-static": "beefy worker.js:workerbundle.js --index=index.html",
-        "start": "npm run browserify; node server.js"
+        "start": "npm run browserify && node server.js"
     },
     "dependencies": {
-        "package-script": "0.0.8"
+    	"pako": ">= 0.2.5",
+        "express": "~4.9.x",
+        "browserify": "*",
+        "bower": "*",
+        "grunt": "*",
+        "grunt-cli": "*",
+        "grunt-bower-requirejs": "1.1",
+        "grunt-contrib-less": "0.10"
     }
 }
