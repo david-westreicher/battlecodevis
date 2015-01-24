@@ -116,7 +116,7 @@ body {
     float: left;
 }
 .left .commander:before{
-    background: url('/images/commander1.png') no-repeat;
+    background: url('../assets/images/commander1.png') no-repeat;
     left: 0;
 }
 .right .commander{
@@ -124,7 +124,7 @@ body {
     float: right;
 }
 .right .commander:before{
-    background: url('/images/commander2.png') no-repeat right;
+    background: url('../assets/images/commander2.png') no-repeat right;
     right: 0;
     transform: rotate(180deg);
 }

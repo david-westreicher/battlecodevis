@@ -40,7 +40,8 @@ function init() {
 	battlecodeCam = new battlecodeCamera();
 	scene = new THREE.Scene();
     explosionRenderer.init(scene);
-
+    
+    // add ground lines
 	var lineGeom = new THREE.Geometry();
 	for(var i=0;i<2*100;i++){
 		lineGeom.vertices.push(new THREE.Vector3(0,0,0));
@@ -48,7 +49,32 @@ function init() {
 	}
 	lines = new THREE.Line(lineGeom,new THREE.LineBasicMaterial({linewidth:3,vertexColors:THREE.VertexColors}),THREE.LinePieces);
 	scene.add(lines);
-
+	
+	
+	
+	// TEST
+	// GROUND
+    var maxAnisotropy = renderer.getMaxAnisotropy();
+    var texture = THREE.ImageUtils.loadTexture( "assets/images/crate.gif" );
+    var material = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture } );
+    texture.anisotropy = maxAnisotropy;
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set( 100, 100 );
+    if ( maxAnisotropy > 0 ) {
+        console.log('anisotropy: '+texture.anisotropy);
+    } else {
+        console.log('anisotropy not supported');
+    }
+    var gridNum = 60;
+    var gridSize = GLOBAL_SCALE;
+    var geometry = new THREE.PlaneBufferGeometry( gridNum*gridSize, gridNum*gridSize );
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.z = -0.1;
+    scene.add(mesh);
+    
+    
+    
+    // add ground lines
 	var gridGeom = new THREE.Geometry();
 	var gridNum = 60;
 	var startGrid = -gridNum;
@@ -64,9 +90,12 @@ function init() {
 	gridMesh = new THREE.Line(gridGeom,new THREE.LineBasicMaterial({color:0xCCCCCC}),THREE.LinePieces);
 	gridMesh.position.z = 0.1;
 	scene.add(gridMesh);
-
-	//LIGHT
-	var light = new THREE.DirectionalLight(0xffffff, 1);
+    
+    // ambient light
+    // scene.add( new THREE.AmbientLight( 0xeef0ff ) );
+    
+	// directional light
+	var light = new THREE.DirectionalLight(0xffffff, 0.5);
 	light.castShadow = true;
 	//light.shadowCameraVisible = true;
     var ratio = GLOBAL_SCALE/80;

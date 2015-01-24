@@ -5,10 +5,24 @@
         <title>battlecodevis - by team schnitzel</title>
         <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
         
-        <link href="vendor/normalize.css/normalize.css" rel="stylesheet" type="text/css"/>
-        
+        <!-- STYLESHEETS -->
         <link href="dist/main.css" rel="stylesheet" type="text/css"/>
         <!--[if IE 7]><link href="dist/main-ie7.css" rel="stylesheet" type="text/css"/><![endif]-->
+        
+        <!-- VENDOR LIBS -->
+        <link href="vendor/normalize.css/normalize.css" rel="stylesheet" type="text/css"/>
+        <script src="vendor/threejs/build/three.js"></script>
+        <script src="vendor/stats.js/build/stats.min.js"></script>
+        
+        <!-- APP -->
+        <script src="src/app/helpers.js"></script>
+        <script src="src/app/camera.js"></script>
+        <script src="src/app/simulation.js"></script>
+        <script src="src/app/robottypes.js"></script>
+        <script src="src/app/modelrenderer.js"></script>
+        <script src="src/app/explosionrenderer.js"></script>
+        <script src="src/app/gui.js"></script>
+        <script src="src/teams/teams.js"></script>
         
         <!--
            from sewa: i would prefer a require.js setup, with packaged files / classes / objects
@@ -67,18 +81,6 @@
         </script>
         -->
         
-        <script src="vendor/threejs/build/three.js"></script>
-        <script src="vendor/stats.js/build/stats.min.js"></script>
-        
-        <script src="helpers.js"></script>
-        <script src="camera.js"></script>
-        <script src="simulation.js"></script>
-        <script src="robottypes.js"></script>
-        <script src="modelrenderer.js"></script>
-        <script src="explosionrenderer.js"></script>
-        <script src="gui.js"></script>
-        <script src="teams/teams.js"></script>
-        
     </head>
     <body>
         <div id="container">
@@ -91,7 +93,7 @@
                         <div class="commander bar"><span></span></div>
                     </div>
                     <div class="photo">
-                        <img src="images/avatar_placeholder.png"/>
+                        <img src="assets/images/avatar_placeholder.png"/>
                     </div>
                     <h3>???</h3>
                     <ul class="towers bar"></ul>
@@ -103,7 +105,7 @@
                         <div class="commander bar"><span></span></div>
                     </div>
                     <div class="photo">
-                        <img src="images/avatar_placeholder.png"/>
+                        <img src="assets/images/avatar_placeholder.png"/>
                     </div>
                     <h3>???</h3>
                     <ul class="towers bar"></ul>
@@ -130,7 +132,7 @@
         renderer = new THREE.WebGLRenderer();
         renderer.shadowMapEnabled = true;
         renderer.shadowMapSoft = false;
-        renderer.setClearColor( 0xffffff );
+        renderer.setClearColor( 0x333333 );
         renderer.setPixelRatio( window.devicePixelRatio );
         renderer.setSize( window.innerWidth, window.innerHeight );
         container.appendChild( renderer.domElement );
@@ -191,6 +193,6 @@
             window.worker.postMessage(file);
         }
     </script>
-    <script src="renderer.js"></script>
+    <script src="src/app/renderer.js"></script>
 </html>
 

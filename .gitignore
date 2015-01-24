@@ -8,6 +8,7 @@ js/demos/*
 ## DEV
 #################
 *.md.html
+pkgscript.log
 vendor/
 
 #############

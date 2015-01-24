@@ -60,10 +60,6 @@ require.config({
 		}
 	},
 	paths: {
-		backbone: "../vendor/backbone/backbone",
-		"backbone.babysitter": "../vendor/backbone.babysitter/lib/backbone.babysitter",
-		"backbone.marionette": "../vendor/backbone.marionette/lib/core/backbone.marionette",
-		"backbone.wreqr": "../vendor/backbone.wreqr/lib/backbone.wreqr",
 		bootstrap: "../vendor/bootstrap/dist/js/bootstrap",
 		hammerjs: "../vendor/hammerjs/hammer",
 		jquery: "../vendor/jquery/jquery",
