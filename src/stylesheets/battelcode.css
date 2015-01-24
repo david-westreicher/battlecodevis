@@ -1,0 +1,138 @@
+body {
+    background:#fff;
+    padding:0;
+    margin:0;
+    font-weight: bold;
+    overflow:hidden;
+}
+/* stats */
+.stats{
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+.stats .left{
+    float: left;
+    width: 50%;
+}
+.left .photo{
+    float: left;
+    border-bottom-color: #8C030E;
+    border-bottom-width: 10px;
+    border-bottom-style: solid;
+}
+.stats .right{
+    float: right;
+    width: 50%;
+}
+.right .photo{
+    float: right;
+    border-bottom-width: 10px;
+    border-bottom-color: #0027B3;
+    border-bottom-style: solid;
+}
+.right h3{
+    text-align: right;
+}
+.photo{
+    margin: 4px;
+    height: 128px;
+    width: 128px;
+}
+.bar{
+    margin: 10px 0 0 4px;
+    height: 20px;
+}
+.trophies{
+    overflow: hidden;
+    list-style: none;
+    padding: 0;
+}
+.trophies li{
+    float: left;
+    margin: 0 5px;
+    display: block;
+    width: 20px;
+    height: 20px;
+    background: #E8DF32;
+}
+.towers{
+    list-style: none;
+    overflow: hidden;
+    padding: 0;
+}
+.right .towers li, .right .hq, .right .trophies li{
+    float: right;
+}
+.towers li{
+    width: 20px;
+    height: 20px;
+    float: left;
+    margin: 0 5px;
+}
+.towers .alive{
+    background-color: #A9D085;
+
+}
+.towers .dead{
+    background-color: #E7EDE2;
+}
+.hq{
+    width: 200px;
+    height: 20px;
+    display: block;
+    background: #008000;
+    float: left;
+    position: relative;
+}
+.hq > span{
+    display: block;
+    height: 100%;
+    background-color: #2BC253;
+    position: relative;
+    overflow: hidden;
+}
+
+.robots{
+    overflow: hidden;
+    width: 100%;
+    height: 42px;
+}
+.commander{
+    width: 180px;
+    height: 32px;
+    display: none;
+    position: relative;
+}
+.commander:before{
+    content: "";
+    width: 32px;
+    height: 32px;
+    display: block;
+    position: absolute;
+    float: left;
+}
+.left .commander{
+    padding-left: 32px;
+    float: left;
+}
+.left .commander:before{
+    background: url('/assets/images/commander1.png') no-repeat;
+    left: 0;
+}
+.right .commander{
+    padding-right: 32px;
+    float: right;
+}
+.right .commander:before{
+    background: url('/assets/images/commander2.png') no-repeat right;
+    right: 0;
+    transform: rotate(180deg);
+}
+.commander > span{
+    display: block;
+    height: 25%;
+    border-bottom: 15px solid #D96D2B;
+    position: relative;
+    overflow: hidden;
+}

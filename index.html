@@ -4,83 +4,18 @@
         <meta charset="UTF-8">
         <title>battlecodevis - by team schnitzel</title>
         <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-        
-        <!-- STYLESHEETS -->
-        <link href="dist/main.css" rel="stylesheet" type="text/css"/>
-        <!--[if IE 7]><link href="dist/main-ie7.css" rel="stylesheet" type="text/css"/><![endif]-->
-        
-        <!-- VENDOR LIBS -->
-        <link href="vendor/normalize.css/normalize.css" rel="stylesheet" type="text/css"/>
-        <script src="vendor/threejs/build/three.js"></script>
-        <script src="vendor/stats.js/build/stats.min.js"></script>
-        
-        <!-- APP -->
-        <script src="src/app/helpers.js"></script>
-        <script src="src/app/camera.js"></script>
-        <script src="src/app/simulation.js"></script>
-        <script src="src/app/robottypes.js"></script>
-        <script src="src/app/modelrenderer.js"></script>
-        <script src="src/app/explosionrenderer.js"></script>
-        <script src="src/app/gui.js"></script>
-        <script src="src/teams/teams.js"></script>
-        
-        <!--
-           from sewa: i would prefer a require.js setup, with packaged files / classes / objects
-           then we can build one distribution file with require.js included
-           but the beefy live update doesn't work, so use "npm run server-static"
-        -->
-        <!--
-        <script src="vendor/requirejs/require.js"></script>
-        <script src="vendor/jquery/jquery.js"></script>
-        <script>
-            $(document).ready(function(){
-                // init our require app / bootstrap require
-                require({
-                    baseUrl: './src/',
-                    paths: {
-                        r: './require.app'
-                    },
-                    deps: ['r'],
-                    urlArgs: "bust=" + (new Date()).getTime()
-                });
-                
-                // boootstraping the app
-                require(['r'], function(r)
-                {
-                    // you can set the url prefix for harder links
-                    // window.setUrlPrefix('{{ URL::to("") }}/');
-                    
-                    // check for readyness
-                    r.onReady(function()
-                    {
-                        /**
-                         * SETUP YOUR APP 
-                         */
-                        require([
-                            'bootstrap',
-                            'statsjs',
-                            'threejs',
-                            
-                            'helpers',
-                            'camera',
-                            'simulation',
-                            'robottypes',
-                            'modelrenderer',
-                            'explosionrenderer',
-                            'gui',
-                            'teams/teams'
-                        ], function(Bootstrap, Statsjs, Threejs)
-                        {
-                            console.log(Bootstrap);
-                            console.log(Statsjs);
-                            console.log(Threejs);
-                        });
-                    });
-                });
-            });
-        </script>
-        -->
-        
+        <link href="/src/stylesheets/normalize.css" rel="stylesheet" type="text/css"/>
+        <link href="/src/stylesheets/battelcode.css" rel="stylesheet" type="text/css"/>
+        <script src="/src/lib/three.min.js"></script>
+        <script src="/src/lib/stats.min.js"></script>
+        <script src="/src/javascript/helpers.js"></script>
+        <script src="/src/javascript/camera.js"></script>
+        <script src="/src/javascript/simulation.js"></script>
+        <script src="/src/javascript/robottypes.js"></script>
+        <script src="/src/javascript/modelrenderer.js"></script>
+        <script src="/src/javascript/explosionrenderer.js"></script>
+        <script src="/src/javascript/gui.js"></script>
+        <script src="teams/teams.js"></script>
     </head>
     <body>
         <div id="container">
@@ -93,7 +28,7 @@
                         <div class="commander bar"><span></span></div>
                     </div>
                     <div class="photo">
-                        <img src="assets/images/avatar_placeholder.png"/>
+                        <img src="/assets/images/avatar_placeholder.png"/>
                     </div>
                     <h3>???</h3>
                     <ul class="towers bar"></ul>
@@ -105,7 +40,7 @@
                         <div class="commander bar"><span></span></div>
                     </div>
                     <div class="photo">
-                        <img src="assets/images/avatar_placeholder.png"/>
+                        <img src="/assets/images/avatar_placeholder.png"/>
                     </div>
                     <h3>???</h3>
                     <ul class="towers bar"></ul>
@@ -132,7 +67,7 @@
         renderer = new THREE.WebGLRenderer();
         renderer.shadowMapEnabled = true;
         renderer.shadowMapSoft = false;
-        renderer.setClearColor( 0x333333 );
+        renderer.setClearColor( 0xffffff );
         renderer.setPixelRatio( window.devicePixelRatio );
         renderer.setSize( window.innerWidth, window.innerHeight );
         container.appendChild( renderer.domElement );
@@ -193,6 +128,5 @@
             window.worker.postMessage(file);
         }
     </script>
-    <script src="src/app/renderer.js"></script>
+    <script src="/src/javascript/renderer.js"></script>
 </html>
-

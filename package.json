@@ -1,29 +1,14 @@
 {
     "name": "battlecodevis",
     "description": "battlecode viewer",
-    "version": "0.0.1",
-    "author": {
-        "name": "Team Schnitzel",
-        "email": ""
-    },
-    "engines": {
-        "node": ">=0.8.x",
-        "npm": ">=1.1.x"
-    },
     "scripts": {
-        "postinstall": "bower install && grunt",
-
         "browserify": "browserify worker.js -o workerbundle.js",
-        "start": "npm run browserify && node server.js"
+        "server": "./node_modules/beefy/bin/beefy worker.js:workerbundle.js --live --index=index.html",
+        "start": "npm run browserify; node server.js"
     },
     "dependencies": {
-    	"pako": ">= 0.2.5",
+        "pako": ">= 0.2.5",
         "express": "~4.9.x",
-        "browserify": "*",
-        "bower": "*",
-        "grunt": "*",
-        "grunt-cli": "*",
-        "grunt-bower-requirejs": "1.1",
-        "grunt-contrib-less": "0.10"
+        "browserify": "*"
     }
 }
