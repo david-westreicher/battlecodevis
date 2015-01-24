@@ -19,7 +19,7 @@ GUI.prototype = {
     setTeams: function(data){
         forEach(this.teamSections, function(i, section){
             // set photo
-            var imgUrl = (data[i][1].match(/hq\d+\.png/i)) ? 'images/avatar_placeholder.png' : this.baseImgUrl + data[i][1];
+            var imgUrl = (data[i][1].match(/hq\d+\.png/i)) ? 'assets/images/avatar_placeholder.png' : this.baseImgUrl + data[i][1];
             section.getElementsByClassName('photo')[0].firstElementChild.src = imgUrl;
             // set name
             section.getElementsByTagName('h3')[0].textContent = data[i][0];
