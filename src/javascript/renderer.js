@@ -229,8 +229,9 @@ function animate() {
 	}
 
 	var frameMod = frameNum%slowmotion;
-	if(frameMod==0)
+	if(frameMod==0 && !gui.controls.isPause()){
 		simulation.simulate();
+	}
 	interp = frameMod/slowmotion;
 	isLastFrame = frameMod==(slowmotion-1);
 	frameNum++;

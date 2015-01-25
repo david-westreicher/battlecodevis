@@ -151,6 +151,7 @@ body {
     height: 32px;
     float: left;
     margin: 0 5px;
+    padding: 0;
 }
 .upload_label{
     background: url('/assets/images/toolbarButton-openFile.png') no-repeat;

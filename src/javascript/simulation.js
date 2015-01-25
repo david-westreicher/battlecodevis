@@ -78,6 +78,7 @@ var Simulation = function(){
         var sigs = frame.signals;
         self.data.lines = [];
         self.data.gold = frame.score;
+        gui.controls.updateBar(self.currentFrame);
         self.currentFrame++;
         for(var i =0;i<sigs.length;i++){
             var sig = sigs[i];

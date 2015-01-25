@@ -1,6 +1,7 @@
 var GUI = function(){
     this.baseImgUrl = "http://s3.amazonaws.com/battlecode-avatars/avatars/";
-    this.teamSections = $('.stats > div')
+    this.teamSections = $('.stats > div');
+    this.controls = null;
     this.teams = {
         'A': {
             'towers': 0,
@@ -12,12 +13,12 @@ var GUI = function(){
             'HQ': 0,
             'COMMANDER': 0
         }
-    }
+    };
     this.resetScores();
 }
 GUI.prototype = {
     setUpControls: function(){
-        this.slider = new controlbar(document.querySelector('.slider input'));
+        this.controls = new Controlbar(document.querySelector('.controls'));
     },
     setTeams: function(data){
         forEach(this.teamSections, function(i, section){
@@ -57,7 +58,7 @@ GUI.prototype = {
                 var bar = this.teamSections[this.getTeamIndex(team)].getElementsByClassName(type)[0],
                     percent = (simulation.data.robots[team[robot.type]].hp/constants[robot.type].hp)*100;
                 bar.getElementsByTagName('span')[0].style.width = percent+'%';
-                console.log('team '+ team +' '+ robot.type +' hp: ' + percent + '%');
+                // console.log('team '+ team +' '+ robot.type +' hp: ' + percent + '%');
             }
         }, this);
     },
