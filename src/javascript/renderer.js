@@ -16,6 +16,7 @@ var GLOBAL_SCALED2 = GLOBAL_SCALE/2;
 var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector2();
 var mouseDown = null;
+var mouseButton = 0;
 var mouseDownX = 0;
 var mouseDownY = 0;
 var CLICK_DRAG_TIME = 200;
@@ -96,11 +97,15 @@ function onDocumentMouseMove(event) {
 }
 
 function onDocumentMouseDown(event) {
+    console.log(event);
+    mouseButton = Math.min(1,event.button);
     mouseDown = (new Date()).getTime();
     mouseDownX = ( event.x - windowHalfX );
     mouseDownY = ( event.y - windowHalfY );
 }
 function onDocumentMouseUp(event) {
+    mouseDown = null;
+    battlecodeCam.dragFinished();
 }
 function onDocumentMouseClick(event) {
     var now = (new Date()).getTime();
@@ -116,7 +121,7 @@ function onDocumentMouseClick(event) {
         var intersects = raycaster.intersectObject(oreMesh,false);
         if(intersects.length>0){
             var point = intersects[0].point;
-            battlecodeCam.setCenter(point.x,point.y);
+           // battlecodeCam.setCenter(point.x,point.y);
         }
     }
     mouseDown = null;
@@ -260,8 +265,14 @@ function getInterpPosition(robot){
 function render() {
 	//update camera
 	var now = (new Date()).getTime();
-	if(mouseDown!=null && mouseDown+CLICK_DRAG_TIME<now)
-	    battlecodeCam.updateRotation(((mouseDownX-mouseX)/windowHalfX));
+	//if(mouseDown!=null && mouseDown+CLICK_DRAG_TIME<now)
+    if(mouseDown!=null){
+        if(mouseButton>0){
+            battlecodeCam.setCenterDelta((mouseDownX-mouseX),(mouseDownY-mouseY));
+        }else{
+	        battlecodeCam.updateRotation(((mouseDownX-mouseX)/windowHalfX));
+        }
+    }
 	battlecodeCam.update();
 
 	//draw shoot lines
