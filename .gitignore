@@ -3,3 +3,4 @@ workerbundle.js
 node_modules/*
 .DS_Store
 js/demos/*
+.project
