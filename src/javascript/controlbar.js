@@ -24,11 +24,23 @@ Controlbar.prototype = {
         document.getElementById('currentValue').textContent = value;
     },
     pause: function(){
+        var elm = this.controls.querySelector('.play');
+        if(this.pause){
+            elm.className = elm.className.replace(" active","");
+        }else{
+            elm.className += " active";
+        }
         this.pause = !this.pause;
     },
     fastForward: function(){
-        slowmotion = (this.ffw) ? 1 : 4;
+        var elm = this.controls.querySelector('.fforward');
+        if(this.ffw){
+            elm.className = elm.className.replace(" active","");
+        }else{
+            elm.className += " active";
+        }
         this.ffw = !this.ffw;
+        slowmotion = (this.ffw) ? 1 : 4;
     },
     isPause: function(){
         return this.pause;
