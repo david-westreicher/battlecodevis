@@ -107,7 +107,7 @@ var Simulation = function(){
                     gui.updateScore(robot.team, true);
                 }
                 if(robot.type == "HQ"){
-                    gui.updateScore(robot.team, true);
+                    //gui.updateScore(robot.team, true);
                     gui.setHQ(robot);
                 }
                 if(robot.type == "COMMANDER"){
