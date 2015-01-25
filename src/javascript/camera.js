@@ -1,12 +1,14 @@
 var battlecodeCamera = function(){
 	var self = this;
-	self.cameraDist = 200;
+	self.cameraRadius = 200;
 	self.cam = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 1000 );
 	self.center = new THREE.Vector3(0,0,0);
 	self.toCenter = new THREE.Vector3(0,0,0);
 	self.offset = new THREE.Vector3(0,0,0);
 	self.planeNormal = new THREE.Vector3(0,0,1);
 	self.angle1 = 0;
+	self.angle1Offset = 0;
+	self.angle2Offset = 0;
 	self.angle2 = Math.PI/2;
 
     self.setCenter = function(x,y){
@@ -44,11 +46,11 @@ var battlecodeCamera = function(){
 	}
 	self.updateDist = function(isUp){
 		if(!isUp){
-			self.cameraDist*=1.1;
+			self.cameraRadius*=1.2;
 		}else
-			self.cameraDist/=1.1;
-		self.cameraDist = Math.min(600,Math.max(20,self.cameraDist));
-		self.updateRotation(0);
+			self.cameraRadius/=1.2;
+		self.cameraRadius = Math.min(700,Math.max(10,self.cameraRadius));
+		self.updateRotation(0,0);
 		self.update();
 	}
 	self.dragFinished = function(){
@@ -56,11 +58,19 @@ var battlecodeCamera = function(){
 	    self.center.y += self.offset.y;
 	    self.offset.x = 0;
 	    self.offset.y = 0;
+        self.angle1 += self.angle1Offset;
+        self.angle2 += self.angle2Offset;
+       // self.angle2 = Math.min(Math.PI*3,self.angle2);
+        self.angle1Offset = 0;
+        self.angle2Offset = 0;
 	}
 	self.update = function(){
-        self.cam.position.x = Math.sin(self.angle1)*self.cameraRadius+self.center.x+self.offset.x;
-		self.cam.position.y = Math.cos(self.angle1)*self.cameraRadius+self.center.y+self.offset.y;
-		self.cam.position.z = Math.cos(self.angle2)*self.cameraDist;
+	    var xAngle = self.angle1+self.angle1Offset;
+	    var yAngle = Math.max(0.01,Math.min(Math.PI/2-0.2,self.angle2+self.angle2Offset));
+        self.cam.position.x = Math.sin(xAngle)*Math.sin(yAngle)*self.cameraRadius+self.center.x+self.offset.x;
+		self.cam.position.y = Math.cos(xAngle)*Math.sin(yAngle)*self.cameraRadius+self.center.y+self.offset.y;
+		self.cam.position.z = Math.cos(yAngle)*self.cameraRadius;
+		//console.log(yAngle);
 		self.cam.up.set(0,0,1);
 		var lookAt = new THREE.Vector3(0,0,0);
 		lookAt.copy(self.center);
@@ -69,10 +79,10 @@ var battlecodeCamera = function(){
 		//self.center.x+=(self.toCenter.x-self.center.x)/10;
 		//self.center.y+=(self.toCenter.y-self.center.y)/10;
 	}
-	self.updateRotation = function(deltaMouseX){
-        self.angle1 += deltaMouseX/30;
-	    self.angle2 = ((self.cameraDist-10)/580+1)*Math.PI/2+Math.PI;//mouseY*Math.PI/4;
-		self.cameraRadius = Math.abs(Math.sin(self.angle2))*self.cameraDist;
+	self.updateRotation = function(deltaMouseX,deltaMouseY){
+        self.angle1Offset = -deltaMouseX*3;
+	    self.angle2Offset = deltaMouseY*3;//((self.cameraDist-10)/580+1)*Math.PI/2+Math.PI;//mouseY*Math.PI/4;
+		//self.cameraRadius = Math.abs(Math.sin(self.angle2+self.angle2Offset))*self.cameraDist;
 	}
-	self.updateRotation(0);
+	self.updateRotation(0,0);
 }

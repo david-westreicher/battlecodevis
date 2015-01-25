@@ -270,7 +270,7 @@ function render() {
         if(mouseButton>0){
             battlecodeCam.setCenterDelta((mouseDownX-mouseX),(mouseDownY-mouseY));
         }else{
-	        battlecodeCam.updateRotation(((mouseDownX-mouseX)/windowHalfX));
+	        battlecodeCam.updateRotation(((mouseDownX-mouseX)/window.innerWidth),((mouseDownY-mouseY)/window.innerHeight));
         }
     }
 	battlecodeCam.update();
