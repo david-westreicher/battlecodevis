@@ -252,22 +252,24 @@ function updateOreUVs(){
 	geom.uvsNeedUpdate = true;
 }
 
-function addFace(mapGeom,startIndex,verIndices){
+function addFace(mapGeom,startIndex,verIndices,atlasIndex,atlasSize){
     for(var i=0;i<verIndices.length;i++)
         verIndices[i]+=startIndex;
     var face1 = new THREE.Face3(verIndices[0],verIndices[2],verIndices[1]);
     var face2 = new THREE.Face3(verIndices[2],verIndices[0],verIndices[3]);
     mapGeom.faces.push(face1);
     mapGeom.faces.push(face2);
+    atlasSize = 1/atlasSize;
+    var offset = atlasIndex*atlasSize;
     mapGeom.faceVertexUvs[0].push([
-            new THREE.Vector2(0,0),
-            new THREE.Vector2(1,1),
-            new THREE.Vector2(1,0)
+            new THREE.Vector2(0+offset,0),
+            new THREE.Vector2(atlasSize+offset,1),
+            new THREE.Vector2(atlasSize+offset,0)
             ]);
     mapGeom.faceVertexUvs[0].push([
-            new THREE.Vector2(1,1),
-            new THREE.Vector2(0,0),
-            new THREE.Vector2(0,1)
+            new THREE.Vector2(atlasSize+offset,1),
+            new THREE.Vector2(0+offset,0),
+            new THREE.Vector2(0+offset,1)
             ]);
 }
 
@@ -315,9 +317,9 @@ function createMap(){
 			                case 2:verIndices=[2,3,7,6]; break;
 			                case 3:verIndices=[3,0,4,7]; break;
 			            }
-			            addFace(mapGeom,startIndex,verIndices);
+			            addFace(mapGeom,startIndex,verIndices,0,2);
 			        }
-			        addFace(mapGeom,startIndex,[4,5,6,7]);
+			        addFace(mapGeom,startIndex,[4,5,6,7],1,2);
 			    }
 			}
 		}	
@@ -338,7 +340,7 @@ function createMap(){
 			    ore2Geom.vertices.push(new THREE.Vector3(corner[0]+ver.x,corner[1]+ver.y,0));
 			}
 			var currentVerIndex = ore2Geom.vertices.length-corners.length;
-			addFace(ore2Geom,currentVerIndex,[0,1,2,3]);
+			addFace(ore2Geom,currentVerIndex,[0,1,2,3],0,4);
 		}	
 	}
 	ore2Geom.uvsNeedUpdate = true;
