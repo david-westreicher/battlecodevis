@@ -8,7 +8,7 @@ var RobotTypes = {
     "DRONE":{model:"assets/models/drone.js",spawnHeight:0,height:25,shootHeight:25},
     "HANDWASHSTATION":{model:"assets/models/handwash.js"},
     "HELIPAD":{model:"assets/models/helipad.js"},
-    "HQ":{model:"assets/models/hq.js",shootHeight:40},
+    "HQ":{model:"assets/models/hq.js",shootHeight:14},
     "LAUNCHER":{model:"assets/models/Suzanne.js"},
     "MINER":{model:"assets/models/Suzanne.js"},
     "MINERFACTORY":{model:"assets/models/mine-factory-02.js"},
@@ -18,6 +18,6 @@ var RobotTypes = {
     "TANK":{model:"assets/models/Suzanne.js"},
     "TANKFACTORY":{model:"assets/models/tank-factory.js"},
     "TECHNOLOGYINSTITUTE":{model:"assets/models/tech.js"},
-    "TOWER":{model:"assets/models/tower.js",shootHeight:22},
+    "TOWER":{model:"assets/models/tower.js",shootHeight:14},
     "TRAININGFIELD":{model:"assets/models/training-field-02.js"}
 };
