@@ -98,5 +98,8 @@ GUI.prototype = {
             var trophiesParent = section.querySelector('.trophies');
             removeChildren(trophiesParent, 'li');
         });
+        if(this.controls.ffw){
+            this.controls.fastForward();
+        }
     }
 }

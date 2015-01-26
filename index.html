@@ -65,6 +65,7 @@
                     <div class="hq bar"><span></span><div>
                 </div>
             </div>
+            <div id="message"><h1>win</h1></div>
         </div>
     </body>
     <script type="text/javascript">
@@ -143,6 +144,9 @@
                     var frames = replayData.maplist[replayData.maplist.length-1].frames;
                     for(var i=0;i<newFrames.length;i++)
                         frames.push(newFrames[i]);
+                }
+                if(data.message == 'end'){
+                    replayData.isLoaded = true;
                 }
             }, false);
             window.worker.postMessage(file);

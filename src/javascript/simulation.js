@@ -179,11 +179,7 @@ var Simulation = function(){
                 }
                 delete self.data.robots[sig.robotID];
             }else if(sig.type=="mapend"){
-                self.newMap();
-                gui.resetScores();
-                gui.win(sig.winner);
-                self.currentMap++;
-                self.score[(sig.winner=='A')?0:1]++;
+                gui.controls.nextMap(sig.winner);
             }
         }
     }

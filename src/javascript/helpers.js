@@ -18,3 +18,15 @@ var removeChildren = function(parentElement, selector){
         parentElement.removeChild(parentElement.lastChild);
     }
 };
+var sleep = function(time, callback, scope){
+    var runCount = 0;
+    function timerMethod() {
+        runCount++;
+        if(runCount > 3){
+            clearInterval(timerId);
+            callback.call(scope);
+        }
+    }
+
+    var timerId = setInterval(timerMethod, time);
+};
