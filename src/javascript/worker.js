@@ -95,8 +95,20 @@ self.addEventListener('message', function(e) {
             }else if(tagName=='ser.MatchFooter'){
                 var maplist = this.metadata.maplist;
                 var attrs = this.getAttrs(tag);
+                /**
+                 **DOMINATIONFACTOR**
+                    github.com/battlecode/battlecode-server/blob/864029a8761a84a094bdeee9ec45bf3670021076/src/main/battlecode/serial/DominationFactor.java
+
+                 WON_BY_DUBIOUS_REASONS: Team HQ id-win
+                 BARELY_BARELY_BEAT: Win by more money
+                 BARELY_BEAT: more handwash stations
+                 BEAT: Win by more tower hp
+                 OWNED: win by more HQ hp
+                 PWNED: win by more towers remaining
+                 DESTROYED: win by destroying HQ
+                 * */
                 var frame = {
-                    signals:[{type:'mapend',winner:attrs['winner']}]
+                    signals:[{type:'mapend',winner:attrs['winner'],reason:this.dominationFactor}]
                 }
                 maplist[maplist.length-1].frames.push(frame);
 				maplist[maplist.length-1].frames.push([]);
@@ -205,7 +217,12 @@ self.addEventListener('message', function(e) {
                     this.metadata.teams.push(attrs['team-a']);
                     this.metadata.teams.push(attrs['team-b']);
                 }
+            }else if(tagName=='ser.GameStats'){
+                //parse team names
+                var attrs = this.getAttrs(tag);
+                this.dominationFactor = attrs['dominationFactor'];
             }
+
         }
 
         this.parseLoc = function(str){
@@ -308,6 +325,7 @@ self.addEventListener('message', function(e) {
 			if(this.chunkParser.tagStack.length!=0){
 				throw new Error("something went terribly wrong while parsing :(");
 			}
+			postMessage({data: null, message: 'end'});
 			console.log("parsing finished, time: "+(new Date().getTime()-this.startTime.getTime())+"ms")
 			console.log('closing worker');
 			close();

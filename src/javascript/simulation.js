@@ -27,16 +27,23 @@ var Simulation = function(){
 
     self.maplocToOreLoc = function(maploc){
         var map = self.data.map;
-        return [-map.originX+maploc[0],-map.originY+maploc[1]];
+        var x = -map.originX+maploc[0];
+        var y = -map.originY+maploc[1];
+        if(x<0||y<0||x>=map.width||y>=map.height)
+            return null;
+        return [x,y];
     }
 
     self.initMap = function(){
         var map = replayData.maplist[self.currentMap];
         var oreStringArray = map.ore.split(',');
+        var maxOre = 0;
         for(var x =0;x<map.width;x++){
             var row = [];
             for(var y =0;y<map.height;y++){
                 var currentOre = parseInt(oreStringArray[y+x*map.height]);
+                if(currentOre>maxOre)
+                    maxOre = currentOre
                 row.push([currentOre,0,'']);
             }
             self.data.ore.push(row);
@@ -56,12 +63,13 @@ var Simulation = function(){
         self.data.oreChanged = true;
         self.data.ready = true;
         self.data.map = map;
+        self.data.map.maxOre = maxOre;
         self.data.robotMap = robotMap;
     }
 
     self.locToMap = function(loc){
         var mapLoc = [0,0];
-        var map = simulation.data.map;
+        var map = self.data.map;
         mapLoc[0] = (loc[0]-map.originX-map.width/2)*GLOBAL_SCALE;
         mapLoc[1] = -(loc[1]-map.originY-map.height/2)*GLOBAL_SCALE;
         return mapLoc;
@@ -107,7 +115,7 @@ var Simulation = function(){
                     gui.updateScore(robot.team, true);
                 }
                 if(robot.type == "HQ"){
-                    gui.updateScore(robot.team, true);
+                    //gui.updateScore(robot.team, true);
                     gui.setHQ(robot);
                 }
                 if(robot.type == "COMMANDER"){
@@ -130,8 +138,8 @@ var Simulation = function(){
                 var from = [robot.loc[0],robot.loc[1],height];
                 var attackLoc = self.locToMap(sig.loc);
                 var mapLoc = self.maplocToOreLoc(sig.loc);
-                var robot2 = self.data.robotMap[mapLoc[0]][mapLoc[1]];
-                var type2 = (robot2)?RobotTypes[robot2.type]:null;
+                var robot2 = (mapLoc==null)?null:self.data.robotMap[mapLoc[0]][mapLoc[1]];
+                var type2 = (robot2!=null)?RobotTypes[robot2.type]:null;
                 height = (type2!=null)?type2.height:5;
                 self.data.lines.push([from,[attackLoc[0],attackLoc[1],height],robot.team]);
             }else if(sig.type=="health"){
@@ -155,7 +163,7 @@ var Simulation = function(){
                 }
             }else if(sig.type=="ore"){
                 var oreLoc = self.maplocToOreLoc(sig.loc);
-                self.data.ore[oreLoc[0]][oreLoc[1]][1] = sig.amount;
+                self.data.ore[oreLoc[0]][oreLoc[1]][0] -= sig.amount;
                 self.data.oreChanged = true;
             }else if(sig.type=="mine"){
                 var robot = self.data.robots[sig.robotID];
@@ -175,11 +183,7 @@ var Simulation = function(){
                 }
                 delete self.data.robots[sig.robotID];
             }else if(sig.type=="mapend"){
-                self.newMap();
-                gui.resetScores();
-                gui.win(sig.winner);
-                self.currentMap++;
-                self.score[(sig.winner=='A')?0:1]++;
+                gui.controls.nextMap(sig.winner);
             }
         }
     }

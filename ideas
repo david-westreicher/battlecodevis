@@ -3,5 +3,17 @@ Control GUI: set explosions to on/off, camera control, shadow quality, walls on/
 Info GUI: explain with pictures what is what (no supply lighter color, robottypes, ...)
 Explosions: color explosion per team?
 Shoot rays: workaround for windows? (linewidth<=1 in windows)
-Mapend: some nice finishing animation
+Mapend: somenice finishing animation
 Ore per team: show running graphs of current ore
+konami code easter egg
+
+priorities:
+1. camera control (click on avatar -> change cam pos, rotate to enemy) bird view
+2. shooting ray width
+3. models & colors
+4. controls
+5. gui styles (buttons, colors..)
+6. start/finish screen
+    * reason from xml
+7. wall mashes
+8. map name/current frame/gold
