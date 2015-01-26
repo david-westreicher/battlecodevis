@@ -357,7 +357,7 @@ function render() {
 	var now = (new Date()).getTime();
 	//if(mouseDown!=null && mouseDown+CLICK_DRAG_TIME<now)
     if(mouseDown!=null){
-        if(mouseButton>0){
+        if(mouseButton==0){
             battlecodeCam.setCenterDelta((mouseDownX-mouseX),(mouseDownY-mouseY));
         }else{
 	        battlecodeCam.updateRotation(((mouseDownX-mouseX)/window.innerWidth),((mouseDownY-mouseY)/window.innerHeight));

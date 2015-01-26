@@ -12,8 +12,8 @@ var battlecodeCamera = function(){
 	self.angle2 = Math.PI/2;
 
     self.setCenter = function(x,y){
-        self.toCenter.x = x;
-        self.toCenter.y = y;
+        self.center.x = x;
+        self.center.y = y;
     }
 
     self.setCenterDelta = function(x,y){
