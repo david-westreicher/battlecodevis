@@ -1,6 +1,6 @@
 var stats;
 var battlecodeCam; var scene, renderer;
-var lines,walls;
+var lines,walls,oreMesh2;
 var mouseX = 0, mouseY = 0;
 var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
@@ -196,8 +196,53 @@ function updateOreTexture(){
 			gridMesh.position.y+=GLOBAL_SCALED2;
 			oreMesh.position.y+=GLOBAL_SCALED2;}
 		scene.add(oreMesh);
+
 	}
 	oreMesh.material.map.needsUpdate = true;
+}
+
+function updateOreUVs(){
+	var map = simulation.data.map;
+	var geom = oreMesh2.geometry;
+	var faceIndex = 0;
+	var textureSize = 1.0/4.0;
+	var maxOre = simulation.data.map.maxOre;
+    for(var x =-1;x<=map.width;x++){
+		for(var y =-1;y<=map.height;y++){
+			var oreLoc = toOreLoc(x,y);
+			if(x==-1||y==-1||x==map.width||y==map.height){
+			    //borders
+			    faceIndex+=2;
+				continue;
+			}
+			var oreInt = simulation.data.ore[x][y][0];
+			var oreTeam = simulation.data.ore[x][y][2];
+            var uvs1 = geom.faceVertexUvs[0][faceIndex++];
+            var uvs2 = geom.faceVertexUvs[0][faceIndex++];
+            var imageIndex = Math.floor(3*oreInt/maxOre);
+			if(oreInt<0){
+			    //wall
+			}else if(oreInt>0){
+			    //ore
+			    var offset = textureSize*imageIndex;
+                uvs1[0].x = offset;
+			    uvs1[1].x = textureSize+offset;
+			    uvs1[2].x = textureSize+offset;
+                uvs2[0].x = textureSize+offset;
+			    uvs2[1].x = offset;
+			    uvs2[2].x = offset;
+			}else{
+			    //no ore
+			    uvs1[0].x = 0;
+			    uvs1[1].x = textureSize;
+			    uvs1[2].x = textureSize;
+                uvs2[0].x = textureSize;
+			    uvs2[1].x = 0;
+			    uvs2[2].x = 0;
+			}
+		}	
+	}
+	geom.uvsNeedUpdate = true;
 }
 
 function createMap(){
@@ -213,6 +258,48 @@ function createMap(){
 	walls = new THREE.PointCloud(mapGeom,new THREE.PointCloudMaterial({size:GLOBAL_SCALE*1.5,color:0x777777}));
 	walls.position.z = 50*GLOBAL_SCALE/80;
 	scene.add(walls);
+
+    var corners = [[-GLOBAL_SCALED2,GLOBAL_SCALED2],[GLOBAL_SCALED2,GLOBAL_SCALED2],[GLOBAL_SCALED2,-GLOBAL_SCALED2],[-GLOBAL_SCALED2,-GLOBAL_SCALED2]];
+	var ore2Geom = new THREE.Geometry();
+	for(var x =-1;x<=map.width;x++){
+		for(var y =-1;y<=map.height;y++){
+			var ver = new THREE.Vector3(x*GLOBAL_SCALE-map.width*GLOBAL_SCALED2,-(y*GLOBAL_SCALE-map.height*GLOBAL_SCALED2),0);
+			for(var i=0;i<corners.length;i++){
+			    var corner = corners[i];
+			    ore2Geom.vertices.push(new THREE.Vector3(corner[0]+ver.x,corner[1]+ver.y,0));
+			}
+			var currentVerIndex = ore2Geom.vertices.length-corners.length;
+			var face1 = new THREE.Face3(currentVerIndex,currentVerIndex+2,currentVerIndex+1);
+			var face2 = new THREE.Face3(currentVerIndex+2,currentVerIndex,currentVerIndex+3);
+			ore2Geom.faces.push(face1);
+			ore2Geom.faces.push(face2);
+            ore2Geom.faceVertexUvs[0].push([
+                    new THREE.Vector2(0,0),
+                    new THREE.Vector2(1,1),
+                    new THREE.Vector2(1,0)
+                    ]);
+            ore2Geom.faceVertexUvs[0].push([
+                    new THREE.Vector2(1,1),
+                    new THREE.Vector2(0,0),
+                    new THREE.Vector2(0,1)
+                    ]);
+
+		}	
+	}
+	ore2Geom.uvsNeedUpdate = true;
+    var texture = THREE.ImageUtils.loadTexture( "assets/images/floortexture.jpg" );
+	oreMesh2 = new THREE.Mesh(ore2Geom,new THREE.MeshBasicMaterial({map:texture}));
+	oreMesh2.receiveShadow = true;
+    if(map.width%2==0){
+		gridMesh.position.x-=GLOBAL_SCALED2;
+		//oreMesh2.position.x-=GLOBAL_SCALED2;
+    }
+	if(map.height%2==0){
+		gridMesh.position.y+=GLOBAL_SCALED2;
+		//oreMesh2.position.y+=GLOBAL_SCALED2;
+	}
+
+	scene.add(oreMesh2);
 }
 function animate() {
 	requestAnimationFrame( animate );
@@ -223,13 +310,16 @@ function animate() {
 	if(!simulation.data.ready && walls!=null){
 		scene.remove(walls);
 		walls = null;
-		scene.remove(oreMesh);
+		//scene.remove(oreMesh);
+		scene.remove(oreMesh2);
+		oreMesh2=null;
 		oreMesh = null;
 		gridMesh.position.x = 0;
 		gridMesh.position.y = 0;
 	}
 	if(simulation.data.oreChanged){
-		updateOreTexture();
+		//updateOreTexture();
+		updateOreUVs();
 		simulation.data.oreChanged = false;
 	}
 
@@ -267,7 +357,7 @@ function render() {
 	var now = (new Date()).getTime();
 	//if(mouseDown!=null && mouseDown+CLICK_DRAG_TIME<now)
     if(mouseDown!=null){
-        if(mouseButton>0){
+        if(mouseButton==0){
             battlecodeCam.setCenterDelta((mouseDownX-mouseX),(mouseDownY-mouseY));
         }else{
 	        battlecodeCam.updateRotation(((mouseDownX-mouseX)/window.innerWidth),((mouseDownY-mouseY)/window.innerHeight));
