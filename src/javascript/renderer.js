@@ -286,7 +286,7 @@ function createMap(){
 			    var verMid = new THREE.Vector3(x*GLOBAL_SCALE-map.width*GLOBAL_SCALED2,-(y*GLOBAL_SCALE-map.height*GLOBAL_SCALED2),0);
 			    for(var i=0;i<corners.length*2;i++){
 			        var corner = corners[i%corners.length];
-			        var ver = new THREE.Vector3(corner[0]+verMid.x,corner[1]+verMid.y,Math.floor(i/corners.length)>0?10:0);
+			        var ver = new THREE.Vector3(corner[0]+verMid.x,corner[1]+verMid.y,Math.floor(i/corners.length)>0?5:0);
 			        vertices.push(ver);
                     mapGeom.vertices.push(ver);
 			    }
