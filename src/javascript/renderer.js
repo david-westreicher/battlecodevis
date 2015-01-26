@@ -45,11 +45,19 @@ function init() {
 	
 	// shots
 	var lineGeom = new THREE.Geometry();
-	for(var i=0;i<2*100;i++){
-		lineGeom.vertices.push(new THREE.Vector3(0,0,0));
-		lineGeom.colors.push(new THREE.Color(0x00ff00));
+	for(var i=0;i<50;i++){
+	    for(var j=0;j<4;j++){
+		    lineGeom.vertices.push(new THREE.Vector3(0,0,0));
+		    lineGeom.colors.push(new THREE.Color(0x000000));
+		}
+        var face1 = new THREE.Face3(i*4+1,i*4+0,i*4+3);
+        var face2 = new THREE.Face3(i*4+2,i*4+1,i*4+3);
+        var face3 = new THREE.Face3(i*4+0,i*4+2,i*4+3);
+        lineGeom.faces.push(face1);
+        lineGeom.faces.push(face2);
+        lineGeom.faces.push(face3);
 	}
-	lines = new THREE.Line(lineGeom,new THREE.LineBasicMaterial({linewidth:3,vertexColors:THREE.VertexColors}),THREE.LinePieces);
+	lines = new THREE.Mesh(lineGeom,new THREE.MeshBasicMaterial({vertexColors:THREE.FaceColors}));
 	lines.frustumCulled = false;
 	scene.add(lines);
 	
@@ -424,18 +432,25 @@ function render() {
 
 	//draw shoot lines
 	var simulines = simulation.data.lines;
-	for(var i=0;i<lines.geometry.vertices.length;i+=2){
-		if(i<simulines.length*2){
-			var start = simulines[i/2][0];
-			var end = simulines[i/2][1];
-			var col = simulines[i/2][2]=='A'?redCol:blueCol;
-			lines.geometry.vertices[i].set(start[0],start[1],start[2]);
-			lines.geometry.vertices[i+1].set(end[0],end[1],end[2]);
-			lines.geometry.colors[i].set(col);
-			lines.geometry.colors[i+1].set(col);
+	var shootWidth = 5;
+	var shootHalf = shootWidth/2;
+	for(var i=0;i<lines.geometry.vertices.length;i+=4){
+		if(i<simulines.length*4){
+			var start = simulines[i/4][0];
+			var end = simulines[i/4][1];
+			var col = simulines[i/4][2]=='A'?redCol:blueCol;
+			lines.geometry.vertices[i].set(start[0]-shootHalf,start[1]-shootHalf,start[2]);
+			lines.geometry.vertices[i+1].set(start[0]-shootHalf,start[1]+shootWidth-shootHalf,start[2]);
+			lines.geometry.vertices[i+2].set(start[0]+shootWidth-shootHalf,start[1]-shootHalf,start[2]);
+			lines.geometry.vertices[i+3].set(end[0],end[1],end[2]);
+            lines.geometry.faces[3*i/4+0].color.set(col);
+            lines.geometry.faces[3*i/4+1].color.set(col);
+            lines.geometry.faces[3*i/4+2].color.set(col);
+		    for(var j=0;j<4;j++)
+			    lines.geometry.colors[i+j].set(col);
 		}else{
-			lines.geometry.vertices[i].set(0,0,0);
-			lines.geometry.vertices[i+1].set(0,0,0);
+		    for(var j=0;j<4;j++)
+			    lines.geometry.vertices[i+j].set(0,0,0);
 		}
 	}
 	lines.geometry.verticesNeedUpdate = true;
