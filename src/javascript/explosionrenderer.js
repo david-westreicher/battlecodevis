@@ -18,6 +18,7 @@ var ExplosionRenderer = function(){
         var texture = THREE.ImageUtils.loadTexture( "assets/images/explosion.png" );
 	    var material = new THREE.PointCloudMaterial({size:20,map:texture,transparent:true,color:0xffaaaa,alphaTest:0.5,opacity:0.5});
 	    self.particlePointCloud = new THREE.PointCloud(self.particleGeom,material);
+	    self.particlePointCloud.frustumCulled = false;
 	    scene.add(self.particlePointCloud);
     }
     self.findFreeIndex = function(){

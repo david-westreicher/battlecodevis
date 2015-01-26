@@ -50,6 +50,7 @@ function init() {
 		lineGeom.colors.push(new THREE.Color(0x00ff00));
 	}
 	lines = new THREE.Line(lineGeom,new THREE.LineBasicMaterial({linewidth:3,vertexColors:THREE.VertexColors}),THREE.LinePieces);
+	lines.frustumCulled = false;
 	scene.add(lines);
 	
 	var gridGeom = new THREE.Geometry();
