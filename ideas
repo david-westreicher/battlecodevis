@@ -9,12 +9,11 @@ konami code easter egg
 
 priorities:
 1. camera control bird view
-2. textures for map
-3. shooting ray width
-4. models & colors
-5. controls
-6. gui styles (buttons, colors..)
-7. start/finish screen
+2. shooting ray width
+3. models & colors
+4. controls
+5. gui styles (buttons, colors..)
+6. start/finish screen
     * reason from xml
-8. wall mashes
-9. map name/current frame/gold
+7. wall mashes
+8. map name/current frame/gold
