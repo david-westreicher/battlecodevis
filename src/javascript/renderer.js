@@ -41,7 +41,8 @@ function init() {
 	battlecodeCam = new battlecodeCamera();
 	scene = new THREE.Scene();
     explosionRenderer.init(scene);
-
+	
+	// shots
 	var lineGeom = new THREE.Geometry();
 	for(var i=0;i<2*100;i++){
 		lineGeom.vertices.push(new THREE.Vector3(0,0,0));
@@ -49,7 +50,7 @@ function init() {
 	}
 	lines = new THREE.Line(lineGeom,new THREE.LineBasicMaterial({linewidth:3,vertexColors:THREE.VertexColors}),THREE.LinePieces);
 	scene.add(lines);
-
+	
 	var gridGeom = new THREE.Geometry();
 	var gridNum = 60;
 	var startGrid = -gridNum;
@@ -65,8 +66,11 @@ function init() {
 	gridMesh = new THREE.Line(gridGeom,new THREE.LineBasicMaterial({color:0xCCCCCC}),THREE.LinePieces);
 	gridMesh.position.z = 0.1;
 	scene.add(gridMesh);
-
+	gridMesh.visible = false;
+	
 	//LIGHT
+	var ambientLight = new THREE.AmbientLight(0x222222);
+	scene.add(ambientLight);
 	var light = new THREE.DirectionalLight(0xffffff, 1);
 	light.castShadow = true;
 	//light.shadowCameraVisible = true;
