@@ -27,7 +27,11 @@ var Simulation = function(){
 
     self.maplocToOreLoc = function(maploc){
         var map = self.data.map;
-        return [-map.originX+maploc[0],-map.originY+maploc[1]];
+        var x = -map.originX+maploc[0];
+        var y = -map.originY+maploc[1];
+        if(x<0||y<0||x>=map.width||y>=map.height)
+            return null;
+        return [x,y];
     }
 
     self.initMap = function(){
@@ -61,7 +65,7 @@ var Simulation = function(){
 
     self.locToMap = function(loc){
         var mapLoc = [0,0];
-        var map = simulation.data.map;
+        var map = self.data.map;
         mapLoc[0] = (loc[0]-map.originX-map.width/2)*GLOBAL_SCALE;
         mapLoc[1] = -(loc[1]-map.originY-map.height/2)*GLOBAL_SCALE;
         return mapLoc;
@@ -107,7 +111,7 @@ var Simulation = function(){
                     gui.updateScore(robot.team, true);
                 }
                 if(robot.type == "HQ"){
-                    gui.updateScore(robot.team, true);
+                    //gui.updateScore(robot.team, true);
                     gui.setHQ(robot);
                 }
                 if(robot.type == "COMMANDER"){
@@ -130,8 +134,8 @@ var Simulation = function(){
                 var from = [robot.loc[0],robot.loc[1],height];
                 var attackLoc = self.locToMap(sig.loc);
                 var mapLoc = self.maplocToOreLoc(sig.loc);
-                var robot2 = self.data.robotMap[mapLoc[0]][mapLoc[1]];
-                var type2 = (robot2)?RobotTypes[robot2.type]:null;
+                var robot2 = (mapLoc==null)?null:self.data.robotMap[mapLoc[0]][mapLoc[1]];
+                var type2 = (robot2!=null)?RobotTypes[robot2.type]:null;
                 height = (type2!=null)?type2.height:5;
                 self.data.lines.push([from,[attackLoc[0],attackLoc[1],height],robot.team]);
             }else if(sig.type=="health"){

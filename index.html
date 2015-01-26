@@ -24,10 +24,10 @@
         <script src="teams/teams.js"></script>
     </head>
     <body>
-        <div id="container">
+        <div id="container" oncontextmenu="return false;" onselectstart="return false;">
             <div class="controls">
                 <div class="buttons set">
-                    <label class="upload_label button"><input type="file" accept=".rms" onchange="loadFile(this.files[0])" class="upload" /></label>
+                    <label class="upload_label button"><input type="file" accept=".rms" onchange="loadFile(this.files[0])" class="upload" onselectstart="return true;"/></label>
                     <input type="button" class="play button" value="&#10073;&#10073;/&#9658;"/>
                     <input type="button" class="fforward button" value="&#10704;"/>
                     <input type="button" class="skip button" value="&#9655;" />
@@ -39,7 +39,7 @@
                 <div class="menu set">
                 </div>
             </div>
-            <div class="stats">
+            <div class="stats" unselectable="on">
                 <div class="left">
                     <div class="robots">
                         <div class="commander bar"><span></span></div>
@@ -89,7 +89,9 @@
         renderer.setPixelRatio( window.devicePixelRatio );
         renderer.setSize( window.innerWidth, window.innerHeight );
         container.appendChild( renderer.domElement );
-
+	    renderer.domElement.oncontextmenu = function(){
+	        return false;
+	    }
         stats = new Stats();
         stats.domElement.style.position = 'absolute';
         stats.domElement.style.top = '0px';

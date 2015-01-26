@@ -1,5 +1,5 @@
 Camera control: if zoom out > birdview
-Control GUI: set explosions to on/off, camera control, shadow quality, walls on/off
+Control GUI: set explosions to on/off, camera control, shadow quality, walls on/off, highlight mob type
 Info GUI: explain with pictures what is what (no supply lighter color, robottypes, ...)
 Explosions: color explosion per team?
 Shoot rays: workaround for windows? (linewidth<=1 in windows)
