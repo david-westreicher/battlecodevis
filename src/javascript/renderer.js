@@ -326,7 +326,7 @@ function createMap(){
 	}
 	mapGeom.computeFaceNormals();
 
-    var wallTex = THREE.ImageUtils.loadTexture( "assets/models/textures/brick-01-512.jpg" );
+    var wallTex = THREE.ImageUtils.loadTexture( "assets/images/walltexture.jpg" );
 	walls = new THREE.Mesh(mapGeom,new THREE.MeshLambertMaterial({map:wallTex}));
 	walls.receiveShadow = true;
 	scene.add(walls);
