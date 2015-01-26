@@ -37,10 +37,13 @@ var Simulation = function(){
     self.initMap = function(){
         var map = replayData.maplist[self.currentMap];
         var oreStringArray = map.ore.split(',');
+        var maxOre = 0;
         for(var x =0;x<map.width;x++){
             var row = [];
             for(var y =0;y<map.height;y++){
                 var currentOre = parseInt(oreStringArray[y+x*map.height]);
+                if(currentOre>maxOre)
+                    maxOre = currentOre
                 row.push([currentOre,0,'']);
             }
             self.data.ore.push(row);
@@ -60,6 +63,7 @@ var Simulation = function(){
         self.data.oreChanged = true;
         self.data.ready = true;
         self.data.map = map;
+        self.data.map.maxOre = maxOre;
         self.data.robotMap = robotMap;
     }
 
@@ -159,7 +163,7 @@ var Simulation = function(){
                 }
             }else if(sig.type=="ore"){
                 var oreLoc = self.maplocToOreLoc(sig.loc);
-                self.data.ore[oreLoc[0]][oreLoc[1]][1] = sig.amount;
+                self.data.ore[oreLoc[0]][oreLoc[1]][0] -= sig.amount;
                 self.data.oreChanged = true;
             }else if(sig.type=="mine"){
                 var robot = self.data.robots[sig.robotID];
