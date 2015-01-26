@@ -19,6 +19,7 @@ var mouseDown = null;
 var mouseButton = 0;
 var mouseDownX = 0;
 var mouseDownY = 0;
+var ctrlDown = false;
 var CLICK_DRAG_TIME = 200;
 init();
 modelRenderer.init();
@@ -103,6 +104,7 @@ function onDocumentMouseMove(event) {
 function onDocumentMouseDown(event) {
     //console.log(event);
     mouseButton = Math.min(1,event.button);
+    ctrlDown = event.ctrlKey;
     mouseDown = (new Date()).getTime();
     mouseDownX = ( event.x - windowHalfX );
     mouseDownY = ( event.y - windowHalfY );
@@ -361,7 +363,7 @@ function render() {
 	var now = (new Date()).getTime();
 	//if(mouseDown!=null && mouseDown+CLICK_DRAG_TIME<now)
     if(mouseDown!=null){
-        if(mouseButton==0){
+        if(mouseButton==0&&!ctrlDown){
             battlecodeCam.setCenterDelta((mouseDownX-mouseX),(mouseDownY-mouseY));
         }else{
 	        battlecodeCam.updateRotation(((mouseDownX-mouseX)/window.innerWidth),((mouseDownY-mouseY)/window.innerHeight));
