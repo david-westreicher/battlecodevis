@@ -19,5 +19,5 @@ var RobotTypes = {
     "TANKFACTORY":{model:"assets/models/box.js"},
     "TECHNOLOGYINSTITUTE":{model:"assets/models/box.js"},
     "TOWER":{model:"assets/models/tower.js",shootHeight:22},
-    "TRAININGFIELD":{model:"assets/models/box.js"},
+    "TRAININGFIELD":{model:"assets/models/box.js"}
 };

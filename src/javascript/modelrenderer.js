@@ -4,25 +4,27 @@ var ModelRenderer = function(){
 	self.geometries = [];
 	self.meshes = [];
 	self.types = RobotTypes;
+	self.materials = [];
 
 	self.loadModel = function(loader){
 		if(self.models.length<=self.geometries.length)
 			return;
 		var model = self.models[self.geometries.length];
 		console.log("loading "+model+"!");
-		loader.load(model,function(geometry){
+		loader.load(model,function(geometry, materials){
 			console.log(self.models[self.geometries.length]+" loaded!");
 			//geometry.computeVertexNormals();
 			for(var type in self.types){
-			    var currentType = self.types[type]
+			    var currentType = self.types[type];
 	            if(self.models[self.geometries.length]==currentType.model)
                     currentType.modelID = self.geometries.length;
 	        }
 			self.meshes.push([]);
 			self.geometries.push(geometry);
+			self.materials.push(new THREE.MeshFaceMaterial(materials));
 			self.loadModel(loader);
 		});
-	}
+	};
 
 	self.createModelsArray = function(){
 	    self.models = [];
@@ -38,7 +40,7 @@ var ModelRenderer = function(){
 	        if(!isAlreadyHere)
 	            self.models.push(model);
 	    }
-	}
+	};
 
 	self.init = function(){
 	    self.meshes = [];
@@ -50,15 +52,16 @@ var ModelRenderer = function(){
 	    self.blueLightMaterial = new THREE.MeshLambertMaterial( { color: 0x8888ff } );
 	    self.createModelsArray();
 		self.loadModel(loader);
-	}
+	};
 
-	self.createMesh = function(geometry){
-		var mesh = new THREE.Mesh( geometry, self.normalMaterial );
+	self.createMesh = function(geometry, material){
+		if(!material) material = self.normalMaterial;
+		var mesh = new THREE.Mesh( geometry, material );
 		mesh.rotation.x = Math.PI/2;
 		mesh.scale.x = mesh.scale.y = mesh.scale.z = 5; 
 		mesh.castShadow = true;
 		return mesh;
-	}
+	};
 
 	self.interpolateRot = function(from,to,interp){
 	    var angleDiff = to-from;
@@ -77,7 +80,7 @@ var ModelRenderer = function(){
 		    angleDiff = angleDiff-Math.PI*2;
 		to = angleDiff+from;
 		return to*interp+from*(1-interp);
-	}
+	};
 
 	self.draw = function(scene,simData){
 		if(self.models.length>self.geometries.length)
@@ -96,7 +99,7 @@ var ModelRenderer = function(){
 			meshCounter[modelID]++;
 			var mesh = null;
 			if(meshCounter[modelID]>self.meshes[modelID].length){
-				mesh = self.createMesh(self.geometries[modelID]);
+				mesh = self.createMesh(self.geometries[modelID], self.materials[modelID]);
 				scene.add( mesh );
 				self.meshes[modelID].push(mesh);
 			}else{
@@ -117,7 +120,7 @@ var ModelRenderer = function(){
 		    mesh.position.z = robot.z;
 		    if("height" in type)
 		        robot.z += (type.height-robot.z)/slowmotion;
-
+			
 		    if(robot.team=='A'){
 		        if(robot.supply>=1)
 		            mesh.material = self.redMaterial;
@@ -137,5 +140,5 @@ var ModelRenderer = function(){
 		        scene.remove(meshToDelete);
 		    }
 		}
-	}
-}
+	};
+};
