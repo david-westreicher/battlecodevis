@@ -97,7 +97,7 @@ function onDocumentMouseMove(event) {
 }
 
 function onDocumentMouseDown(event) {
-    console.log(event);
+    //console.log(event);
     mouseButton = Math.min(1,event.button);
     mouseDown = (new Date()).getTime();
     mouseDownX = ( event.x - windowHalfX );

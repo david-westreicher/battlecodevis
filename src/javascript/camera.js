@@ -59,8 +59,7 @@ var battlecodeCamera = function(){
 	    self.offset.x = 0;
 	    self.offset.y = 0;
         self.angle1 += self.angle1Offset;
-        self.angle2 += self.angle2Offset;
-       // self.angle2 = Math.min(Math.PI*3,self.angle2);
+	    self.angle2 = Math.max(0.01,Math.min(Math.PI/2-0.2,self.angle2+self.angle2Offset));
         self.angle1Offset = 0;
         self.angle2Offset = 0;
 	}
