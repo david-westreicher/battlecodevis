@@ -252,21 +252,83 @@ function updateOreUVs(){
 	geom.uvsNeedUpdate = true;
 }
 
+function addFace(mapGeom,startIndex,verIndices){
+    for(var i=0;i<verIndices.length;i++)
+        verIndices[i]+=startIndex;
+    var face1 = new THREE.Face3(verIndices[0],verIndices[2],verIndices[1]);
+    var face2 = new THREE.Face3(verIndices[2],verIndices[0],verIndices[3]);
+    mapGeom.faces.push(face1);
+    mapGeom.faces.push(face2);
+    mapGeom.faceVertexUvs[0].push([
+            new THREE.Vector2(0,0),
+            new THREE.Vector2(1,1),
+            new THREE.Vector2(1,0)
+            ]);
+    mapGeom.faceVertexUvs[0].push([
+            new THREE.Vector2(1,1),
+            new THREE.Vector2(0,0),
+            new THREE.Vector2(0,1)
+            ]);
+}
+
 function createMap(){
 	var map = simulation.data.map;
 	var tiles = map.tiles;
 	var mapGeom = new THREE.Geometry();
+	var sides = [[0,-1],[1,0],[0,1],[-1,0]];
+	var center = new THREE.Vector3(map.width*GLOBAL_SCALED2,map.height*GLOBAL_SCALED2,0);
+    var corners = [[-GLOBAL_SCALED2,GLOBAL_SCALED2],[GLOBAL_SCALED2,GLOBAL_SCALED2],[GLOBAL_SCALED2,-GLOBAL_SCALED2],[-GLOBAL_SCALED2,-GLOBAL_SCALED2]];
+    
 	for(var x =-1;x<=map.width;x++){
 		for(var y =-1;y<=map.height;y++){
-			if(x==-1||y==-1||x==map.width||y==map.height||tiles.charAt(x+y*map.width)=='#')
-				mapGeom.vertices.push(new THREE.Vector3(x*GLOBAL_SCALE-map.width*GLOBAL_SCALED2,-(y*GLOBAL_SCALE-map.height*GLOBAL_SCALED2),0));
+			if(x==-1||y==-1||x==map.width||y==map.height||tiles.charAt(x+y*map.width)=='#'){
+			    var vertices = [];
+			    var verMid = new THREE.Vector3(x*GLOBAL_SCALE-map.width*GLOBAL_SCALED2,-(y*GLOBAL_SCALE-map.height*GLOBAL_SCALED2),0);
+			    for(var i=0;i<corners.length*2;i++){
+			        var corner = corners[i%corners.length];
+			        var ver = new THREE.Vector3(corner[0]+verMid.x,corner[1]+verMid.y,Math.floor(i/corners.length)>0?10:0);
+			        vertices.push(ver);
+                    mapGeom.vertices.push(ver);
+			    }
+			    var startIndex = mapGeom.vertices.length-corners.length*2;
+			    for(var i=0;i<sides.length;i++){
+			        var sideX = x+sides[i][0];
+			        var sideY = y+sides[i][1];
+			        var isWall = false;
+			        if(sideX<0 || sideY<0 || sideX>= map.width || sideY>=map.height || tiles.charAt(sideX+sideY*map.width)!='#')
+			            isWall = true;
+			        /*
+			            4---------5
+			            |\     4  |\
+			            | \  0    | \
+			            |3 7------|--6
+			            0--+------1 1|
+			             \ |    2  \ |
+			              \|        \|
+			               3---------2
+			         */
+			        if(isWall){
+			           // var verIndices = [0,1,5,4];
+			            switch(i){
+			                case 0:verIndices=[0,1,5,4]; break;
+			                case 1:verIndices=[1,2,6,5]; break;
+			                case 2:verIndices=[2,3,7,6]; break;
+			                case 3:verIndices=[3,0,4,7]; break;
+			            }
+			            addFace(mapGeom,startIndex,verIndices);
+			        }
+			        addFace(mapGeom,startIndex,[4,5,6,7]);
+			    }
+			}
 		}	
 	}
-	walls = new THREE.PointCloud(mapGeom,new THREE.PointCloudMaterial({size:GLOBAL_SCALE*1.5,color:0x777777}));
-	walls.position.z = 50*GLOBAL_SCALE/80;
+	mapGeom.computeFaceNormals();
+
+    var wallTex = THREE.ImageUtils.loadTexture( "assets/models/textures/brick-01-512.jpg" );
+	walls = new THREE.Mesh(mapGeom,new THREE.MeshLambertMaterial({map:wallTex}));
+	walls.receiveShadow = true;
 	scene.add(walls);
 
-    var corners = [[-GLOBAL_SCALED2,GLOBAL_SCALED2],[GLOBAL_SCALED2,GLOBAL_SCALED2],[GLOBAL_SCALED2,-GLOBAL_SCALED2],[-GLOBAL_SCALED2,-GLOBAL_SCALED2]];
 	var ore2Geom = new THREE.Geometry();
 	for(var x =-1;x<=map.width;x++){
 		for(var y =-1;y<=map.height;y++){
@@ -276,21 +338,7 @@ function createMap(){
 			    ore2Geom.vertices.push(new THREE.Vector3(corner[0]+ver.x,corner[1]+ver.y,0));
 			}
 			var currentVerIndex = ore2Geom.vertices.length-corners.length;
-			var face1 = new THREE.Face3(currentVerIndex,currentVerIndex+2,currentVerIndex+1);
-			var face2 = new THREE.Face3(currentVerIndex+2,currentVerIndex,currentVerIndex+3);
-			ore2Geom.faces.push(face1);
-			ore2Geom.faces.push(face2);
-            ore2Geom.faceVertexUvs[0].push([
-                    new THREE.Vector2(0,0),
-                    new THREE.Vector2(1,1),
-                    new THREE.Vector2(1,0)
-                    ]);
-            ore2Geom.faceVertexUvs[0].push([
-                    new THREE.Vector2(1,1),
-                    new THREE.Vector2(0,0),
-                    new THREE.Vector2(0,1)
-                    ]);
-
+			addFace(ore2Geom,currentVerIndex,[0,1,2,3]);
 		}	
 	}
 	ore2Geom.uvsNeedUpdate = true;
