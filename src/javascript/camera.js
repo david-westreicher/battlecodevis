@@ -35,7 +35,7 @@ var battlecodeCamera = function(){
         //x/=self.cam.aspect;
         var angleForward = -Math.atan2(forward.y,forward.x);
         var angleMouse = -Math.atan2(y,-x);
-        var dist = Math.sqrt(y*y+x*x);
+        var dist = Math.sqrt(y*y+x*x)*Math.log(self.cameraRadius)/10;
         self.offset.x = (Math.sin(angleForward+angleMouse))*dist;
         self.offset.y = (Math.cos(angleForward+angleMouse))*dist;
     }
