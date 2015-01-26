@@ -1,7 +1,7 @@
 var Controlbar = function(controls){
     this.controls = controls;
     this.setUp();
-    this.pause = false;
+    this.paused = false;
     this.ffw = false;
 };
 Controlbar.prototype = {
@@ -25,12 +25,12 @@ Controlbar.prototype = {
     },
     pause: function(){
         var elm = this.controls.querySelector('.play');
-        if(this.pause){
+        if(this.paused){
             elm.className = elm.className.replace(" active","");
         }else{
             elm.className += " active";
         }
-        this.pause = !this.pause;
+        this.paused = !this.paused;
     },
     fastForward: function(){
         var elm = this.controls.querySelector('.fforward');
@@ -42,9 +42,56 @@ Controlbar.prototype = {
         this.ffw = !this.ffw;
         slowmotion = (this.ffw) ? 1 : 4;
     },
-    isPause: function(){
-        return this.pause;
+    isPaused: function(){
+        return this.paused;
     },
-    nextMap: function(){
+    nextMap: function(winner){
+        var signals = replayData.maplist[simulation.currentMap].frames[replayData.maplist[simulation.currentMap].frames.length-2].signals,
+            winner = (typeof winner != "string" && signals.length == 1 && signals[0].type == "mapend") ? signals[0].winner : winner;
+
+        if(replayData.maplist[simulation.currentMap].frames[replayData.maplist[simulation.currentMap].frames.length-1].length == 0){
+            gui.win(winner);
+            if(simulation.currentMap < replayData.maplist.length-1){
+                this.showWinner(winner, function(){
+                    simulation.currentMap++;
+                    simulation.score[(winner=='A')?0:1]++;
+                    simulation.newMap();
+                    gui.resetScores();
+                });
+            }else{
+                if(replayData.isLoaded){
+                    simulation.currentMap = 0;
+                    simulation.score = [0,0];
+                    this.showWinner(winner, function(){
+                        gui.resetUI()
+                        simulation.newMap();
+                        gui.resetScores();
+                    });
+                    return true;
+                    console.log('replay');
+                }else{
+                    console.log('not ready yet')
+                    return false;
+                }
+            }
+        }else{
+            console.log('not ready yet');
+            return false;
+        }
+    },
+    showWinner: function(winner, callback){
+        var message = document.getElementById('message');
+        var oldText = message.textContent;
+        message.textContent = winner +' - '+ message.textContent;
+        message.style.display = "block";
+        this.pause();
+
+        sleep(300, function(){
+            message.style.display = "none";
+            message.textContent = oldText;
+            this.pause();
+            if(callback)
+                callback.call(this);
+        }, this);
     }
 };

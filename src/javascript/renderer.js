@@ -229,7 +229,7 @@ function animate() {
 	}
 
 	var frameMod = frameNum%slowmotion;
-	if(frameMod==0 && !gui.controls.isPause()){
+	if(frameMod==0 && !gui.controls.isPaused()){
 		simulation.simulate();
 	}
 	interp = frameMod/slowmotion;

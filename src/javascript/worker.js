@@ -308,6 +308,7 @@ self.addEventListener('message', function(e) {
 			if(this.chunkParser.tagStack.length!=0){
 				throw new Error("something went terribly wrong while parsing :(");
 			}
+			postMessage({data: null, message: 'end'});
 			console.log("parsing finished, time: "+(new Date().getTime()-this.startTime.getTime())+"ms")
 			console.log('closing worker');
 			close();
