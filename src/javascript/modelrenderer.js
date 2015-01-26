@@ -45,11 +45,11 @@ var ModelRenderer = function(){
 	self.init = function(){
 	    self.meshes = [];
 		var loader = new THREE.JSONLoader();
-		self.normalMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff } );
-        self.redMaterial = new THREE.MeshLambertMaterial( { color: 0xff0000 } );
-        self.redLightMaterial = new THREE.MeshLambertMaterial( { color: 0xff8888 } );
-	    self.blueMaterial = new THREE.MeshLambertMaterial( { color: 0x0000ff } );
-	    self.blueLightMaterial = new THREE.MeshLambertMaterial( { color: 0x8888ff } );
+		self.normalMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff } );
+        self.redMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000 } );
+        self.redLightMaterial = new THREE.MeshPhongMaterial( { color: 0xff8888 } );
+	    self.blueMaterial = new THREE.MeshPhongMaterial( { color: 0x0000ff } );
+	    self.blueLightMaterial = new THREE.MeshPhongMaterial( { color: 0x8888ff } );
 	    self.createModelsArray();
 		self.loadModel(loader);
 	};
