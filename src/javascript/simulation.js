@@ -16,12 +16,14 @@ var Simulation = function(){
             map:null,
             robotMap:null
         };
+        self.mapwinner = null;
     }
 
     self.newReplayFile = function(){
         self.score = [0,0];
         self.currentMap = 0;
         self.newMap();
+        self.mapwinner = null;
         gui.resetScores();
     }
 
@@ -60,6 +62,7 @@ var Simulation = function(){
             }
             robotMap.push(row);
         }
+        self.mapwinner = null;
         self.data.oreChanged = true;
         self.data.ready = true;
         self.data.map = map;
@@ -78,6 +81,34 @@ var Simulation = function(){
     self.simulate = function(){
         //check if replayData has enough maps/frames parsed
         var replayData = window.replayData;
+
+        if(self.mapwinner!=null){
+            var losers = [];
+            var robots = simulation.data.robots;
+            var robotIDs = Object.keys(simulation.data.robots);
+            for(var i=0;i<robotIDs.length;i++){
+                var robot = robots[robotIDs[i]];
+                if(robot.team!=self.mapwinner){
+                    if(robot.z>-15)
+                        robot.z-=(0.1+Math.random()*0.3)/4;
+                    losers.push(robot);
+                }
+            }
+            self.animationTimer++;
+            if(self.animationTimer%8==0){
+                var randRobot = losers[Math.floor(Math.random()*losers.length)];
+                self.data.explosions.push([true,15,randRobot.loc]);
+            }
+            window.battlecodeCam.updateRotation(self.animationTimer/300,0);
+            if(self.animationTimer>400){
+                slowmotion=4;
+                window.battlecodeCam.dragFinished();
+                self.mapwinner=null;
+                gui.controls.nextMap(self.mapwinner);
+            }
+            return;
+        }
+
         if(replayData==null || replayData.maplist.length==self.currentMap || replayData.maplist[self.currentMap].frames.length<=self.currentFrame+1)
             return;
         if(self.currentFrame==0)
@@ -184,9 +215,22 @@ var Simulation = function(){
                     case "COMMANDER":
                         gui.commanderDead(robot.team);
                 }
-                delete self.data.robots[sig.robotID];
+                if(robot.type!="HQ")
+                    delete self.data.robots[sig.robotID];
             }else if(sig.type=="mapend"){
-                gui.controls.nextMap(sig.winner, sig.reason);
+                self.mapwinner = sig.winner;
+                self.animationTimer = 0;
+                slowmotion=1;
+                var robots = simulation.data.robots;
+                var robotIDs = Object.keys(simulation.data.robots);
+                var loserHQ = null;
+                for(var i=0;i<robotIDs.length;i++){
+                    var robot = robots[robotIDs[i]];
+                    if(robot.team!=self.mapwinner&&robot.type=="HQ")
+                        loserHQ = robot;
+                }
+                if(loserHQ!=null)
+                    window.battlecodeCam.setCenter(loserHQ.loc[0],loserHQ.loc[1]);
             }
         }
     }

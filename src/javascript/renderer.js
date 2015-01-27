@@ -44,11 +44,19 @@ function init() {
 	
 	// shots
 	var lineGeom = new THREE.Geometry();
-	for(var i=0;i<2*100;i++){
-		lineGeom.vertices.push(new THREE.Vector3(0,0,0));
-		lineGeom.colors.push(new THREE.Color(0x00ff00));
+	for(var i=0;i<25;i++){
+	    for(var j=0;j<4;j++){
+		    lineGeom.vertices.push(new THREE.Vector3(0,0,0));
+		    lineGeom.colors.push(new THREE.Color(0x000000));
+		}
+        var face1 = new THREE.Face3(i*4+1,i*4+0,i*4+3);
+        var face2 = new THREE.Face3(i*4+2,i*4+1,i*4+3);
+        var face3 = new THREE.Face3(i*4+0,i*4+2,i*4+3);
+        lineGeom.faces.push(face1);
+        lineGeom.faces.push(face2);
+        lineGeom.faces.push(face3);
 	}
-	lines = new THREE.Line(lineGeom,new THREE.LineBasicMaterial({linewidth:3,vertexColors:THREE.VertexColors}),THREE.LinePieces);
+	lines = new THREE.Mesh(lineGeom,new THREE.MeshBasicMaterial({vertexColors:THREE.FaceColors}));
 	lines.frustumCulled = false;
 	scene.add(lines);
 	
@@ -87,6 +95,10 @@ function init() {
 	light.shadowCameraBottom = -2500*ratio;
 	light.position.set(0,0,500*ratio);
 	scene.add(light);
+
+    var light2 = new THREE.DirectionalLight(0xffffff, 0.5);
+	light2.position.set(500*ratio,500*ratio,500*ratio);
+	scene.add(light2);
 }
 
 function onWindowResize() {
@@ -214,14 +226,9 @@ function updateOreUVs(){
 	var faceIndex = 0;
 	var textureSize = 1.0/4.0;
 	var maxOre = simulation.data.map.maxOre;
-    for(var x =-1;x<=map.width;x++){
-		for(var y =-1;y<=map.height;y++){
+    for(var x =0;x<map.width;x++){
+		for(var y =0;y<map.height;y++){
 			var oreLoc = toOreLoc(x,y);
-			if(x==-1||y==-1||x==map.width||y==map.height){
-			    //borders
-			    faceIndex+=2;
-				continue;
-			}
 			var oreInt = simulation.data.ore[x][y][0];
 			var oreTeam = simulation.data.ore[x][y][2];
             var uvs1 = geom.faceVertexUvs[0][faceIndex++];
@@ -278,17 +285,20 @@ function createMap(){
 	var tiles = map.tiles;
 	var mapGeom = new THREE.Geometry();
 	var sides = [[0,-1],[1,0],[0,1],[-1,0]];
-	var center = new THREE.Vector3(map.width*GLOBAL_SCALED2,map.height*GLOBAL_SCALED2,0);
     var corners = [[-GLOBAL_SCALED2,GLOBAL_SCALED2],[GLOBAL_SCALED2,GLOBAL_SCALED2],[GLOBAL_SCALED2,-GLOBAL_SCALED2],[-GLOBAL_SCALED2,-GLOBAL_SCALED2]];
     
-	for(var x =-1;x<=map.width;x++){
-		for(var y =-1;y<=map.height;y++){
-			if(x==-1||y==-1||x==map.width||y==map.height||tiles.charAt(x+y*map.width)=='#'){
+	for(var x =0;x<map.width;x++){
+		for(var y =0;y<map.height;y++){
+			var isBorder = x==0||y==0||x==map.width-1||y==map.height-1;
+            var isVoid =tiles.charAt(x+y*map.width)=='#';
+			if(isBorder||isVoid){
+			    var posZ = isBorder?-10:0;
+			    var wallHeight = isBorder?(isVoid?15:10):5;
 			    var vertices = [];
 			    var verMid = new THREE.Vector3(x*GLOBAL_SCALE-map.width*GLOBAL_SCALED2,-(y*GLOBAL_SCALE-map.height*GLOBAL_SCALED2),0);
 			    for(var i=0;i<corners.length*2;i++){
 			        var corner = corners[i%corners.length];
-			        var ver = new THREE.Vector3(corner[0]+verMid.x,corner[1]+verMid.y,Math.floor(i/corners.length)>0?5:0);
+			        var ver = new THREE.Vector3(corner[0]+verMid.x,corner[1]+verMid.y,Math.floor(i/corners.length)>0?(posZ+wallHeight):posZ);
 			        vertices.push(ver);
                     mapGeom.vertices.push(ver);
 			    }
@@ -310,7 +320,7 @@ function createMap(){
 			               3---------2
 			         */
 			        if(isWall){
-			           // var verIndices = [0,1,5,4];
+			           var verIndices = null;
 			            switch(i){
 			                case 0:verIndices=[0,1,5,4]; break;
 			                case 1:verIndices=[1,2,6,5]; break;
@@ -332,8 +342,8 @@ function createMap(){
 	scene.add(walls);
 
 	var ore2Geom = new THREE.Geometry();
-	for(var x =-1;x<=map.width;x++){
-		for(var y =-1;y<=map.height;y++){
+	for(var x =0;x<map.width;x++){
+		for(var y =0;y<map.height;y++){
 			var ver = new THREE.Vector3(x*GLOBAL_SCALE-map.width*GLOBAL_SCALED2,-(y*GLOBAL_SCALE-map.height*GLOBAL_SCALED2),0);
 			for(var i=0;i<corners.length;i++){
 			    var corner = corners[i];
@@ -424,18 +434,25 @@ function render() {
 
 	//draw shoot lines
 	var simulines = simulation.data.lines;
-	for(var i=0;i<lines.geometry.vertices.length;i+=2){
-		if(i<simulines.length*2){
-			var start = simulines[i/2][0];
-			var end = simulines[i/2][1];
-			var col = simulines[i/2][2]=='A'?redCol:blueCol;
-			lines.geometry.vertices[i].set(start[0],start[1],start[2]);
-			lines.geometry.vertices[i+1].set(end[0],end[1],end[2]);
-			lines.geometry.colors[i].set(col);
-			lines.geometry.colors[i+1].set(col);
+	var shootWidth = 2.5;
+	var shootHalf = shootWidth/2;
+	for(var i=0;i<lines.geometry.vertices.length;i+=4){
+		if(i<simulines.length*4){
+			var start = simulines[i/4][0];
+			var end = simulines[i/4][1];
+			var col = simulines[i/4][2]=='A'?redCol:blueCol;
+			lines.geometry.vertices[i].set(start[0]-shootHalf,start[1]-shootHalf,start[2]);
+			lines.geometry.vertices[i+1].set(start[0]-shootHalf,start[1]+shootWidth-shootHalf,start[2]);
+			lines.geometry.vertices[i+2].set(start[0]+shootWidth-shootHalf,start[1]-shootHalf,start[2]);
+			lines.geometry.vertices[i+3].set(end[0],end[1],end[2]);
+            lines.geometry.faces[3*i/4+0].color.set(col);
+            lines.geometry.faces[3*i/4+1].color.set(col);
+            lines.geometry.faces[3*i/4+2].color.set(col);
+		    for(var j=0;j<4;j++)
+			    lines.geometry.colors[i+j].set(col);
 		}else{
-			lines.geometry.vertices[i].set(0,0,0);
-			lines.geometry.vertices[i+1].set(0,0,0);
+		    for(var j=0;j<4;j++)
+			    lines.geometry.vertices[i+j].set(0,0,0);
 		}
 	}
 	lines.geometry.verticesNeedUpdate = true;

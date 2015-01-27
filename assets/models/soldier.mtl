@@ -8,20 +8,6 @@
 #  
 #  ==========================================================================
 
-newmtl Mat.2
-Kd 0.800000 0.800000 0.800000
-Ks 1.000000 1.000000 1.000000
-illum 2
-Ns 50.781250
-map_Kd grass-seamless-01-bricked-1.jpg
-
-newmtl Mat.3
-Kd 0.800000 0.800000 0.800000
-Ks 1.000000 1.000000 1.000000
-illum 2
-Ns 50.781250
-map_Kd wood-seamless-01.jpg
-
 newmtl TEAM
 Kd 1.000000 0.000000 0.000000
 Ks 1.000000 1.000000 1.000000
@@ -29,7 +15,24 @@ illum 2
 Ns 50.781250
 
 newmtl rubber
-Kd 0.262745 0.235294 0.231373
+Kd 0.149020 0.125490 0.125490
 Ks 1.000000 1.000000 1.000000
 illum 2
 Ns 50.781250
+
+newmtl Mat.4
+Kd 0.800000 0.800000 0.800000
+Ks 1.000000 1.000000 1.000000
+illum 2
+Ns 50.781250
+map_Kd metal-seamless-03.jpg
+
+newmtl Mat.5
+Kd 0.800000 0.800000 0.800000
+Ks 1.000000 1.000000 1.000000
+illum 2
+Ns 50.781250
+map_Kd metal-seamless-02.png
+
+newmtl default_Mat
+illum 1
