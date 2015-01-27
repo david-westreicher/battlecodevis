@@ -16,12 +16,14 @@ var Simulation = function(){
             map:null,
             robotMap:null
         };
+        self.mapwinner = null;
     }
 
     self.newReplayFile = function(){
         self.score = [0,0];
         self.currentMap = 0;
         self.newMap();
+        self.mapwinner = null;
         gui.resetScores();
     }
 
@@ -87,14 +89,15 @@ var Simulation = function(){
             for(var i=0;i<robotIDs.length;i++){
                 var robot = robots[robotIDs[i]];
                 if(robot.team!=self.mapwinner){
-                    robot.z-=(0.1+Math.random()*0.3)/4;
+                    if(robot.z>-15)
+                        robot.z-=(0.1+Math.random()*0.3)/4;
                     losers.push(robot);
                 }
             }
             self.animationTimer++;
-            if(self.animationTimer%2==0){
+            if(self.animationTimer%8==0){
                 var randRobot = losers[Math.floor(Math.random()*losers.length)];
-                self.data.explosions.push([true,7,randRobot.loc]);
+                self.data.explosions.push([true,15,randRobot.loc]);
             }
             window.battlecodeCam.updateRotation(self.animationTimer/300,0);
             if(self.animationTimer>400){
