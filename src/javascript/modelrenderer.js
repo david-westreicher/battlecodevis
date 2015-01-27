@@ -91,7 +91,17 @@ var ModelRenderer = function(){
 	{
 		for(var k=0; k<materials.length; k++){
 			if(materials[k].name == 'TEAM'){
-				materials[k].color = new THREE.Color( 0x0000ff );
+				if(team=='A'){
+			        if(supply>=1)
+			            materials[k].color = new THREE.Color( 0x2222ff );
+			        else
+			            materials[k].color = new THREE.Color( 0x6666ff );
+			    }else{
+	                if(supply>=1)
+			            materials[k].color = new THREE.Color( 0x2222ff );
+			        else
+			            materials[k].color = new THREE.Color( 0x6666ff );
+			    }
 			}
 		}
 		return materials;
