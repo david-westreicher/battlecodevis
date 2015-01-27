@@ -13,6 +13,8 @@ var ModelRenderer = function(){
 		console.log("loading "+model+"!");
 		loader.load(model,function(geometry, materials){
 			console.log(self.models[self.geometries.length]+" loaded!");
+			if(geometry.vertices.length==0)
+			    console.error("No vertices in model"+self.models[self.geometries.length]+", something is wrong");
 			//geometry.computeVertexNormals();
 			for(var type in self.types){
 			    var currentType = self.types[type];
@@ -49,11 +51,11 @@ var ModelRenderer = function(){
 	self.init = function(){
 	    self.meshes = [];
 		var loader = new THREE.JSONLoader();
-		self.normalMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff } );
-        self.redMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000 } );
-        self.redLightMaterial = new THREE.MeshPhongMaterial( { color: 0xff8888 } );
-	    self.blueMaterial = new THREE.MeshPhongMaterial( { color: 0x0000ff } );
-	    self.blueLightMaterial = new THREE.MeshPhongMaterial( { color: 0x8888ff } );
+		self.normalMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, name: 'TEAM' } );
+        self.redMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000, name: 'TEAM' } );
+        self.redLightMaterial = new THREE.MeshPhongMaterial( { color: 0xff8888, name: 'TEAM' } );
+	    self.blueMaterial = new THREE.MeshPhongMaterial( { color: 0x0000ff, name: 'TEAM' } );
+	    self.blueLightMaterial = new THREE.MeshPhongMaterial( { color: 0x8888ff , name: 'TEAM'} );
 	    self.createModelsArray();
 		self.loadModel(loader);
 	};
@@ -91,11 +93,32 @@ var ModelRenderer = function(){
 	{
 		for(var k=0; k<materials.length; k++){
 			if(materials[k].name == 'TEAM'){
-				materials[k].color = new THREE.Color( 0x0000ff );
+                if(team=='A'){
+		            if(supply>=1)
+		                materials[k] = self.redMaterial;
+		            else
+		                materials[k] = self.redLightMaterial;
+		        }else{
+                    if(supply>=1)
+		                materials[k] = self.blueMaterial;
+		            else
+		                materials[k] = self.blueLightMaterial;
+		        }
+			    break;
 			}
 		}
-		return materials;
 	};
+
+	self.copyMaterial = function(materials){
+	    var materialsCopy = [];
+        for(var l=0;l<materials.length;l++){
+            var mat = materials[l];
+            if(mat.name=='TEAM')
+                mat = self.blueMaterial;
+            materialsCopy.push(mat);
+        }
+        return materialsCopy;
+	}
 
 	self.draw = function(scene,simData){
 		if(self.models.length>self.geometries.length)
@@ -115,7 +138,7 @@ var ModelRenderer = function(){
 			var mesh = null;
 			if(meshCounter[modelID]>self.meshes[modelID].length){
 				//change team material
-				materials = self.changeTeamMaterial(self.materials[modelID], robot.team, robot.supply);
+				var materials = self.copyMaterial(self.materials[modelID]);
 				mesh = self.createMesh(self.geometries[modelID], new THREE.MeshFaceMaterial(materials));
 				scene.add( mesh );
 				self.meshes[modelID].push(mesh);
@@ -137,24 +160,7 @@ var ModelRenderer = function(){
 		    mesh.position.z = robot.z;
 		    if("height" in type)
 		        robot.z += (type.height-robot.z)/slowmotion;
-			
-			
-			
-			
-			
-			/*
-		    if(robot.team=='A'){
-		        if(robot.supply>=1)
-		            mesh.material = self.redMaterial;
-		        else
-		            mesh.material = self.redLightMaterial;
-		    }else{
-                if(robot.supply>=1)
-		            mesh.material = self.blueMaterial;
-		        else
-		            mesh.material = self.blueLightMaterial;
-		    }
-		    */
+			self.changeTeamMaterial(mesh.material.materials, robot.team, robot.supply);
 		}
 		//remove unnecessary meshes if meshCounter[i]<self.meshes[i]
 		for(var i=0;i<meshCounter.length;i++){
