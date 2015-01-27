@@ -1,4 +1,3 @@
-var stats;
 var battlecodeCam; var scene, renderer;
 var lines,walls,oreMesh2;
 var mouseX = 0, mouseY = 0;
@@ -103,7 +102,7 @@ function onDocumentMouseMove(event) {
 }
 
 function onDocumentMouseDown(event) {
-    //console.log(event);
+    document.querySelector('canvas').style.cursor = "move";
     mouseButton = Math.min(1,event.button);
     ctrlDown = event.ctrlKey;
     mouseDown = (new Date()).getTime();
@@ -113,6 +112,7 @@ function onDocumentMouseDown(event) {
 function onDocumentMouseUp(event) {
     mouseDown = null;
     battlecodeCam.dragFinished();
+    document.querySelector('canvas').style.cursor = "auto";
 }
 function onDocumentMouseClick(event) {
     var now = (new Date()).getTime();
@@ -389,7 +389,7 @@ function animate() {
 	frameNum++;
 
 	render();
-	stats.update();
+	gui.stats.update();
 }
 
 function interpolate(arr2,arr1,interp){

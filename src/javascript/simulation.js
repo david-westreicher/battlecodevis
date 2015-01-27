@@ -186,7 +186,7 @@ var Simulation = function(){
                 }
                 delete self.data.robots[sig.robotID];
             }else if(sig.type=="mapend"){
-                gui.controls.nextMap(sig.winner);
+                gui.controls.nextMap(sig.winner, sig.reason);
             }
         }
     }

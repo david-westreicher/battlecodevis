@@ -10,21 +10,40 @@
 
         <script src="/src/lib/three.min.js"></script>
         <script src="/src/lib/stats.min.js"></script>
-        <script src="/src/lib/dat.gui.min.js"></script>
+        <script src="/src/lib/dat.gui.js"></script>
         <script src="/src/lib/html5slider.js"></script>
+        <script src="/src/lib/jquery.min.js"></script>
+        <script type="text/javascript">
+            $.noConflict();
+        </script>
 
+        <script src="/src/javascript/gui.js"></script>
         <script src="/src/javascript/helpers.js"></script>
         <script src="/src/javascript/camera.js"></script>
         <script src="/src/javascript/simulation.js"></script>
         <script src="/src/javascript/robottypes.js"></script>
         <script src="/src/javascript/modelrenderer.js"></script>
         <script src="/src/javascript/explosionrenderer.js"></script>
-        <script src="/src/javascript/gui.js"></script>
         <script src="/src/javascript/controlbar.js"></script>
         <script src="teams/teams.js"></script>
     </head>
     <body>
         <div id="container" oncontextmenu="return false;" onselectstart="return false;">
+        </div>
+        <div id="message" class="fullscreen invisible hidden">
+            <div class="content-a">
+                <div class="content-b">
+                </div>
+            </div>
+        </div>
+        <div id="welcomescreen" class="fullscreen background" style="background-image: url('/assets/images/splash-background.jpg');" data-img-width="1920" data-img-height="1200">
+            <div class="content-a">
+                <div class="content-b">
+                    Welcome
+                </div>
+            </div>
+        </div>
+        <div class="ui" oncontextmenu="return false;" onselectstart="return false;">
             <div class="controls">
                 <div class="buttons set">
                     <label class="upload_label button"><input type="file" accept=".rms" onchange="loadFile(this.files[0])" class="upload" onselectstart="return true;"/></label>
@@ -34,38 +53,41 @@
                 </div>
                 <div class="slider set">
                     <input type="range" min="0" max="2000" step="1" value="0" />
-                    <p class="note">Current value: <span id="currentValue">0</span></p>
+                    <p class="note">Frame: <span id="currentValue">0</span></p>
                 </div>
                 <div class="menu set">
                 </div>
             </div>
             <div class="stats" unselectable="on">
                 <div class="left">
-                    <div class="robots">
-                        <div class="commander bar"><span></span></div>
+                    <div class="controlsbackground">
+                        <div class="robots">
+                            <div class="commander bar"><span></span></div>
+                        </div>
+                        <div class="photo">
+                            <img src="/assets/images/avatar_placeholder.png"/>
+                        </div>
+                        <h3>???</h3>
+                        <ul class="towers bar"></ul>
+                        <ul class="trophies bar"></ul>
+                        <div class="hq bar"><span></span></div>
                     </div>
-                    <div class="photo">
-                        <img src="/assets/images/avatar_placeholder.png"/>
-                    </div>
-                    <h3>???</h3>
-                    <ul class="towers bar"></ul>
-                    <ul class="trophies bar"></ul>
-                    <div class="hq bar"><span></span></div>
                 </div>
                 <div class="right">
-                    <div class="robots">
-                        <div class="commander bar"><span></span></div>
+                    <div class="controlsbackground">
+                        <div class="robots">
+                            <div class="commander bar"><span></span></div>
+                        </div>
+                        <div class="photo">
+                            <img src="/assets/images/avatar_placeholder.png"/>
+                        </div>
+                        <h3>???</h3>
+                        <ul class="towers bar"></ul>
+                        <ul class="trophies bar"></ul>
+                        <div class="hq bar"><span></span></div>
                     </div>
-                    <div class="photo">
-                        <img src="/assets/images/avatar_placeholder.png"/>
-                    </div>
-                    <h3>???</h3>
-                    <ul class="towers bar"></ul>
-                    <ul class="trophies bar"></ul>
-                    <div class="hq bar"><span></span><div>
                 </div>
             </div>
-            <div id="message"><h1>win</h1></div>
         </div>
     </body>
     <script type="text/javascript">
@@ -91,20 +113,40 @@
         container.appendChild( renderer.domElement );
 	    renderer.domElement.oncontextmenu = function(){
 	        return false;
-	    }
-        stats = new Stats();
-        stats.domElement.style.position = 'absolute';
-        stats.domElement.style.top = '0px';
-        stats.domElement.style.right = '0px';
-        stats.domElement.style.zIndex = 100;
-        container.appendChild( stats.domElement );
-
+	    };
         var simulation = new Simulation();
+        var gui = new GUI();
+        gui.setUpControls();
+
+        window.onload = function(){
+            (function(dat){
+                var dat = new dat.GUI(),
+                    menu = {
+                        slowmotion: window.slowmotion,
+                        fps: function(){
+                            if(getComputedStyle(gui.stats.domElement).display=="none"){
+                                if(gui.stats.domElement.dataset.display == "block"){
+                                    gui.stats.domElement.style.display = "block";
+                                }
+                                gui.stats.domElement.dataset.display = "block";
+                            }else{
+                                if(gui.stats.domElement.dataset.display == "none"){
+                                    gui.stats.domElement.style.display = "none";
+                                }
+                                gui.stats.domElement.dataset.display = "none";
+                            }
+                        }
+                    };
+                    dat.add(menu, 'slowmotion', 0, 10).min(1).step(1).listen();
+                    dat.add(menu,'fps');
+                    dat.close();
+
+                    gui.appendDat(dat);
+            })(dat);
+        };
     </script>
     <!-- worker -->
     <script type="text/javascript">
-        var gui = new GUI();
-        gui.setUpControls();
         function loadFile(file){
             if(!file)
                 return;
@@ -114,6 +156,7 @@
             replayData = null;
             startNewWorker(file);
             gui.resetUI()
+            $('#welcomescreen')[0].className += " invisible";
         }
 
         function startNewWorker(file){
@@ -153,4 +196,5 @@
         }
     </script>
     <script src="/src/javascript/renderer.js"></script>
+    <script src="/src/javascript/fullscreen.js"></script>
 </html>
