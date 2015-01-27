@@ -1,9 +1,17 @@
-# docker
-```
-docker build -t battlecode .
-docker run --rm -t --name battlecode -v <local-path-to-battlecodevis>:/battlecodevis:rw -p 5000:5000 battlecode
-```
+# Battlecode Visualization 2015
+##- by team schnitzel
 
-now look at ``localhost:5000``
+## Install
+You will need [nodejs](http://nodejs.org/).
+```sh
+$ npm install
+$ npm run start
+```
+Visit ``localhost:5000``. Done.
 
-if you are using boot2docker, instead of localhost, run ``boot2docker ip`` to find out the ip, docker is running on.
+## with Docker
+```sh
+$ docker build -t battlecode .
+$ docker run --rm -t --name battlecode -v <local-path-to-battlecodevis>:/battlecodevis:rw -p 5000:5000 battlecode
+```
+Visit ``localhost:5000``. Done.
