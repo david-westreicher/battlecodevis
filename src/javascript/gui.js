@@ -25,10 +25,10 @@ GUI.prototype = {
         splashscreen.addEventListener("transitionend", function(){
             splashscreen.className += " hidden";
         }, true);
-        splashscreen.addEventListener('click', function(e){
-            splashscreen.className += " invisible";
-            return false;
-        });
+        // splashscreen.addEventListener('click', function(e){
+        //     splashscreen.className += " invisible";
+        //     return false;
+        // });
 
         jQuery('.controlsbackground').mouseenter(function(){
             jQuery('.controlsbackground').addClass('off');
