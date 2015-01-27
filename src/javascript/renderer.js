@@ -45,7 +45,7 @@ function init() {
 	
 	// shots
 	var lineGeom = new THREE.Geometry();
-	for(var i=0;i<50;i++){
+	for(var i=0;i<25;i++){
 	    for(var j=0;j<4;j++){
 		    lineGeom.vertices.push(new THREE.Vector3(0,0,0));
 		    lineGeom.colors.push(new THREE.Color(0x000000));
@@ -222,14 +222,9 @@ function updateOreUVs(){
 	var faceIndex = 0;
 	var textureSize = 1.0/4.0;
 	var maxOre = simulation.data.map.maxOre;
-    for(var x =-1;x<=map.width;x++){
-		for(var y =-1;y<=map.height;y++){
+    for(var x =0;x<map.width;x++){
+		for(var y =0;y<map.height;y++){
 			var oreLoc = toOreLoc(x,y);
-			if(x==-1||y==-1||x==map.width||y==map.height){
-			    //borders
-			    faceIndex+=2;
-				continue;
-			}
 			var oreInt = simulation.data.ore[x][y][0];
 			var oreTeam = simulation.data.ore[x][y][2];
             var uvs1 = geom.faceVertexUvs[0][faceIndex++];
@@ -286,17 +281,20 @@ function createMap(){
 	var tiles = map.tiles;
 	var mapGeom = new THREE.Geometry();
 	var sides = [[0,-1],[1,0],[0,1],[-1,0]];
-	var center = new THREE.Vector3(map.width*GLOBAL_SCALED2,map.height*GLOBAL_SCALED2,0);
     var corners = [[-GLOBAL_SCALED2,GLOBAL_SCALED2],[GLOBAL_SCALED2,GLOBAL_SCALED2],[GLOBAL_SCALED2,-GLOBAL_SCALED2],[-GLOBAL_SCALED2,-GLOBAL_SCALED2]];
     
-	for(var x =-1;x<=map.width;x++){
-		for(var y =-1;y<=map.height;y++){
-			if(x==-1||y==-1||x==map.width||y==map.height||tiles.charAt(x+y*map.width)=='#'){
+	for(var x =0;x<map.width;x++){
+		for(var y =0;y<map.height;y++){
+			var isBorder = x==0||y==0||x==map.width-1||y==map.height-1;
+            var isVoid =tiles.charAt(x+y*map.width)=='#';
+			if(isBorder||isVoid){
+			    var posZ = isBorder?-10:0;
+			    var wallHeight = isBorder?(isVoid?15:10):5;
 			    var vertices = [];
 			    var verMid = new THREE.Vector3(x*GLOBAL_SCALE-map.width*GLOBAL_SCALED2,-(y*GLOBAL_SCALE-map.height*GLOBAL_SCALED2),0);
 			    for(var i=0;i<corners.length*2;i++){
 			        var corner = corners[i%corners.length];
-			        var ver = new THREE.Vector3(corner[0]+verMid.x,corner[1]+verMid.y,Math.floor(i/corners.length)>0?5:0);
+			        var ver = new THREE.Vector3(corner[0]+verMid.x,corner[1]+verMid.y,Math.floor(i/corners.length)>0?(posZ+wallHeight):posZ);
 			        vertices.push(ver);
                     mapGeom.vertices.push(ver);
 			    }
@@ -318,7 +316,7 @@ function createMap(){
 			               3---------2
 			         */
 			        if(isWall){
-			           // var verIndices = [0,1,5,4];
+			           var verIndices = null;
 			            switch(i){
 			                case 0:verIndices=[0,1,5,4]; break;
 			                case 1:verIndices=[1,2,6,5]; break;
@@ -340,8 +338,8 @@ function createMap(){
 	scene.add(walls);
 
 	var ore2Geom = new THREE.Geometry();
-	for(var x =-1;x<=map.width;x++){
-		for(var y =-1;y<=map.height;y++){
+	for(var x =0;x<map.width;x++){
+		for(var y =0;y<map.height;y++){
 			var ver = new THREE.Vector3(x*GLOBAL_SCALE-map.width*GLOBAL_SCALED2,-(y*GLOBAL_SCALE-map.height*GLOBAL_SCALED2),0);
 			for(var i=0;i<corners.length;i++){
 			    var corner = corners[i];
