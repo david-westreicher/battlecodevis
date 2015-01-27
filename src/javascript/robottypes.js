@@ -3,7 +3,7 @@ var RobotTypes = {
     "BARRACKS":{model:"assets/models/barracks.js"},
     "BASHER":{model:"assets/models/basher.js"},
     "BEAVER":{model:"assets/models/beaver.js"},
-    "COMMANDER":{model:"assets/models/Suzanne.js"},
+    "COMMANDER":{model:"assets/models/commander.js"},
     "COMPUTER":{model:"assets/models/computer.js"},
     "DRONE":{model:"assets/models/drone.js",spawnHeight:0,height:25,shootHeight:25},
     "HANDWASHSTATION":{model:"assets/models/handwash.js"},

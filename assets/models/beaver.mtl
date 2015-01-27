@@ -10,3 +10,28 @@
 
 newmtl default_Mat
 illum 1
+
+newmtl TEAM
+Kd 1.000000 0.000000 0.000000
+Ks 1.000000 1.000000 1.000000
+illum 2
+Ns 50.781250
+
+newmtl Mat.8
+Kd 0.800000 0.800000 0.800000
+Ks 1.000000 1.000000 1.000000
+illum 2
+Ns 50.781250
+map_Kd metal-seamless-04.jpg
+
+newmtl Mat.7
+Kd 0.000000 0.000000 0.000000
+Ks 1.000000 1.000000 1.000000
+illum 2
+Ns 50.781250
+
+newmtl rubber
+Kd 0.149020 0.125490 0.125490
+Ks 1.000000 1.000000 1.000000
+illum 2
+Ns 50.781250
