@@ -22,10 +22,17 @@ Ns 50.781250
 map_Kd metal-seamless-03.jpg
 
 newmtl rubber
-Kd 0.149020 0.125490 0.125490
+Kd 0.039216 0.015686 0.015686
 Ks 1.000000 1.000000 1.000000
 illum 2
 Ns 50.781250
+
+newmtl Mat.11
+Kd 0.800000 0.800000 0.800000
+Ks 1.000000 1.000000 1.000000
+illum 2
+Ns 50.781250
+map_Kd wood-seamless-02.jpg
 
 newmtl Mat.5
 Kd 0.800000 0.800000 0.800000
