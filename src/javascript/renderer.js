@@ -432,7 +432,7 @@ function render() {
 
 	//draw shoot lines
 	var simulines = simulation.data.lines;
-	var shootWidth = 5;
+	var shootWidth = 2.5;
 	var shootHalf = shootWidth/2;
 	for(var i=0;i<lines.geometry.vertices.length;i+=4){
 		if(i<simulines.length*4){
