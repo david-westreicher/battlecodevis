@@ -21,7 +21,11 @@ var ModelRenderer = function(){
 	        }
 			self.meshes.push([]);
 			self.geometries.push(geometry);
-			self.materials.push(new THREE.MeshFaceMaterial(materials));
+			
+			if(!materials) materials = array();
+			self.materials.push(materials);
+			//self.materials.push(materials);
+			//console.log(materials);
 			self.loadModel(loader);
 		});
 	};
@@ -81,6 +85,17 @@ var ModelRenderer = function(){
 		to = angleDiff+from;
 		return to*interp+from*(1-interp);
 	};
+	
+	
+	self.changeTeamMaterial = function(materials, team, supply)
+	{
+		for(var k=0; k<materials.length; k++){
+			if(materials[k].name == 'TEAM'){
+				materials[k].color = new THREE.Color( 0x0000ff );
+			}
+		}
+		return materials;
+	};
 
 	self.draw = function(scene,simData){
 		if(self.models.length>self.geometries.length)
@@ -99,7 +114,9 @@ var ModelRenderer = function(){
 			meshCounter[modelID]++;
 			var mesh = null;
 			if(meshCounter[modelID]>self.meshes[modelID].length){
-				mesh = self.createMesh(self.geometries[modelID], self.materials[modelID]);
+				//change team material
+				materials = self.changeTeamMaterial(self.materials[modelID], robot.team, robot.supply);
+				mesh = self.createMesh(self.geometries[modelID], new THREE.MeshFaceMaterial(materials));
 				scene.add( mesh );
 				self.meshes[modelID].push(mesh);
 			}else{
@@ -121,6 +138,11 @@ var ModelRenderer = function(){
 		    if("height" in type)
 		        robot.z += (type.height-robot.z)/slowmotion;
 			
+			
+			
+			
+			
+			/*
 		    if(robot.team=='A'){
 		        if(robot.supply>=1)
 		            mesh.material = self.redMaterial;
@@ -132,6 +154,7 @@ var ModelRenderer = function(){
 		        else
 		            mesh.material = self.blueLightMaterial;
 		    }
+		    */
 		}
 		//remove unnecessary meshes if meshCounter[i]<self.meshes[i]
 		for(var i=0;i<meshCounter.length;i++){
