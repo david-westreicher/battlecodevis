@@ -96,6 +96,10 @@ function init() {
 	light.shadowCameraBottom = -2500*ratio;
 	light.position.set(0,0,500*ratio);
 	scene.add(light);
+
+    var light2 = new THREE.DirectionalLight(0xffffff, 0.5);
+	light2.position.set(500*ratio,500*ratio,500*ratio);
+	scene.add(light2);
 }
 
 function onWindowResize() {
