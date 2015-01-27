@@ -26,7 +26,7 @@
 	"DbgColor" : 15597568,
 	"DbgIndex" : 1,
 	"DbgName" : "Mat.8",
-	"colorDiffuse" : [0.8, 0.8, 0.8],
+	"colorDiffuse" : [1.0, 1.0, 1.0],
 	"colorSpecular" : [1.0, 1.0, 1.0],
 	"illumination" : 2,
 	"mapDiffuse" : "metal-seamless-04.jpg",
