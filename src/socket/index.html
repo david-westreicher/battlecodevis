@@ -6,6 +6,9 @@
                 var textField = document.getElementById("text");
                 textField.innerHTML+=e.data+"\n";
             }
+            exampleSocket.onerror = function(e){
+                console.log("error in creating connection");
+            }
         </script>
     </head>
     <body>
