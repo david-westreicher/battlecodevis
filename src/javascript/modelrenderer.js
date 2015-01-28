@@ -158,7 +158,7 @@ var ModelRenderer = function(){
 		    mesh.position.x = realPos[0];
 		    mesh.position.y = realPos[1];
 		    mesh.position.z = robot.z;
-		    if("height" in type)
+		    if(!robot.dead)
 		        robot.z += (type.height-robot.z)/slowmotion;
 			self.changeTeamMaterial(mesh.material.materials, robot.team, robot.supply);
 		}
