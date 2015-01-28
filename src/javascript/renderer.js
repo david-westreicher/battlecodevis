@@ -84,6 +84,8 @@ function init() {
 	//
 	var light = new THREE.DirectionalLight(0xffffff, 0);
 	light.castShadow = true;
+	// performance: http://threejs.org/docs/#Reference/Lights/DirectionalLight
+	light.onlyShadow = true;
 	//light.shadowCameraVisible = true;
     var ratio = GLOBAL_SCALE/80;
     //TODO set shadow quality to gui
