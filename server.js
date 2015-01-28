@@ -9,7 +9,6 @@ app.get('/', function(request, response) {
 });
 
 app.get(/^(.+)$/, function(req, res){ 
-    console.log(req.params[0]);
     res.sendFile(req.params[0], {"root": __dirname}); 
 });
 

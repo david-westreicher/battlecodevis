@@ -5,3 +5,4 @@ node_modules/*
 js/demos/*
 .project
 .pydevproject
+src/socket/node_modules/*
