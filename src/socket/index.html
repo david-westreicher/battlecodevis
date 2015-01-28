@@ -3,7 +3,8 @@
         <script>
             var exampleSocket = new WebSocket("ws://localhost:1338");
             exampleSocket.onmessage = function(e){
-                console.log(e.data);
+                var textField = document.getElementById("text");
+                textField.innerHTML+=e.data+"\n";
             }
         </script>
     </head>

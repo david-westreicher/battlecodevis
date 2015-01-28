@@ -34,7 +34,7 @@ var client = net.connect({port: BATTLECODE_TICK_PORT},
         createWebSocket();
     });
 client.on('data', function(data) {
-    console.log('received from battlecode tick server: '+data.toString());
+    //console.log('received from battlecode tick server: '+data.toString());
     if(wsconn)
         wsconn.send(data.toString());
 });
