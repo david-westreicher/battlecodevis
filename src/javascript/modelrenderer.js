@@ -51,11 +51,11 @@ var ModelRenderer = function(){
 	self.init = function(){
 	    self.meshes = [];
 		var loader = new THREE.JSONLoader();
-		self.normalMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, name: 'TEAM' } );
-        self.redMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000, name: 'TEAM' } );
-        self.redLightMaterial = new THREE.MeshPhongMaterial( { color: 0xff44444, name: 'TEAM' } );
-	    self.blueMaterial = new THREE.MeshPhongMaterial( { color: 0x0000ff, name: 'TEAM' } );
-	    self.blueLightMaterial = new THREE.MeshPhongMaterial( { color: 0x4444ff , name: 'TEAM'} );
+		self.normalMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, name: 'TEAM' } );
+        self.redMaterial = new THREE.MeshPhongMaterial( { color: 0xfa2626, name: 'TEAM' } );
+        self.redLightMaterial = new THREE.MeshPhongMaterial( { color: 0xfb4444, name: 'TEAM' } );
+	    self.blueMaterial = new THREE.MeshPhongMaterial( { color: 0x004af1, name: 'TEAM' } );
+	    self.blueLightMaterial = new THREE.MeshPhongMaterial( { color: 0x1e5ff1 , name: 'TEAM'} );
 	    self.createModelsArray();
 		self.loadModel(loader);
 	};
@@ -118,7 +118,7 @@ var ModelRenderer = function(){
             materialsCopy.push(mat);
         }
         return materialsCopy;
-	}
+	};
 
 	self.draw = function(scene,simData){
 		if(self.models.length>self.geometries.length)

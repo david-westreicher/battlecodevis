@@ -60,6 +60,7 @@ function init() {
 	lines.frustumCulled = false;
 	scene.add(lines);
 	
+	//line grid
 	var gridGeom = new THREE.Geometry();
 	var gridNum = 60;
 	var startGrid = -gridNum;
@@ -79,8 +80,9 @@ function init() {
 	
 	//LIGHT
 	var ambientLight = new THREE.AmbientLight(0x222222);
-	scene.add(ambientLight);
-	var light = new THREE.DirectionalLight(0xffffff, 1);
+	//scene.add(ambientLight);
+	//
+	var light = new THREE.DirectionalLight(0xffffff, 0);
 	light.castShadow = true;
 	//light.shadowCameraVisible = true;
     var ratio = GLOBAL_SCALE/80;
@@ -95,10 +97,17 @@ function init() {
 	light.shadowCameraBottom = -2500*ratio;
 	light.position.set(0,0,500*ratio);
 	scene.add(light);
-
-    var light2 = new THREE.DirectionalLight(0xffffff, 0.5);
-	light2.position.set(500*ratio,500*ratio,500*ratio);
+	//
+	
+    var light2 = new THREE.DirectionalLight(0xffffff, 1.2);
+    //light2.castShadow = true;
+	light2.position.set(500*ratio,500*ratio,600*ratio);
 	scene.add(light2);
+	
+	var light3 = new THREE.DirectionalLight(0xffffff, 0.75);
+	//light3.castShadow = true;
+	light3.position.set(-200*ratio,-500*ratio,400*ratio);
+	scene.add(light3);
 }
 
 function onWindowResize() {
@@ -292,8 +301,10 @@ function createMap(){
 			var isBorder = x==0||y==0||x==map.width-1||y==map.height-1;
             var isVoid =tiles.charAt(x+y*map.width)=='#';
 			if(isBorder||isVoid){
-			    var posZ = isBorder?-10:0;
-			    var wallHeight = isBorder?(isVoid?15:10):5;
+			    //var posZ = isBorder?-10:0;
+			    //var wallHeight = isBorder?(isVoid?15:10):5;
+			    var posZ = isBorder?-10:-3.1;
+			    var wallHeight = isBorder?(isVoid?16.9:10):10;
 			    var vertices = [];
 			    var verMid = new THREE.Vector3(x*GLOBAL_SCALE-map.width*GLOBAL_SCALED2,-(y*GLOBAL_SCALE-map.height*GLOBAL_SCALED2),0);
 			    for(var i=0;i<corners.length*2;i++){
@@ -335,12 +346,17 @@ function createMap(){
 		}	
 	}
 	mapGeom.computeFaceNormals();
-
+	
+	// walls
     var wallTex = THREE.ImageUtils.loadTexture( "assets/images/walltexture.jpg" );
+    wallTex.wrapS = THREE.RepeatWrapping;
+	wallTex.wrapT = THREE.RepeatWrapping;
 	walls = new THREE.Mesh(mapGeom,new THREE.MeshLambertMaterial({map:wallTex}));
 	walls.receiveShadow = true;
 	scene.add(walls);
-
+	
+	
+	// ore geom
 	var ore2Geom = new THREE.Geometry();
 	for(var x =0;x<map.width;x++){
 		for(var y =0;y<map.height;y++){
