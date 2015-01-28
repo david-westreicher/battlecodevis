@@ -1,0 +1,7 @@
+{
+  "name": "sockettest",
+  "description": "battlecode viewer",
+  "dependencies": {
+    "ws": "^0.7.0"
+  }
+}

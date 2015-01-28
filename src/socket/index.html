@@ -1,0 +1,14 @@
+<html>
+    <head>
+        <script>
+            var exampleSocket = new WebSocket("ws://localhost:1338");
+            exampleSocket.onmessage = function(e){
+                console.log(e.data);
+            }
+        </script>
+    </head>
+    <body>
+        <p id="text">
+        </p>
+    </body>
+</html>
