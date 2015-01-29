@@ -4,13 +4,13 @@ var Controlbar = function(controls){
     this.paused = false;
     this.ffw = false;
     this.reasons = {
-        "WON_BY_DUBIOUS_REASONS": "Team HQ id-win",
-        "BARELY_BARELY_BEAT": "Win by more money",
-        "BARELY_BEAT": "more handwash stations",
-        "BEAT": "Win by more tower hp",
-        "OWNED": "win by more HQ hp",
-        "PWNED": "win by more towers remaining",
-        "DESTROYED": "win by destroying HQ"
+        "WON_BY_DUBIOUS_REASONS": "wins by having pure luck :(  (higher HQ-id)",
+        "BARELY_BARELY_BEAT": "wins by generating more ore",
+        "BARELY_BEAT": "wins because sanitation is important",
+        "BEAT": "wins by having more tower health",
+        "OWNED": "wins by having more HQ health",
+        "PWNED": "wins by having more towers remaining",
+        "DESTROYED": "wins by pwning the enemy's HQ"
     };
 };
 Controlbar.prototype = {
