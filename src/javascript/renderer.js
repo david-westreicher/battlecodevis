@@ -79,7 +79,7 @@ function init() {
 	gridMesh.visible = false;
 	
 	//LIGHT
-	var ambientLight = new THREE.AmbientLight(0x222222);
+	var ambientLight = new THREE.AmbientLight(0x111111);
 	//scene.add(ambientLight);
 	//
 	var light = new THREE.DirectionalLight(0xffffff, 0);
@@ -101,15 +101,20 @@ function init() {
 	scene.add(light);
 	//
 	
-    var light2 = new THREE.DirectionalLight(0xffffff, 1.2);
+    var light2 = new THREE.DirectionalLight(0xffffff, 1.0);
     //light2.castShadow = true;
-	light2.position.set(500*ratio,500*ratio,600*ratio);
+	light2.position.set(500*ratio,400*ratio,700*ratio);
 	scene.add(light2);
 	
-	var light3 = new THREE.DirectionalLight(0xffffff, 0.75);
+	var light3 = new THREE.DirectionalLight(0xffffff, 0.8);
 	//light3.castShadow = true;
-	light3.position.set(-200*ratio,-500*ratio,400*ratio);
+	light3.position.set(-500*ratio,300*ratio,500*ratio);
 	scene.add(light3);
+	
+	var light4 = new THREE.DirectionalLight(0xffffff, 0.4);
+	//light3.castShadow = true;
+	light4.position.set(100*ratio,-500*ratio,100*ratio);
+	scene.add(light4);
 }
 
 function onWindowResize() {
