@@ -470,6 +470,13 @@ function createTextMesh(string){
     return new THREE.Mesh(geom,new THREE.MeshBasicMaterial());
 }
 
+function swapInfo(){
+    if(renderInfo)
+        hideInfo();
+    else
+        showInfo();
+}
+
 function showInfo(){
     renderInfo = true;
     if(walls!=null)
