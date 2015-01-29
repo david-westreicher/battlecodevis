@@ -305,8 +305,8 @@ function createMap(){
 			if(isBorder||isVoid){
 			    //var posZ = isBorder?-10:0;
 			    //var wallHeight = isBorder?(isVoid?15:10):5;
-			    var posZ = isBorder?-10:-3.1;
-			    var wallHeight = isBorder?(isVoid?16.9:10):10;
+			    var posZ = isBorder?-10:-5;
+			    var wallHeight = isBorder?(isVoid?15:10):10;
 			    var vertices = [];
 			    var verMid = new THREE.Vector3(x*GLOBAL_SCALE-map.width*GLOBAL_SCALED2,-(y*GLOBAL_SCALE-map.height*GLOBAL_SCALED2),0);
 			    for(var i=0;i<corners.length*2;i++){
