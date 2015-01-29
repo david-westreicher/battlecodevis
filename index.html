@@ -125,7 +125,10 @@
                     menu = {
                         slowmotion: 4,
                         showfps: false,
-                        robotinfo: false
+                        robotinfo: false,
+                        birdview: function(){
+                            window.battlecodeCam.reset();
+                        }
                     };
                     dat.add(menu, 'slowmotion', 1, 10).step(1).onChange(function(val){
                         window.slowmotion=val;
@@ -139,6 +142,7 @@
                     dat.add(menu,'robotinfo').onChange(function(){
                             swapInfo();
                     });
+                    dat.add(menu,"birdview");
                     dat.close();
 
                     gui.appendDat(dat);
