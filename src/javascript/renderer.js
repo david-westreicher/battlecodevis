@@ -20,6 +20,7 @@ var mouseDownX = 0;
 var mouseDownY = 0;
 var ctrlDown = false;
 var CLICK_DRAG_TIME = 200;
+var renderInfo = false;
 init();
 modelRenderer.init();
 animate();
@@ -110,6 +111,27 @@ function init() {
 	//light3.castShadow = true;
 	light3.position.set(-200*ratio,-500*ratio,400*ratio);
 	scene.add(light3);
+
+    infoRobots = {};
+    var typeIndex = 0;
+    var radius = 100;
+    for(var type in RobotTypes){
+        var angle = (typeIndex++)/Object.keys(RobotTypes).length*Math.PI*2;
+        var robotLoc = [Math.sin(angle)*radius,Math.cos(angle)*radius];
+        var robot = {
+            loc: robotLoc,
+            lastloc: robotLoc,
+            team: 'A',
+            type: type,
+            hasInterp: false,
+            hp: 0,
+            supply: 100,
+            z: 20,
+            dead: true,
+            rot:0
+        }
+        infoRobots[type] = robot;
+    }
 }
 
 function onWindowResize() {
@@ -409,7 +431,7 @@ function animate() {
 	}
 
 	var frameMod = frameNum%slowmotion;
-	if(frameMod==0 && !gui.controls.isPaused()){
+	if(frameMod==0 && !gui.controls.isPaused() && !renderInfo){
 		simulation.simulate();
 	}
 	interp = frameMod/slowmotion;
@@ -435,6 +457,50 @@ function getInterpPosition(robot){
 			robot.hasInterp=false;
 	}
 	return realPos;
+}
+
+function createTextMesh(string){
+    var geom = new THREE.TextGeometry(string, {size:2,height:0.1,font: 'helvetiker'});
+    geom.center();
+    return new THREE.Mesh(geom,new THREE.MeshBasicMaterial());
+}
+
+function showInfo(){
+    renderInfo = true;
+    if(walls!=null)
+        walls.visible = false;
+    if(oreMesh2!=null)
+        oreMesh2.visible = false;
+    battlecodeCam.save();
+    battlecodeCam.reset();
+    battlecodeCam.angle2 = Math.PI;
+    battlecodeCam.cameraRadius = 130;
+    textMeshes = [];
+    var typeIndex = 0;
+    var radius = 100;
+    for(var type in RobotTypes){
+        var angle = (typeIndex++)/Object.keys(RobotTypes).length*Math.PI*2;
+        var robotLoc = [Math.sin(angle)*radius,Math.cos(angle)*radius];
+        var mesh = createTextMesh(type);
+        mesh.position.x = robotLoc[0];
+        mesh.position.y = robotLoc[1];
+        mesh.position.z = 10;
+        mesh.rotation.x = Math.PI/2;
+        mesh.rotation.y = -angle+Math.PI;
+        textMeshes.push(mesh);
+        scene.add(mesh);
+    } 
+}
+
+function hideInfo(){
+    renderInfo = false;
+    if(walls!=null)
+        walls.visible = true;
+    if(oreMesh2!=null)
+        oreMesh2.visible = true;
+    for(var i=0;i<textMeshes.length;i++)
+        scene.remove(textMeshes[i]);
+    battlecodeCam.restore();
 }
 
 function render() {
@@ -476,7 +542,7 @@ function render() {
 	lines.geometry.verticesNeedUpdate = true;
 	lines.geometry.colorsNeedUpdate = true;
 
-	modelRenderer.draw(scene,simulation.data);
+	modelRenderer.draw(scene,renderInfo?infoRobots:simulation.data.robots);
 	explosionRenderer.draw(scene,simulation.data.explosions);
 
 	renderer.render( scene, battlecodeCam.cam );

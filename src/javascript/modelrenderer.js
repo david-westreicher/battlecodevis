@@ -120,15 +120,15 @@ var ModelRenderer = function(){
         return materialsCopy;
 	};
 
-	self.draw = function(scene,simData){
+	self.draw = function(scene,robots){
 		if(self.models.length>self.geometries.length)
 			return;
 		var meshCounter = [];
 		for(var i=0;i<self.models.length;i++){
 			meshCounter.push(0);
 		}
-		for(var id in simData.robots){
-			var robot = simData.robots[id];
+		for(var id in robots){
+			var robot = robots[id];
 			var type = self.types[robot.type];
 			var modelID = type.modelID;
 			if(!modelID)

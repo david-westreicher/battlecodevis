@@ -98,4 +98,28 @@ var battlecodeCamera = function(){
         self.angle1Offset = -deltaMouseX*3;
 	    self.angle2Offset = deltaMouseY*3;
 	}
+
+	self.save = function(){
+	    self.saveObj = {
+	        center: self.center,
+	        angle1: self.angle1,
+	        angle2: self.angle2,
+	        cameraRadius: self.cameraRadius
+	    };
+        self.setCenter(0,0);
+        self.cameraRadius = 300;
+        self.angle1 = 0;
+        self.angle2 = 0.01;
+        self.angle1Offset = 0;
+        self.angle2Offset = 0;
+	}
+	self.restore = function(){
+	    self.reset();
+	    self.center = self.saveObj.center;
+	    self.angle1 = self.saveObj.angle1;
+	    self.angle2 = self.saveObj.angle2;
+	    self.cameraRadius = self.saveObj.cameraRadius;
+        self.angle1Offset = 0;
+        self.angle2Offset = 0;
+	}
 }
