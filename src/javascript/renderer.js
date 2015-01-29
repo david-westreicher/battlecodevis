@@ -101,19 +101,19 @@ function init() {
 	scene.add(light);
 	//
 	
-    var light2 = new THREE.DirectionalLight(0xffffff, 1.0);
+    var light2 = new THREE.DirectionalLight(0xffffff, 1.1);
     //light2.castShadow = true;
-	light2.position.set(500*ratio,400*ratio,700*ratio);
+	light2.position.set(500*ratio,500*ratio,500*ratio);
 	scene.add(light2);
 	
 	var light3 = new THREE.DirectionalLight(0xffffff, 0.8);
 	//light3.castShadow = true;
-	light3.position.set(-500*ratio,300*ratio,500*ratio);
+	light3.position.set(-500*ratio,200*ratio,500*ratio);
 	scene.add(light3);
 	
 	var light4 = new THREE.DirectionalLight(0xffffff, 0.4);
 	//light3.castShadow = true;
-	light4.position.set(100*ratio,-500*ratio,100*ratio);
+	light4.position.set(0*ratio,-500*ratio,100*ratio);
 	scene.add(light4);
 }
 
