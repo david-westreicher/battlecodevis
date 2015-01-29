@@ -91,6 +91,7 @@ var Simulation = function(){
                 if(robot.team!=self.mapwinner){
                     if(robot.z>-15)
                         robot.z-=(0.1+Math.random()*0.3)/4;
+                    robot.dead = true;
                     losers.push(robot);
                 }
             }
@@ -133,9 +134,8 @@ var Simulation = function(){
                     hasInterp: false,
                     hp: 0,
                     supply: 0,
-                    z: ('spawnHeight' in robotType)?
-                        robotType.spawnHeight:
-                        (('height' in robotType)?robotType.height:0),
+                    z: robotType.spawnHeight,
+                    dead: false,
                     rot:0
                 };
                 self.data.robots[robot.id] = robot;
@@ -164,18 +164,18 @@ var Simulation = function(){
                 robot.hasInterp = true;
             }else if(sig.type=="attack"){
                 var robot = self.data.robots[sig.robotID];
-                var type = RobotTypes[robot.type];
-                var height = ("shootHeight" in type)?type.shootHeight:5;
-                var from = [robot.loc[0],robot.loc[1],height];
-                //from[0]+=(Math.random()-0.5)*2;
-                //from[1]+=(Math.random()-0.5)*2;
-                //from[2]+=(Math.random()-0.5)*2;
+                var from = [robot.loc[0],robot.loc[1],RobotTypes[robot.type].shootHeight];
                 var attackLoc = self.locToMap(sig.loc);
+                var attackHeight = 5;
                 var mapLoc = self.maplocToOreLoc(sig.loc);
-                var robot2 = (mapLoc==null)?null:self.data.robotMap[mapLoc[0]][mapLoc[1]];
-                var type2 = (robot2!=null)?RobotTypes[robot2.type]:null;
-                height = (type2!=null)?type2.height:5;
-                self.data.lines.push([from,[attackLoc[0]+(Math.random()-0.5)*2,attackLoc[1]+(Math.random()-0.5)*2,height+(Math.random()-0.5)*2],robot.team]);
+                var enemyRobot = (mapLoc==null)?null:self.data.robotMap[mapLoc[0]][mapLoc[1]];
+                var enemyType = (enemyRobot==null)?null:RobotTypes[enemyRobot.type];
+                if(enemyType!=null)
+                    attackHeight += enemyType.height;
+                attackLoc.push(attackHeight);
+                for(var l = 0;l<3;l++)
+                    attackLoc[l] += (Math.random()-0.5);
+                self.data.lines.push([from,attackLoc,robot.team]);
             }else if(sig.type=="health"){
                 var robots = sig.robots;
                 var healths = sig.healths;

@@ -75,7 +75,7 @@ GUI.prototype = {
         this.updateHP(robot, true);
     },
     setCommander: function(robot){
-        var commanderElement = this.teamSections[this.getTeamIndex(robot)].getElementsByClassName(robot.type.toLowerCase());
+        var commanderElement = this.teamSections[this.getTeamIndex(robot.team)].getElementsByClassName(robot.type.toLowerCase());
         this.teams[robot.team].COMMANDER = robot.id;
         this.updateHP(robot, true);
         commanderElement[0].style.display = "block";
