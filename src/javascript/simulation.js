@@ -4,7 +4,7 @@ var Simulation = function(){
     self.newMap = function(){
         self.currentFrame = 0;
         if(window.battlecodeCam)
-            window.battlecodeCam.setCenter(0,0);
+            window.battlecodeCam.reset();
         self.data  = {
             robots:{},
             lines:[],
@@ -78,35 +78,38 @@ var Simulation = function(){
         return mapLoc;
     }
 
+    self.winnerAnimation = function(){
+        var losers = [];
+        var robots = simulation.data.robots;
+        var robotIDs = Object.keys(simulation.data.robots);
+        for(var i=0;i<robotIDs.length;i++){
+            var robot = robots[robotIDs[i]];
+            if(robot.team!=self.mapwinner){
+                if(robot.z>-15)
+                    robot.z-=(0.1+Math.random()*0.3)/4;
+                robot.dead = true;
+                losers.push(robot);
+            }
+        }
+        self.animationTimer++;
+        if(self.animationTimer%8==0){
+            var randRobot = losers[Math.floor(Math.random()*losers.length)];
+            self.data.explosions.push([true,15,randRobot.loc]);
+        }
+        if(self.animationTimer>400){
+            slowmotion=4;
+            self.mapwinner=null;
+            window.battlecodeCam.endWinnerAnimation();
+            gui.controls.nextMap(self.mapwinner);
+        }
+    }
+
     self.simulate = function(){
         //check if replayData has enough maps/frames parsed
         var replayData = window.replayData;
 
         if(self.mapwinner!=null){
-            var losers = [];
-            var robots = simulation.data.robots;
-            var robotIDs = Object.keys(simulation.data.robots);
-            for(var i=0;i<robotIDs.length;i++){
-                var robot = robots[robotIDs[i]];
-                if(robot.team!=self.mapwinner){
-                    if(robot.z>-15)
-                        robot.z-=(0.1+Math.random()*0.3)/4;
-                    robot.dead = true;
-                    losers.push(robot);
-                }
-            }
-            self.animationTimer++;
-            if(self.animationTimer%8==0){
-                var randRobot = losers[Math.floor(Math.random()*losers.length)];
-                self.data.explosions.push([true,15,randRobot.loc]);
-            }
-            window.battlecodeCam.updateRotation(self.animationTimer/300,0);
-            if(self.animationTimer>400){
-                slowmotion=4;
-                window.battlecodeCam.dragFinished();
-                self.mapwinner=null;
-                gui.controls.nextMap(self.mapwinner);
-            }
+            self.winnerAnimation();
             return;
         }
 
@@ -230,7 +233,7 @@ var Simulation = function(){
                         loserHQ = robot;
                 }
                 if(loserHQ!=null)
-                    window.battlecodeCam.setCenter(loserHQ.loc[0],loserHQ.loc[1]);
+                    window.battlecodeCam.startWinnerAnimation(loserHQ.loc[0],loserHQ.loc[1]);
             }
         }
     }
