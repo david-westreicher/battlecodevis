@@ -52,9 +52,9 @@ var ModelRenderer = function(){
 	    self.meshes = [];
 		var loader = new THREE.JSONLoader();
 		self.normalMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, name: 'TEAM' } );
-        self.redMaterial = new THREE.MeshPhongMaterial( { color: 0xfa2626, name: 'TEAM' } );
+        self.redMaterial = new THREE.MeshPhongMaterial( { color: 0xEE2200, name: 'TEAM' } );
         self.redLightMaterial = new THREE.MeshPhongMaterial( { color: 0xfb4444, name: 'TEAM' } );
-	    self.blueMaterial = new THREE.MeshPhongMaterial( { color: 0x004af1, name: 'TEAM' } );
+	    self.blueMaterial = new THREE.MeshPhongMaterial( { color: 0x0022EE, name: 'TEAM' } );
 	    self.blueLightMaterial = new THREE.MeshPhongMaterial( { color: 0x1e5ff1 , name: 'TEAM'} );
 	    self.createModelsArray();
 		self.loadModel(loader);
