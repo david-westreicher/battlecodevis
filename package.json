@@ -6,13 +6,15 @@
         "vendors": "browserify -r src/javascript/dat-gui -r src/javascript/stats-js -o vendors.js",
         "//": "compile: npm run workers && npm run vendors",
         "compile": "npm run workers",
-        "start": "npm run compile && node server.js"
+        "start": "npm run compile && node server.js",
+        "starttick": "npm run compile && node server.js tick"
     },
     "dependencies": {
         "pako": ">= 0.2.5",
         "express": "~4.9.x",
         "browserify": "*",
         "dat-gui": "*",
-        "stats-js": "*"
+        "stats-js": "*",
+        "ws": "^0.7.0"
     }
 }
