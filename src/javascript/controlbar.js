@@ -33,7 +33,7 @@ Controlbar.prototype = {
         // });
         
     	// add default pause state
-    	this.controls.querySelector('.play').className += ' active';
+    	// this.controls.querySelector('.play').className += ' active';
     },
     upload: function(){
         // refactor worker
@@ -53,12 +53,8 @@ Controlbar.prototype = {
     	elmPlay.className = elmPlay.className.replace(" active","");
     	elmPause.className = elmPause.className.replace(" active","");
     	// add active where needed
-    	if(this.paused){
-            elmPause.className += " active";
-        }else{
-            elmPlay.className += " active";
-        }
-        this.paused = !this.paused;
+    	elmPlay.className += " active";
+        this.paused = false;
     },
     pause: function(){
         var elmPlay = this.controls.querySelector('.play');
@@ -67,12 +63,8 @@ Controlbar.prototype = {
     	elmPlay.className = elmPlay.className.replace(" active","");
     	elmPause.className = elmPause.className.replace(" active","");
     	// add active where needed
-    	if(this.paused){
-            elmPause.className += " active";
-        }else{
-            elmPlay.className += " active";
-        }
-        this.paused = !this.paused;
+    	elmPause.className += " active";
+        this.paused = true;
     },
     fastForward: function(){
         var elm = this.controls.querySelector('.fforward');
