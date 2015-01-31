@@ -52,10 +52,33 @@ var ModelRenderer = function(){
 	    self.meshes = [];
 		var loader = new THREE.JSONLoader();
 		self.normalMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, name: 'TEAM' } );
-        self.redMaterial = new THREE.MeshPhongMaterial( { color: 0xEE2200, name: 'TEAM' } );
-        self.redLightMaterial = new THREE.MeshPhongMaterial( { color: 0xfb4444, name: 'TEAM' } );
-	    self.blueMaterial = new THREE.MeshPhongMaterial( { color: 0x0022EE, name: 'TEAM' } );
-	    self.blueLightMaterial = new THREE.MeshPhongMaterial( { color: 0x1e5ff1 , name: 'TEAM'} );
+		
+		var shading = THREE.FlatShading;
+		
+        self.redMaterial = new THREE.MeshLambertMaterial( { 
+        	color: 0xEE2200,
+        	name: 'TEAM',
+        	shading: shading,
+        	emissive: 0x330000
+        } );
+        self.redLightMaterial = new THREE.MeshLambertMaterial( { 
+        	color: 0xfb4444,
+        	name: 'TEAM',
+        	shading: shading,
+        	emissive: 0x660000
+         } );
+	    self.blueMaterial = new THREE.MeshLambertMaterial( { 
+	    	color: 0x0531e5,
+	    	name: 'TEAM',
+        	shading: shading,
+        	emissive: 0x000033
+         } );
+	    self.blueLightMaterial = new THREE.MeshLambertMaterial( { 
+	    	color: 0x2161f1 ,
+	    	name: 'TEAM',
+        	shading: shading,
+        	emissive: 0x000066
+        } );
 	    self.createModelsArray();
 		self.loadModel(loader);
 	};

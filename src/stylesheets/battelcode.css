@@ -224,6 +224,9 @@ table, tr, td{
     outline: 0;
     overflow: hidden;
     cursor: pointer;
+    -webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
 }
 .button:hover{
 	background: #DDDDDD;

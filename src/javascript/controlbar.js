@@ -15,8 +15,9 @@ var Controlbar = function(controls){
 };
 Controlbar.prototype = {
     setUp: function(){
-        this.controls.querySelector('.play').addEventListener('click', this.pause.bind(this));
-        this.controls.querySelector('.upload').addEventListener('click', this.upload.bind(this));
+    	this.controls.querySelector('.upload').addEventListener('click', this.upload.bind(this));
+    	this.controls.querySelector('.pause').addEventListener('click', this.pause.bind(this));
+        this.controls.querySelector('.play').addEventListener('click', this.play.bind(this));
         this.controls.querySelector('.fforward').addEventListener('click', this.fastForward.bind(this));
         this.controls.querySelector('.skip').addEventListener('click', this.nextMap.bind(this));
         this.controls.querySelector('.frameslider input').addEventListener('change', this.updateSlider.bind(this));
@@ -30,6 +31,9 @@ Controlbar.prototype = {
         //     splashscreen.className += " invisible";
         //     return false;
         // });
+        
+    	// add default pause state
+    	this.controls.querySelector('.pause').className += ' active';
     },
     upload: function(){
         // refactor worker
@@ -42,12 +46,31 @@ Controlbar.prototype = {
         this.controls.querySelector('.frameslider input').value = value;
         document.getElementById('currentValue').textContent = value;
     },
-    pause: function(){
-        var elm = this.controls.querySelector('.play');
-        if(this.paused){
-            elm.className = elm.className.replace(" active","");
+    play: function(){
+    	var elmPlay = this.controls.querySelector('.play');
+    	var elmPause = this.controls.querySelector('.pause');
+    	// first remove all actives
+    	elmPlay.className = elmPlay.className.replace(" active","");
+    	elmPause.className = elmPause.className.replace(" active","");
+    	// add active where needed
+    	if(this.paused){
+            elmPause.className += " active";
         }else{
-            elm.className += " active";
+            elmPlay.className += " active";
+        }
+        this.paused = !this.paused;
+    },
+    pause: function(){
+        var elmPlay = this.controls.querySelector('.play');
+    	var elmPause = this.controls.querySelector('.pause');
+    	// first remove all actives
+    	elmPlay.className = elmPlay.className.replace(" active","");
+    	elmPause.className = elmPause.className.replace(" active","");
+    	// add active where needed
+    	if(this.paused){
+            elmPause.className += " active";
+        }else{
+            elmPlay.className += " active";
         }
         this.paused = !this.paused;
     },

@@ -80,10 +80,10 @@ function init() {
 	gridMesh.visible = false;
 	
 	//LIGHT
-	var ambientLight = new THREE.AmbientLight(0x111111);
+	var ambientLight = new THREE.AmbientLight(0x131313);
 	scene.add(ambientLight);
 	//
-	var light = new THREE.DirectionalLight(0xffffff, 0);
+	var light = new THREE.DirectionalLight(0xffffff, 1);
 	light.castShadow = true;
 	// performance: http://threejs.org/docs/#Reference/Lights/DirectionalLight
 	light.onlyShadow = true;
@@ -102,21 +102,18 @@ function init() {
 	scene.add(light);
 	//
 	
-    var light2 = new THREE.DirectionalLight(0xffffff, 1.1);
+	
+    var light2 = new THREE.DirectionalLight(0xffffff, 1.3);
     //light2.castShadow = true;
-	light2.position.set(500*ratio,500*ratio,500*ratio);
+	light2.position.set(500*ratio,500*ratio,700*ratio);
 	scene.add(light2);
 	
-	var light3 = new THREE.DirectionalLight(0xffffff, 0.6);
+	var light3 = new THREE.DirectionalLight(0xffffff, 0.8);
 	//light3.castShadow = true;
-	light3.position.set(-500*ratio,-500*ratio,200*ratio);
+	light3.position.set(-400*ratio,-500*ratio,300*ratio);
 	scene.add(light3);
 	
-	var light4 = new THREE.DirectionalLight(0xffffff, 0.4);
-	//light3.castShadow = true;
-	light4.position.set(0*ratio,-500*ratio,100*ratio);
-//	scene.add(light4);
-
+	
     infoRobots = {};
     var typeIndex = 0;
     var radius = 100;
