@@ -19,9 +19,9 @@ Controlbar.prototype = {
         this.controls.querySelector('.upload').addEventListener('click', this.upload.bind(this));
         this.controls.querySelector('.fforward').addEventListener('click', this.fastForward.bind(this));
         this.controls.querySelector('.skip').addEventListener('click', this.nextMap.bind(this));
-        this.controls.querySelector('.slider input').addEventListener('change', this.updateSlider.bind(this));
+        this.controls.querySelector('.frameslider input').addEventListener('change', this.updateSlider.bind(this));
 
-         this.message = document.getElementById('message'),
+        this.message = document.getElementById('message'),
 
         this.message.addEventListener("transitionend", function(){
             this.message.className += " hidden";
@@ -35,11 +35,11 @@ Controlbar.prototype = {
         // refactor worker
     },
     updateSlider: function(e){
-        var target = e.target || e.srcElement
+        var target = e.target || e.srcElement;
         this.updateBar(target.value);
     },
     updateBar: function(value){
-        this.controls.querySelector('.slider input').value = value;
+        this.controls.querySelector('.frameslider input').value = value;
         document.getElementById('currentValue').textContent = value;
     },
     pause: function(){
@@ -83,14 +83,14 @@ Controlbar.prototype = {
                     simulation.currentMap = 0;
                     simulation.score = [0,0];
                     this.showWinner(winner, reason, function(){
-                        gui.resetUI()
+                        gui.resetUI();
                         simulation.newMap();
                         gui.resetScores();
                     });
                     return true;
                     console.log('replay');
                 }else{
-                    console.log('not ready yet')
+                    console.log('not ready yet');
                     return false;
                 }
             }

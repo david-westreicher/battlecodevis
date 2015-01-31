@@ -4,7 +4,11 @@
         <meta charset="UTF-8">
         <title>battlecodevis - by team schnitzel</title>
         <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-
+		
+		<link rel="stylesheet" href="/assets/fonts/battlecode-icons/css/battlecode-icons.css">
+    	<link rel="stylesheet" href="/assets/fonts/battlecode-icons/css/animation.css">
+    	<!--[if IE 7]><link rel="stylesheet" href="/assets/fonts/battlecode-icons/css/battlecode-icons-ie7.css"><![endif]-->
+    	
         <link href="/src/stylesheets/normalize.css" rel="stylesheet" type="text/css"/>
         <link href="/src/stylesheets/battelcode.css" rel="stylesheet" type="text/css"/>
 
@@ -46,20 +50,31 @@
         </div>
         <div class="ui" oncontextmenu="return false;" onselectstart="return false;">
             <div class="controls">
-                <div class="buttons set">
-                    <label class="upload_label button"><input type="file" accept=".rms" onchange="loadFile(this.files[0])" class="upload" onselectstart="return true;"/></label>
-                    <input type="button" class="play button" value="&#10073;&#10073;/&#9658;"/>
-                    <input type="button" class="fforward button" value="&#10704;"/>
-                    <input type="button" class="skip button" value="&#9655;" />
-                </div>
-                <div class="slider set">
-                    <input type="range" min="0" max="2000" step="1" value="0" />
-                    <p class="note">Frame: <span id="currentValue">0</span></p>
-                </div>
-                <div class="menu set">
-                </div>
+            	
+            	<table border="0" cellpadding="0" cellspacing="0" width="100%"><tr>
+            		
+            		<td class="buttons">
+            			<label class="button"><input type="file" accept=".rms" onchange="loadFile(this.files[0])" class="upload icon-battlecode-upload" onselectstart="return true;"/></label>
+	                    <div class="pause button icon-battlecode-pause"></div>
+	                    <div class="play button icon-battlecode-play"></div>
+	                    <div class="fforward button icon-battlecode-fast-fw"></div>
+	                    <div class="skip button icon-battlecode-to-end"></div>
+            		</td>
+            		
+            		<td class="frameslider">
+            			<input type="range" min="0" max="2000" step="1" value="0" />
+            		</td>
+            		<td class="note">
+            			Frame: <span id="currentValue">0</span>
+            		</td>
+            		
+            		<td class="menu-wrapper">
+            			<div class="menu"></div>
+            		</td>
+            		
+            	</tr></table>
             </div>
-            <div class="stats" unselectable="on">
+            <div id="playerinfo" class="infolayer" unselectable="on">
                 <div class="left">
                     <div class="controlsbackground">
                         <div class="robots">
@@ -159,7 +174,7 @@
             simulation.newReplayFile();
             replayData = null;
             startNewWorker(file);
-            gui.resetUI()
+            gui.resetUI();
             $('#welcomescreen')[0].className += " invisible";
         }
 

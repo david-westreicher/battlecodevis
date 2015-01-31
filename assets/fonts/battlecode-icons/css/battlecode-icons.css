@@ -1,0 +1,79 @@
+@font-face {
+  font-family: 'battlecode-icons';
+  src: url('../font/battlecode-icons.eot?35982892');
+  src: url('../font/battlecode-icons.eot?35982892#iefix') format('embedded-opentype'),
+       url('../font/battlecode-icons.woff?35982892') format('woff'),
+       url('../font/battlecode-icons.ttf?35982892') format('truetype'),
+       url('../font/battlecode-icons.svg?35982892#battlecode-icons') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+/* Chrome hack: SVG is rendered more smooth in Windozze. 100% magic, uncomment if you need it. */
+/* Note, that will break hinting! In other OS-es font will be not as sharp as it could be */
+/*
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  @font-face {
+    font-family: 'battlecode-icons';
+    src: url('../font/battlecode-icons.svg?35982892#battlecode-icons') format('svg');
+  }
+}
+*/
+ 
+ [class^="icon-battlecode-"]:before, [class*=" icon-battlecode-"]:before {
+  font-family: "battlecode-icons";
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+ 
+  display: inline-block;
+  text-decoration: inherit;
+  width: 1em;
+  margin-right: .2em;
+  text-align: center;
+  /* opacity: .8; */
+ 
+  /* For safety - reset parent styles, that can break glyph codes*/
+  font-variant: normal;
+  text-transform: none;
+     
+  /* fix buttons height, for twitter bootstrap */
+  line-height: 1em;
+ 
+  /* Animation center compensation - margins should be symmetric */
+  /* remove if not needed */
+  margin-left: .2em;
+ 
+  /* you can be more comfortable with increased icons size */
+  /* font-size: 120%; */
+ 
+  /* Uncomment for 3D effect */
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+}
+ 
+.icon-battlecode-upload:before { content: '\e800'; } /* '' */
+.icon-battlecode-stop:before { content: '\e801'; } /* '' */
+.icon-battlecode-pause:before { content: '\e802'; } /* '' */
+.icon-battlecode-to-end:before { content: '\e803'; } /* '' */
+.icon-battlecode-to-end-alt:before { content: '\e804'; } /* '' */
+.icon-battlecode-to-start:before { content: '\e805'; } /* '' */
+.icon-battlecode-to-start-alt:before { content: '\e806'; } /* '' */
+.icon-battlecode-fast-fw:before { content: '\e807'; } /* '' */
+.icon-battlecode-fast-bw:before { content: '\e808'; } /* '' */
+.icon-battlecode-list:before { content: '\e809'; } /* '' */
+.icon-battlecode-folder-open:before { content: '\e80a'; } /* '' */
+.icon-battlecode-folder-open-empty:before { content: '\e80b'; } /* '' */
+.icon-battlecode-folder:before { content: '\e80c'; } /* '' */
+.icon-battlecode-folder-empty:before { content: '\e80d'; } /* '' */
+.icon-battlecode-cog:before { content: '\e80e'; } /* '' */
+.icon-battlecode-cog-alt:before { content: '\e80f'; } /* '' */
+.icon-battlecode-wrench:before { content: '\e810'; } /* '' */
+.icon-battlecode-sliders:before { content: '\e811'; } /* '' */
+.icon-battlecode-menu:before { content: '\e812'; } /* '' */
+.icon-battlecode-link-ext-alt:before { content: '\e813'; } /* '' */
+.icon-battlecode-link-ext:before { content: '\e814'; } /* '' */
+.icon-battlecode-down-open:before { content: '\e815'; } /* '' */
+.icon-battlecode-left-open:before { content: '\e816'; } /* '' */
+.icon-battlecode-right-open:before { content: '\e817'; } /* '' */
+.icon-battlecode-up-open:before { content: '\e818'; } /* '' */
+.icon-battlecode-resize-full-alt:before { content: '\e819'; } /* '' */
+.icon-battlecode-play:before { content: '\e81a'; } /* '' */

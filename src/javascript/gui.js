@@ -1,6 +1,6 @@
 var GUI = function(){
     this.baseImgUrl = "http://s3.amazonaws.com/battlecode-avatars/avatars/";
-    this.teamSections = $('.stats > div');
+    this.teamSections = $('#playerinfo > div');
     this.controls = null;
     this.stats = null;
     this.teams = {
@@ -27,7 +27,7 @@ GUI.prototype = {
         }, true);
         splashscreen.addEventListener('click', function(e){
             // document.querySelector('.controls .upload_label input')
-            jQuery('.controls .upload_label input').focus().trigger('click');
+            jQuery('.controls input.upload').focus().trigger('click');
             return false;
         });
 
@@ -134,4 +134,4 @@ GUI.prototype = {
     appendDat: function(dat){
         document.querySelector('.controls .menu').appendChild(dat.domElement);
     }
-}
+};

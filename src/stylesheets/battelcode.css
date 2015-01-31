@@ -3,17 +3,29 @@ body {
     background:#fff;
     padding:0;
     margin:0;
-    font-weight: bold;
     overflow:hidden;
+    font-size: 14px;
 }
+table, tr, td{
+	font-size: 14px;
+}
+
+/**
+ * 	CANVAS / GAME
+ */
 #container canvas{
     position: absolute;
+    z-index: 1;
     cursor: move;
 }
-/* stats */
-.stats{
-    position: fixed;
+
+/**
+ * 	infolayer
+ */
+.infolayer{
+    position: absolute;
     bottom: 0;
+    z-index: 98;
     width: 100%;
     pointer-events: none;
      -moz-user-select: -moz-none;
@@ -22,7 +34,7 @@ body {
     -o-user-select: none;
     user-select: none;
 }
-.stats .controlsbackground{
+.infolayer .controlsbackground{
     background: rgba(0, 0, 0, 0.7);
     /* background: #000; */
     /* -webkit-transition:opacity .5s ease-in; */
@@ -34,15 +46,22 @@ body {
     width: 400px;
     color: #fff;
 }
-.stats .off{
+.infolayer .off{
     /* background: rgba(0, 0, 0, 0.7); */
     /* opacity:0.4; */
     /* color: #000; */
 }
-.stats .left{
+.infolayer .left{
     float: left;
     width: 50%;
 }
+.infolayer .right{
+    float: right;
+    width: 50%;
+}
+
+
+
 .left .controlsbackground{
     float: left;
     padding: 0 0 5px 5px;
@@ -53,10 +72,7 @@ body {
     border-bottom-width: 10px;
     border-bottom-style: solid;
 }
-.stats .right{
-    float: right;
-    width: 50%;
-}
+
 .right .controlsbackground{
     padding: 0 5px 5px 0;
     float: right;
@@ -173,60 +189,103 @@ body {
     overflow: hidden;
 }
 
-/* controls */
+
+
+
+
+/**
+ * 	MAIN CONTROLS
+ */
 .controls{
-    position: fixed;
+    position: absolute;
     top: 0;
+    left: 0;
     width: 100%;
+    height: 32px;
+    background: url('../../assets/images/black_transparent_80.png');
+    padding: 4px 2px;
+    margin: 0px !important;
+    z-index: 99;
 }
-.set{
-    float: left;
-}
-.menu{
-    margin-left: 5px;
+.controls [class^="icon-battlecode-"]:before, .controls [class*=" icon-battlecode-"]:before  {
+	font-size: 22px;
+	margin-top: 0.2em;
+	margin-bottom: 0.3em;
 }
 .button{
     width: 32px;
     height: 32px;
     float: left;
-    margin: 0 5px;
+    margin: 0 2px;
     padding: 0;
     border: none;
-    background: #EFEEEE;
+    background: #EEEEEE;
+    color: #333333;
     outline: 0;
-}
-.button.active{
-    box-shadow: inset 0px 0px 7px 2px rgba(157, 157, 157, 0.75);
-}
-.upload_label{
-    background: url('/assets/images/toolbarButton-openFile.png') no-repeat;
-    position: relative;
     overflow: hidden;
     cursor: pointer;
-    background-color: #A97F0C;
-    display: block;
+}
+.button:hover{
+	background: #DDDDDD;
+	color: #000000;
+}
+.button.active{
+    background: #333333;
+    color: #EEEEEE;
+}
+.set{
+    float: left;
+}
+
+/* buttons */
+.controls .buttons{
+	width: 185px;
 }
 .upload{
     z-index: 999;
     line-height: 0;
-    font-size: 0px;
-    position: absolute;
-    opacity: 0;
+    position: relative;
+    width: 32px;
+    height: 32px;
     cursor: pointer;
-    left: 0;
 }
-.slider{
-    width: 66%;
+.upload:before{
+	
 }
-.slider .note{
-    color: #FFF;
-    font-weight: normal;
-    margin: 0;
-    padding-top: 2px;
+
+/* slider */
+.controls .frameslider{
+	padding: 3px 6px 0px 0px;
 }
-.slider input{
+.controls .frameslider input{
     width: 100%;
 }
+
+/* note */
+.controls .note{
+	width: 150px;
+    color: #FFF;
+    font-weight: normal;
+}
+
+/* menu */
+.controls .menu-wrapper{
+    overflow: visible;
+    width: 250px;
+    height: 32px;
+}
+.controls .menu{
+	position: absolute;
+	right: 0px;
+	top: 10px;
+}
+.controls .menu .dg.a{
+	margin-right: 4px;
+}
+
+/**
+ * 	OVERLAYS
+ */
 #message, #welcomescreen{
     cursor: pointer;
     color: #fff;
@@ -235,6 +294,7 @@ body {
     -o-transition:opacity .5s ease-in;
     transition:opacity .5s ease-in;
     position: absolute;
+    z-index: 9;
 }
 .invisible{
     opacity:0;
