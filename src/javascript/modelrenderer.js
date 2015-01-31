@@ -51,11 +51,11 @@ var ModelRenderer = function(){
 	self.init = function(){
 	    self.meshes = [];
 		var loader = new THREE.JSONLoader();
-		self.normalMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, name: 'TEAM' } );
-        self.redMaterial = new THREE.MeshPhongMaterial( { color: 0xff0000, name: 'TEAM' } );
-        self.redLightMaterial = new THREE.MeshPhongMaterial( { color: 0xff44444, name: 'TEAM' } );
-	    self.blueMaterial = new THREE.MeshPhongMaterial( { color: 0x0000ff, name: 'TEAM' } );
-	    self.blueLightMaterial = new THREE.MeshPhongMaterial( { color: 0x4444ff , name: 'TEAM'} );
+		self.normalMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, name: 'TEAM' } );
+        self.redMaterial = new THREE.MeshPhongMaterial( { color: 0xEE2200, name: 'TEAM' } );
+        self.redLightMaterial = new THREE.MeshPhongMaterial( { color: 0xfb4444, name: 'TEAM' } );
+	    self.blueMaterial = new THREE.MeshPhongMaterial( { color: 0x0022EE, name: 'TEAM' } );
+	    self.blueLightMaterial = new THREE.MeshPhongMaterial( { color: 0x1e5ff1 , name: 'TEAM'} );
 	    self.createModelsArray();
 		self.loadModel(loader);
 	};
@@ -118,17 +118,17 @@ var ModelRenderer = function(){
             materialsCopy.push(mat);
         }
         return materialsCopy;
-	}
+	};
 
-	self.draw = function(scene,simData){
+	self.draw = function(scene,robots){
 		if(self.models.length>self.geometries.length)
 			return;
 		var meshCounter = [];
 		for(var i=0;i<self.models.length;i++){
 			meshCounter.push(0);
 		}
-		for(var id in simData.robots){
-			var robot = simData.robots[id];
+		for(var id in robots){
+			var robot = robots[id];
 			var type = self.types[robot.type];
 			var modelID = type.modelID;
 			if(!modelID)
@@ -158,7 +158,7 @@ var ModelRenderer = function(){
 		    mesh.position.x = realPos[0];
 		    mesh.position.y = realPos[1];
 		    mesh.position.z = robot.z;
-		    if("height" in type)
+		    if(!robot.dead)
 		        robot.z += (type.height-robot.z)/slowmotion;
 			self.changeTeamMaterial(mesh.material.materials, robot.team, robot.supply);
 		}

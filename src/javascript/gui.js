@@ -75,7 +75,7 @@ GUI.prototype = {
         this.updateHP(robot, true);
     },
     setCommander: function(robot){
-        var commanderElement = this.teamSections[this.getTeamIndex(robot)].getElementsByClassName(robot.type.toLowerCase());
+        var commanderElement = this.teamSections[this.getTeamIndex(robot.team)].getElementsByClassName(robot.type.toLowerCase());
         this.teams[robot.team].COMMANDER = robot.id;
         this.updateHP(robot, true);
         commanderElement[0].style.display = "block";
@@ -84,7 +84,7 @@ GUI.prototype = {
         var type = robot.type.toLowerCase();
         forEach(this.teams, function(i, team){
             if(simulation.data.robots[team[robot.type]]){
-                var bar = this.teamSections[this.getTeamIndex(team)].getElementsByClassName(type)[0],
+                var bar = this.teamSections[i].getElementsByClassName(type)[0],
                     percent = (simulation.data.robots[team[robot.type]].hp/constants[robot.type].hp)*100;
                 bar.getElementsByTagName('span')[0].style.width = percent+'%';
                 // console.log('team '+ team +' '+ robot.type +' hp: ' + percent + '%');

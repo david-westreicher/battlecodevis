@@ -9,6 +9,7 @@
         <link href="/src/stylesheets/battelcode.css" rel="stylesheet" type="text/css"/>
 
         <script src="/src/lib/three.min.js"></script>
+        <script src="/src/lib/helvetiker_regular.typeface.js"></script>
         <script src="/src/lib/stats.min.js"></script>
         <script src="/src/lib/dat.gui.js"></script>
         <script src="/src/lib/html5slider.js"></script>
@@ -122,23 +123,26 @@
             (function(dat){
                 var dat = new dat.GUI(),
                     menu = {
-                        slowmotion: window.slowmotion,
-                        fps: function(){
-                            if(getComputedStyle(gui.stats.domElement).display=="none"){
-                                if(gui.stats.domElement.dataset.display == "block"){
-                                    gui.stats.domElement.style.display = "block";
-                                }
-                                gui.stats.domElement.dataset.display = "block";
-                            }else{
-                                if(gui.stats.domElement.dataset.display == "none"){
-                                    gui.stats.domElement.style.display = "none";
-                                }
-                                gui.stats.domElement.dataset.display = "none";
-                            }
+                        slowmotion: 4,
+                        showfps: false,
+                        robotinfo: false,
+                        birdview: function(){
+                            window.battlecodeCam.reset();
                         }
                     };
-                    dat.add(menu, 'slowmotion', 0, 10).min(1).step(1).listen();
-                    dat.add(menu,'fps');
+                    dat.add(menu, 'slowmotion', 1, 10).step(1).onChange(function(val){
+                        window.slowmotion=val;
+                        });
+                    dat.add(menu,'showfps').onChange(function(){
+                        if(gui.stats.domElement.style.display == "none")
+                            gui.stats.domElement.style.display = "block";
+                        else
+                            gui.stats.domElement.style.display = "none";
+                        });
+                    dat.add(menu,'robotinfo').onChange(function(){
+                            swapInfo();
+                    });
+                    dat.add(menu,"birdview");
                     dat.close();
 
                     gui.appendDat(dat);

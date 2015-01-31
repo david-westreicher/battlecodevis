@@ -8,18 +8,25 @@
 #  
 #  ==========================================================================
 
+newmtl gunbarrel
+Kd 0.800000 0.800000 0.800000
+Ks 1.000000 1.000000 1.000000
+illum 2
+Ns 50.781250
+map_Kd gunbarrel-seamless-01.jpg
+
 newmtl TEAM
 Kd 1.000000 0.000000 0.000000
 Ks 1.000000 1.000000 1.000000
 illum 2
 Ns 50.781250
 
-newmtl Mat.4
-Kd 0.800000 0.800000 0.800000
+newmtl light_metal
+Kd 1.000000 1.000000 1.000000
 Ks 1.000000 1.000000 1.000000
 illum 2
 Ns 50.781250
-map_Kd metal-seamless-03.jpg
+map_Kd metal-seamless-04.jpg
 
 newmtl rubber
 Kd 0.039216 0.015686 0.015686
@@ -27,9 +34,9 @@ Ks 1.000000 1.000000 1.000000
 illum 2
 Ns 50.781250
 
-newmtl Mat.5
+newmtl wood
 Kd 0.800000 0.800000 0.800000
 Ks 1.000000 1.000000 1.000000
 illum 2
 Ns 50.781250
-map_Kd metal-seamless-02.png
+map_Kd wood-seamless-02.jpg

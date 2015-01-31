@@ -20,6 +20,7 @@ var mouseDownX = 0;
 var mouseDownY = 0;
 var ctrlDown = false;
 var CLICK_DRAG_TIME = 200;
+var renderInfo = false;
 init();
 modelRenderer.init();
 animate();
@@ -60,6 +61,7 @@ function init() {
 	lines.frustumCulled = false;
 	scene.add(lines);
 	
+	//line grid
 	var gridGeom = new THREE.Geometry();
 	var gridNum = 60;
 	var startGrid = -gridNum;
@@ -78,10 +80,13 @@ function init() {
 	gridMesh.visible = false;
 	
 	//LIGHT
-	var ambientLight = new THREE.AmbientLight(0x222222);
+	var ambientLight = new THREE.AmbientLight(0x111111);
 	scene.add(ambientLight);
-	var light = new THREE.DirectionalLight(0xffffff, 1);
+	//
+	var light = new THREE.DirectionalLight(0xffffff, 0);
 	light.castShadow = true;
+	// performance: http://threejs.org/docs/#Reference/Lights/DirectionalLight
+	light.onlyShadow = true;
 	//light.shadowCameraVisible = true;
     var ratio = GLOBAL_SCALE/80;
     //TODO set shadow quality to gui
@@ -95,10 +100,43 @@ function init() {
 	light.shadowCameraBottom = -2500*ratio;
 	light.position.set(0,0,500*ratio);
 	scene.add(light);
-
-    var light2 = new THREE.DirectionalLight(0xffffff, 0.5);
+	//
+	
+    var light2 = new THREE.DirectionalLight(0xffffff, 1.1);
+    //light2.castShadow = true;
 	light2.position.set(500*ratio,500*ratio,500*ratio);
 	scene.add(light2);
+	
+	var light3 = new THREE.DirectionalLight(0xffffff, 0.6);
+	//light3.castShadow = true;
+	light3.position.set(-500*ratio,-500*ratio,200*ratio);
+	scene.add(light3);
+	
+	var light4 = new THREE.DirectionalLight(0xffffff, 0.4);
+	//light3.castShadow = true;
+	light4.position.set(0*ratio,-500*ratio,100*ratio);
+//	scene.add(light4);
+
+    infoRobots = {};
+    var typeIndex = 0;
+    var radius = 100;
+    for(var type in RobotTypes){
+        var angle = (typeIndex++)/Object.keys(RobotTypes).length*Math.PI*2;
+        var robotLoc = [Math.sin(angle)*radius,Math.cos(angle)*radius];
+        var robot = {
+            loc: robotLoc,
+            lastloc: robotLoc,
+            team: 'A',
+            type: type,
+            hasInterp: false,
+            hp: 0,
+            supply: 100,
+            z: 20,
+            dead: true,
+            rot:0
+        }
+        infoRobots[type] = robot;
+    }
 }
 
 function onWindowResize() {
@@ -292,8 +330,10 @@ function createMap(){
 			var isBorder = x==0||y==0||x==map.width-1||y==map.height-1;
             var isVoid =tiles.charAt(x+y*map.width)=='#';
 			if(isBorder||isVoid){
-			    var posZ = isBorder?-10:0;
-			    var wallHeight = isBorder?(isVoid?15:10):5;
+			    //var posZ = isBorder?-10:0;
+			    //var wallHeight = isBorder?(isVoid?15:10):5;
+			    var posZ = isBorder?-10:-5;
+			    var wallHeight = isBorder?(isVoid?15:10):10;
 			    var vertices = [];
 			    var verMid = new THREE.Vector3(x*GLOBAL_SCALE-map.width*GLOBAL_SCALED2,-(y*GLOBAL_SCALE-map.height*GLOBAL_SCALED2),0);
 			    for(var i=0;i<corners.length*2;i++){
@@ -335,12 +375,17 @@ function createMap(){
 		}	
 	}
 	mapGeom.computeFaceNormals();
-
+	
+	// walls
     var wallTex = THREE.ImageUtils.loadTexture( "assets/images/walltexture.jpg" );
+    wallTex.wrapS = THREE.RepeatWrapping;
+	wallTex.wrapT = THREE.RepeatWrapping;
 	walls = new THREE.Mesh(mapGeom,new THREE.MeshLambertMaterial({map:wallTex}));
 	walls.receiveShadow = true;
 	scene.add(walls);
-
+	
+	
+	// ore geom
 	var ore2Geom = new THREE.Geometry();
 	for(var x =0;x<map.width;x++){
 		for(var y =0;y<map.height;y++){
@@ -391,7 +436,7 @@ function animate() {
 	}
 
 	var frameMod = frameNum%slowmotion;
-	if(frameMod==0 && !gui.controls.isPaused()){
+	if(frameMod==0 && !gui.controls.isPaused() && !renderInfo){
 		simulation.simulate();
 	}
 	interp = frameMod/slowmotion;
@@ -417,6 +462,57 @@ function getInterpPosition(robot){
 			robot.hasInterp=false;
 	}
 	return realPos;
+}
+
+function createTextMesh(string){
+    var geom = new THREE.TextGeometry(string, {size:2,height:0.1,font: 'helvetiker'});
+    geom.center();
+    return new THREE.Mesh(geom,new THREE.MeshBasicMaterial());
+}
+
+function swapInfo(){
+    if(renderInfo)
+        hideInfo();
+    else
+        showInfo();
+}
+
+function showInfo(){
+    renderInfo = true;
+    if(walls!=null)
+        walls.visible = false;
+    if(oreMesh2!=null)
+        oreMesh2.visible = false;
+    battlecodeCam.save();
+    battlecodeCam.reset();
+    battlecodeCam.angle2 = Math.PI;
+    battlecodeCam.cameraRadius = 130;
+    textMeshes = [];
+    var typeIndex = 0;
+    var radius = 100;
+    for(var type in RobotTypes){
+        var angle = (typeIndex++)/Object.keys(RobotTypes).length*Math.PI*2;
+        var robotLoc = [Math.sin(angle)*radius,Math.cos(angle)*radius];
+        var mesh = createTextMesh(type);
+        mesh.position.x = robotLoc[0];
+        mesh.position.y = robotLoc[1];
+        mesh.position.z = 10;
+        mesh.rotation.x = Math.PI/2;
+        mesh.rotation.y = -angle+Math.PI;
+        textMeshes.push(mesh);
+        scene.add(mesh);
+    } 
+}
+
+function hideInfo(){
+    renderInfo = false;
+    if(walls!=null)
+        walls.visible = true;
+    if(oreMesh2!=null)
+        oreMesh2.visible = true;
+    for(var i=0;i<textMeshes.length;i++)
+        scene.remove(textMeshes[i]);
+    battlecodeCam.restore();
 }
 
 function render() {
@@ -458,7 +554,7 @@ function render() {
 	lines.geometry.verticesNeedUpdate = true;
 	lines.geometry.colorsNeedUpdate = true;
 
-	modelRenderer.draw(scene,simulation.data);
+	modelRenderer.draw(scene,renderInfo?infoRobots:simulation.data.robots);
 	explosionRenderer.draw(scene,simulation.data.explosions);
 
 	renderer.render( scene, battlecodeCam.cam );
