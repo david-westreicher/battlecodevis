@@ -2,12 +2,22 @@
     <head>
         <script>
             var exampleSocket = new WebSocket("ws://localhost:1338");
+            exampleSocket.onopen = function(e){
+                var textField = document.getElementById("text");
+                textField.innerHTML+="Open\n";
+            }
+            exampleSocket.onclose = function(e){
+                var textField = document.getElementById("text");
+                textField.innerHTML+="Close websocket\n";
+            }
             exampleSocket.onmessage = function(e){
                 var textField = document.getElementById("text");
+                console.log(parseInt(e.data));
                 textField.innerHTML+=e.data+"\n";
             }
             exampleSocket.onerror = function(e){
-                console.log("error in creating connection");
+                var textField = document.getElementById("text");
+                textField.innerHTML+="Could not connect to the websocket\n";
             }
         </script>
     </head>

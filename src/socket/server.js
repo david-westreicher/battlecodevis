@@ -1,8 +1,15 @@
 var net = require('net');
 var WebSocketServer = require('ws').Server;
 
-var BATTLECODE_TICK_PORT = 1337;
 var WEBSOCKET_PORT = 1338;
+var BATTLECODE_TICK_PORT = 1337;
+
+
+// This is for the Battlecode tick server.
+// It relays messages from the battlecode socket
+// to a websocket.
+// The javscript in 'index.html' connects to the
+// websocket and receives the relayed messages.
 
 // make a local websocketserver
 var wss = null;

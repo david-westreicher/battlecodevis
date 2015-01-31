@@ -9,7 +9,7 @@ s.bind(('localhost', 1337))
 s.listen(1)
 conn, addr = s.accept()
 print 'Connected by', addr
-while roundnumber<2000:
+while roundnumber<2001:
     conn.sendall(str(roundnumber))
     roundnumber+=1
     time.sleep(0.01)
