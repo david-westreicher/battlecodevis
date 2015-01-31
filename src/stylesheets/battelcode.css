@@ -35,7 +35,7 @@ table, tr, td{
     user-select: none;
 }
 .infolayer .controlsbackground{
-	background: url('../../assets/images/black_transparent_80.png');
+	background: url('../../assets/images/black_transparent_65.png');
     /*background: rgba(0, 0, 0, 0.7);*/
     /* background: #000; */
     /* -webkit-transition:opacity .5s ease-in; */
@@ -218,7 +218,7 @@ table, tr, td{
     left: 0;
     width: 100%;
     height: 32px;
-    background: url('../../assets/images/black_transparent_80.png');
+    background: url('../../assets/images/black_transparent_65.png');
     padding: 4px 2px;
     margin: 0px !important;
     z-index: 99;
