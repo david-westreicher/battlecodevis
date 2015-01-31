@@ -35,7 +35,8 @@ table, tr, td{
     user-select: none;
 }
 .infolayer .controlsbackground{
-    background: rgba(0, 0, 0, 0.7);
+	background: url('../../assets/images/black_transparent_80.png');
+    /*background: rgba(0, 0, 0, 0.7);*/
     /* background: #000; */
     /* -webkit-transition:opacity .5s ease-in; */
     /* -moz-transition:opacity .5s ease-in; */
@@ -43,7 +44,7 @@ table, tr, td{
     /* transition:opacity .5s ease-in; */
     /* opacity:0.7; */
     overflow: hidden;
-    width: 400px;
+    display:block;
     color: #fff;
 }
 .infolayer .off{
@@ -53,13 +54,22 @@ table, tr, td{
 }
 .infolayer .left{
     float: left;
-    width: 50%;
+    width: 185px;
+    overflow: hidden;
 }
 .infolayer .right{
     float: right;
-    width: 50%;
+    width: 185px;
+    overflow: hidden;
 }
-
+.infolayer .clearfix{
+	float: none;
+	overflow: auto;
+	clear: both;
+}
+.infolayer h3{
+	padding: 10px 5px 5px 5px;
+}
 
 
 .left .controlsbackground{
@@ -67,10 +77,13 @@ table, tr, td{
     padding: 0 0 5px 5px;
 }
 .left .photo{
-    float: left;
+	float:left;
     border-bottom-color: #8C030E;
     border-bottom-width: 10px;
     border-bottom-style: solid;
+    border-right-color: #8C030E;
+    border-right-width: 5px;
+    border-right-style: solid;
 }
 
 .right .controlsbackground{
@@ -78,10 +91,13 @@ table, tr, td{
     float: right;
 }
 .right .photo{
-    float: right;
+	float:right;
     border-bottom-width: 10px;
     border-bottom-color: #0027B3;
     border-bottom-style: solid;
+    border-left-color: #0027B3;
+    border-left-width: 5px;
+    border-left-style: solid;
 }
 .right h3{
     text-align: right;
@@ -98,11 +114,11 @@ table, tr, td{
 .trophies{
     overflow: hidden;
     list-style: none;
-    padding: 0;
+    padding: 5px 5px 5px 5px;
 }
 .trophies li{
-    float: left;
-    margin: 0 5px;
+    float: none;
+    margin: 0px;
     display: block;
     width: 20px;
     height: 20px;
@@ -117,10 +133,10 @@ table, tr, td{
     float: right;
 }
 .towers li{
-    width: 20px;
-    height: 20px;
+    width: 15px;
+    height: 15px;
     float: left;
-    margin: 0 5px;
+    margin: 0 4px;
 }
 .towers .alive{
     background-color: #A9D085;
@@ -130,7 +146,7 @@ table, tr, td{
     background-color: #E7EDE2;
 }
 .hq{
-    width: 200px;
+    width: 165px;
     height: 20px;
     display: block;
     background: #008000;
@@ -148,10 +164,10 @@ table, tr, td{
 .robots{
     overflow: hidden;
     width: 100%;
-    height: 42px;
+    /*height: 42px;*/
 }
 .commander{
-    width: 180px;
+    width: 125px;
     height: 32px;
     display: none;
     position: relative;
