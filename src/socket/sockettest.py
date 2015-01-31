@@ -12,7 +12,7 @@ print 'Connected by', addr
 while roundnumber<2001:
     conn.sendall(str(roundnumber))
     roundnumber+=1
-    time.sleep(0.01)
+    time.sleep(0.1)
 print 'Connection closed'
 conn.close()
 s.shutdown(socket.SHUT_RDWR)

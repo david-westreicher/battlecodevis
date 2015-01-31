@@ -48,6 +48,7 @@ function closeWebSocket(){
         console.log('closing websocket');
         wss.close();
         wss = null;
+        wsconn = null;
     }
 }
 

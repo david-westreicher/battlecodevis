@@ -105,6 +105,16 @@ var Simulation = function(){
     }
 
     self.simulate = function(){
+        var maxSimulations = 5;
+        if(currentFrameTick>=0){
+            while(self.currentFrame<currentFrameTick && maxSimulations-->=0){
+                self.simulateForReal();
+            }
+        }else
+            self.simulateForReal();
+    }
+
+    self.simulateForReal = function(){
         //check if replayData has enough maps/frames parsed
         var replayData = window.replayData;
 

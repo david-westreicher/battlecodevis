@@ -199,6 +199,26 @@
             window.worker.postMessage(file);
         }
     </script>
+
+    <script type="text/javascript">
+            var currentFrameTick = -1;
+            var socket = new WebSocket("ws://localhost:1338");
+            socket.onopen = function(e){
+                console.log('connected to the websocket');
+            }
+            socket.onclose = function(e){
+                currentFrameTick = -1;
+                console.log('disconnected from the websocket');
+            }
+            socket.onmessage = function(e){
+                currentFrameTick = parseInt(e.data);
+                //console.log('received '+currentFrameTick);
+            }
+            socket.onerror = function(e){
+                currentFrameTick = -1;
+                console.log('could not connect to the websocket');
+            }
+    </script>
     <script src="/src/javascript/renderer.js"></script>
     <script src="/src/javascript/fullscreen.js"></script>
 </html>
