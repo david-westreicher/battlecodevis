@@ -33,7 +33,7 @@ Controlbar.prototype = {
         // });
         
     	// add default pause state
-    	this.controls.querySelector('.pause').className += ' active';
+    	this.controls.querySelector('.play').className += ' active';
     },
     upload: function(){
         // refactor worker
