@@ -164,7 +164,7 @@ table, tr, td{
 .robots{
     overflow: hidden;
     width: 100%;
-    /*height: 42px;*/
+    height: 42px;
 }
 .commander{
     width: 125px;

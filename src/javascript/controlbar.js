@@ -33,7 +33,7 @@ Controlbar.prototype = {
         // });
         
     	// add default pause state
-    	// this.controls.querySelector('.play').className += ' active';
+    	this.controls.querySelector('.play').className += ' active';
     },
     upload: function(){
         // refactor worker
@@ -125,10 +125,10 @@ Controlbar.prototype = {
         message.className = message.className.replace("hidden", "");
         this.pause();
 
-        sleep(1000, function(){
+        sleep(1500, function(){
             message.className += " invisible";
             container.innerHTML = oldHtml;
-            this.pause();
+            this.play();
             if(callback)
                 callback.call(this);
         }, this);

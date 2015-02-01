@@ -19,6 +19,7 @@ var battlecodeCamera = function(){
         self.angle2 = 0.01;
         self.angle1Offset = 0;
         self.angle2Offset = 0;
+        self.winnerAnimation = false;
     }
     self.reset();
 

@@ -105,7 +105,7 @@ function init() {
 	
     var light2 = new THREE.DirectionalLight(0xffffff, 1.3);
     //light2.castShadow = true;
-	light2.position.set(500*ratio,500*ratio,700*ratio);
+	light2.position.set(500*ratio,400*ratio,700*ratio);
 	scene.add(light2);
 	
 	var light3 = new THREE.DirectionalLight(0xffffff, 0.8);
